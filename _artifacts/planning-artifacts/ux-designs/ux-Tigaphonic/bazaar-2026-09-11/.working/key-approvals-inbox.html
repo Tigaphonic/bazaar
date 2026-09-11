@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bazaar Admin — Approvals Inbox (Key Screen Mock)</title>
+<style>
+/* =====================================================================
+   BAZAAR ADMIN — key screen: APPROVALS INBOX
+   Governed by:
+   · EXPERIENCE.md § Information Architecture > Global chrome (row:
+     "Approvals Inbox — Cross-domain queue of every Item, Blog/Page,
+     Review, Cancel/Retur, and Refund Request awaiting the viewer's
+     approval permission")
+   · EXPERIENCE.md § Maker-Checker & Approval Pattern (Shape 1 + Shape 2,
+     "the Approve/Reject control is permission-gated at render time, not
+     merely disabled — a Staff member without the relevant permission
+     never sees the control")
+   · EXPERIENCE.md § Component Patterns row "Approval Action" and row
+     "Data Table" ("the single most common row action ... is always a
+     visible icon button, never buried in a menu")
+   · EXPERIENCE.md § Key Flow 2 — Rara works the Approvals Inbox (row
+     content, typed queue, permission-scoped Approve)
+   · DESIGN.md § Components > Status Pills ("Approval & Maker-Checker
+     Pill Labeling" — generic "Menunggu Approval", never a role name)
+   Shell/tokens/components reused verbatim from imports/admin-dashboard.html
+   (sidebar, topbar, card, pill, table) — re-scoped nav to Bazaar's own
+   9-domain IA (EXPERIENCE.md), ArmyWatch placeholder branding dropped
+   per DESIGN.md §Brand & Style.
+   Inline CSS, system-font fallback, no JS, no network — offline mock.
+   ===================================================================== */
+  :root{
+    --primary:#00609e; --primary-700:#00527f; --primary-50:#eef6fb; --primary-100:#d9ecf7;
+    --bluegray:#5a6a82; --charcoal:#333333; --soft:#f7f7f7;
+    --border:#e3e6ea; --white:#ffffff; --ink:#22262b; --muted:#5c6875;
+    --success-bg:#e8f5ec; --success-text:#1e7d3c; --success-ring:#bfe3cb;
+    --warn-bg:#fdf3e2;    --warn-text:#a15c00;    --warn-ring:#f3d9a3;
+    --info-bg:#e8f1fb;    --info-text:#00609e;    --info-ring:#bcd9ef;
+    --danger-bg:#fbeaea;  --danger-text:#b0292b;  --danger-ring:#f0c2c3;
+    --neutral-bg:#eef0f2; --neutral-text:#5b6472; --neutral-ring:#dbdfe4;
+    --done-bg:#eef1f5;    --done-text:#3d4655;    --done-ring:#d7dce3;
+    --r-lg:8px; --r-xl:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.04), 0 2px 6px rgba(16,24,40,.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#dfe3e7; color:var(--ink); font-family:'Mulish','Segoe UI',system-ui,-apple-system,sans-serif; font-size:14px; line-height:1.5;}
+  h1,h2,h3,h4,.font-heading{font-family:'Poppins','Segoe UI',system-ui,-apple-system,sans-serif; margin:0;}
+  p{margin:0;}
+  .icon{width:18px;height:18px;display:inline-block;vertical-align:-4px;flex:none;}
+  .icon-sm{width:14px;height:14px;vertical-align:-2px;}
+  .device-frame{max-width:1440px;margin:28px auto;border-radius:14px;overflow:hidden;box-shadow:0 24px 60px rgba(16,24,40,.22);border:1px solid #cfd4d9;background:var(--white);}
+  .browser-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#e9ebee;border-bottom:1px solid var(--border);}
+  .browser-dot{width:10px;height:10px;border-radius:50%;}
+  .browser-url{margin-left:10px;background:#fff;border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:12px;color:var(--muted);flex:1;max-width:460px;font-family:'Mulish',sans-serif;}
+  .shell{display:grid;grid-template-columns:250px 1fr;min-height:840px;background:var(--soft);}
+  .sidebar{background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;}
+  .brand{padding:20px 18px 14px;border-bottom:1px solid #f0f1f3;}
+  .brand-mark{display:flex;align-items:center;gap:9px;}
+  .brand-badge{width:32px;height:32px;border-radius:9px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;}
+  .brand-name{font-family:'Poppins',sans-serif;font-weight:700;font-size:15px;color:var(--charcoal);}
+  .brand-sub{font-size:11px;color:var(--bluegray);margin-top:1px;}
+  .env-row{display:flex;align-items:center;gap:6px;margin-top:10px;}
+  .env-dot{width:6px;height:6px;border-radius:50%;background:#2fae5c;}
+  .env-label{font-size:11px;color:var(--bluegray);}
+  nav.nav{flex:1;padding:10px 12px;overflow-y:auto;}
+  .nav-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 11px;border-radius:var(--r-lg);color:var(--charcoal);font-family:'Poppins',sans-serif;font-weight:500;font-size:13.5px;cursor:default;margin-bottom:2px;}
+  .nav-item .nav-left{display:flex;align-items:center;gap:11px;}
+  .nav-item:hover{background:#f4f6f7;}
+  .nav-item.active{background:var(--primary-50);color:var(--primary-700);position:relative;}
+  .nav-item.active::before{content:"";position:absolute;left:-12px;top:6px;bottom:6px;width:3px;background:var(--primary);border-radius:0 3px 3px 0;}
+  .nav-item .icon{color:var(--bluegray);}
+  .nav-item.active .icon{color:var(--primary);}
+  .nav-count{font-size:11px;font-weight:700;padding:1px 7px;border-radius:99px;background:var(--warn-bg);color:var(--warn-text);}
+  .nav-foot{padding:14px 18px;border-top:1px solid #f0f1f3;display:flex;align-items:center;gap:10px;}
+  .avatar{width:32px;height:32px;border-radius:50%;background:var(--primary-100);color:var(--primary-700);display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-weight:700;font-size:12px;flex:none;}
+  .nav-foot-name{font-size:12.5px;font-weight:700;color:var(--charcoal);font-family:'Poppins',sans-serif;}
+  .nav-foot-role{font-size:11px;color:var(--bluegray);}
+  .main{display:flex;flex-direction:column;min-width:0;}
+  .topbar{height:62px;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;padding:0 22px;flex:none;}
+  .search-wrap{flex:1;max-width:420px;position:relative;}
+  .search-wrap .icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#9aa3ab;}
+  .search-input{width:100%;border:1px solid var(--border);background:var(--soft);border-radius:var(--r-lg);padding:8px 12px 8px 34px;font-size:13px;color:var(--muted);font-family:'Mulish',sans-serif;}
+  .topbar-actions{display:flex;align-items:center;gap:8px;margin-left:auto;}
+  .icon-btn{position:relative;width:34px;height:34px;border-radius:var(--r-lg);border:1px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;color:var(--bluegray);}
+  .icon-btn .dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#e6544f;border:1.5px solid #fff;}
+  .user-chip{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;border-radius:99px;border:1px solid var(--border);}
+  .user-chip .name{font-size:12.5px;font-weight:700;font-family:'Poppins',sans-serif;color:var(--charcoal);}
+  .content{padding:26px 28px 40px;flex:1;}
+  .page-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+  .breadcrumb{font-size:12px;color:var(--bluegray);margin-bottom:4px;}
+  .page-title{font-size:21px;font-weight:700;color:var(--charcoal);}
+  .page-desc{font-size:12.5px;color:var(--bluegray);margin-top:4px;}
+  .btn{font-family:'Poppins',sans-serif;font-weight:500;font-size:13px;border-radius:var(--r-lg);padding:9px 15px;display:inline-flex;align-items:center;gap:7px;border:1px solid transparent;cursor:default;white-space:nowrap;}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-secondary{background:#fff;color:var(--charcoal);border-color:#d7dbdf;}
+  .btn-ghost{background:transparent;color:var(--bluegray);}
+  .btn-sm{padding:6px 11px;font-size:12px;}
+  .card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow);}
+  .card-pad{padding:18px 18px;}
+  .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .section-title{font-size:14.5px;font-weight:700;color:var(--charcoal);}
+  .section-sub{font-size:11.5px;color:var(--bluegray);margin-top:2px;}
+  .filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+  .select-chip{display:flex;align-items:center;gap:6px;border:1px solid var(--border);background:#fff;border-radius:var(--r-lg);padding:7px 11px;font-size:12.5px;color:var(--charcoal);}
+  .select-chip .icon{color:var(--bluegray);}
+  .pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;border:1px solid transparent;font-family:'Mulish',sans-serif;white-space:nowrap;}
+  .pill-neutral{background:var(--neutral-bg);color:var(--neutral-text);border-color:var(--neutral-ring);}
+  .pill-info{background:var(--info-bg);color:var(--info-text);border-color:var(--info-ring);}
+  .pill-warn{background:var(--warn-bg);color:var(--warn-text);border-color:var(--warn-ring);}
+  .pill-success{background:var(--success-bg);color:var(--success-text);border-color:var(--success-ring);}
+  .pill-danger{background:var(--danger-bg);color:var(--danger-text);border-color:var(--danger-ring);}
+  .pill-done{background:var(--done-bg);color:var(--done-text);border-color:var(--done-ring);}
+  .table-wrap{overflow-x:auto;}
+  table.admin-table{width:100%;border-collapse:collapse;font-size:13px;}
+  table.admin-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.02em;color:var(--bluegray);font-weight:700;padding:0 14px 10px;border-bottom:1px solid var(--border);white-space:nowrap;}
+  table.admin-table td{padding:12px 14px;border-bottom:1px solid #f1f2f4;vertical-align:top;}
+  table.admin-table tr:last-child td{border-bottom:none;}
+  .cell-strong{font-weight:700;color:var(--charcoal);}
+  .cell-muted{color:var(--bluegray);font-size:12px;}
+  .row-actions{display:flex;gap:6px;justify-content:flex-end;}
+  .icon-action{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;color:var(--bluegray);flex:none;}
+  /* type cell */
+  .type-cell{display:flex;align-items:center;gap:10px;}
+  .type-ico{width:30px;height:30px;border-radius:8px;background:var(--soft);display:flex;align-items:center;justify-content:center;flex:none;color:var(--bluegray);}
+  .type-label{font-size:13px;font-weight:700;color:var(--charcoal);font-family:'Poppins',sans-serif;}
+  .preview-text{font-size:12.5px;color:var(--ink);max-width:340px;}
+  .preview-quote{font-size:12.5px;color:var(--ink);font-style:italic;max-width:340px;}
+  .empty-note{font-size:12px;color:var(--bluegray);text-align:center;padding:18px 0;}
+</style>
+</head>
+<body>
+<div class="device-frame">
+  <div class="browser-bar">
+    <span class="browser-dot" style="background:#ec6a5e"></span>
+    <span class="browser-dot" style="background:#f5bd4f"></span>
+    <span class="browser-dot" style="background:#61c454"></span>
+    <span class="browser-url">admin.brandstore.id/approvals</span>
+  </div>
+
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">
+          <div class="brand-badge">BZ</div>
+          <div>
+            <div class="brand-name">Bazaar</div>
+            <div class="brand-sub">Admin Portal</div>
+          </div>
+        </div>
+        <div class="env-row"><span class="env-dot"></span><span class="env-label">Live · Brand Store</span></div>
+      </div>
+
+      <nav class="nav">
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-grid"/></svg>Dashboard</span></div>
+        <div class="nav-item active"><span class="nav-left"><svg class="icon"><use href="#icon-inbox"/></svg>Approvals Inbox</span><span class="nav-count">5</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-box"/></svg>Catalog</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-receipt"/></svg>Order</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-wallet"/></svg>Finance</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-shield"/></svg>User &amp; Access</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-message"/></svg>Content</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-activity"/></svg>Reporting</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-mail"/></svg>Notification</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-gear"/></svg>Global Settings</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-search"/></svg>SEO &amp; Discoverability</span></div>
+      </nav>
+
+      <div class="nav-foot">
+        <div class="avatar">RR</div>
+        <div>
+          <div class="nav-foot-name">Rara</div>
+          <div class="nav-foot-role">Approval Role</div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div class="search-wrap">
+          <svg class="icon"><use href="#icon-search"/></svg>
+          <input class="search-input" placeholder="Cari Order, Item, atau Customer…" readonly>
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-btn"><svg class="icon"><use href="#icon-bell"/></svg><span class="dot"></span></button>
+          <div class="user-chip">
+            <div class="avatar" style="width:26px;height:26px;font-size:10.5px;">RR</div>
+            <div class="name">Rara</div>
+            <svg class="icon-sm"><use href="#icon-chevron"/></svg>
+          </div>
+        </div>
+      </header>
+
+      <main class="content">
+        <div class="page-head">
+          <div>
+            <div class="breadcrumb">Admin Portal</div>
+            <div class="page-title">Approvals Inbox</div>
+            <div class="page-desc">5 permintaan menunggu approval Anda — Item, Blog/Page, Review, Return Request, dan Refund Request dalam satu antrian.</div>
+          </div>
+          <div class="filter-bar" style="margin:0;">
+            <span class="select-chip"><svg class="icon-sm"><use href="#icon-filter"/></svg>Semua Tipe<svg class="icon-sm"><use href="#icon-chevron"/></svg></span>
+          </div>
+        </div>
+
+        <!-- Cross-domain queue — EXPERIENCE.md § Maker-Checker & Approval Pattern,
+             Key Flow 2 step 2: "one cross-domain queue, typed rows (Item, Blog/Page,
+             Review, Cancel/Retur, Refund), each showing submitted-by/at and a
+             compact preview." -->
+        <div class="card card-pad">
+          <div class="section-head">
+            <div>
+              <div class="section-title">Menunggu Approval Anda</div>
+              <div class="section-sub">Diurutkan dari yang paling lama menunggu</div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr><th>Tipe</th><th>Diajukan</th><th>Pratinjau</th><th>Status</th><th></th></tr>
+              </thead>
+              <tbody>
+                <!-- Row 1 — Item (Flow 1: Sari; Flow 2: Rara reviews it). Viewer holds
+                     Item-approve permission here — canonical/at-rest state: Approve
+                     button rendered per the permission-gated-at-render rule. -->
+                <tr>
+                  <td>
+                    <div class="type-cell">
+                      <div class="type-ico"><svg class="icon"><use href="#icon-box"/></svg></div>
+                      <div class="type-label">Item</div>
+                    </div>
+                  </td>
+                  <td><div class="cell-strong">Sari</div><div class="cell-muted">Staff Catalog · 18 menit lalu</div></td>
+                  <td><div class="preview-text">Brand &amp; Sub-Category lengkap · Condition: Second, Grading terisi · 4 foto diunggah (alt text otomatis dari nama Item).</div></td>
+                  <td><span class="pill pill-warn">Menunggu Approval</span></td>
+                  <td>
+                    <div class="row-actions">
+                      <span class="icon-action" title="Buka detail"><svg class="icon-sm"><use href="#icon-eye"/></svg></span>
+                      <button class="btn btn-primary btn-sm">Approve</button>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Row 2 — Blog/Page (Flow 8: Yoga publishes a Blog post). Viewer here
+                     does not hold the Content-approve permission — Approve control is
+                     hidden entirely, not shown-disabled; only the generic open action
+                     remains. -->
+                <tr>
+                  <td>
+                    <div class="type-cell">
+                      <div class="type-ico"><svg class="icon"><use href="#icon-message"/></svg></div>
+                      <div class="type-label">Blog/Page</div>
+                    </div>
+                  </td>
+                  <td><div class="cell-strong">Yoga</div><div class="cell-muted">Staff Content · 2 jam lalu</div></td>
+                  <td><div class="preview-text">"5 Tips Merawat Sepatu Kulit Agar Awet" · Kategori Blog dipilih · body Markdown ditulis · Feature Image diunggah · SEO fields terisi.</div></td>
+                  <td><span class="pill pill-warn">Menunggu Approval</span></td>
+                  <td>
+                    <div class="row-actions">
+                      <span class="icon-action" title="Buka detail"><svg class="icon-sm"><use href="#icon-eye"/></svg></span>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Row 3 — Review (Flow 2 step 4: Rara reads text + rating inline,
+                     approval only gates visibility, not Order state). Approve hidden
+                     for this viewer scope in this canonical render. -->
+                <tr>
+                  <td>
+                    <div class="type-cell">
+                      <div class="type-ico"><svg class="icon"><use href="#icon-message"/></svg></div>
+                      <div class="type-label">Review</div>
+                    </div>
+                  </td>
+                  <td><div class="cell-strong">Customer</div><div class="cell-muted">via tokenized Order #ORD-2231 · 5 jam lalu</div></td>
+                  <td><div class="preview-quote">"Barangnya sesuai deskripsi, pengiriman cepat." — Rating 4/5</div></td>
+                  <td><span class="pill pill-warn">Menunggu Approval</span></td>
+                  <td>
+                    <div class="row-actions">
+                      <span class="icon-action" title="Buka detail"><svg class="icon-sm"><use href="#icon-eye"/></svg></span>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Row 4 — Return Request (Flow 5, Branch B: AWB exists, not yet
+                     physically shipped — files as Return Request, Order Status flips
+                     to Return Requested while Pending). -->
+                <tr>
+                  <td>
+                    <div class="type-cell">
+                      <div class="type-ico"><svg class="icon"><use href="#icon-rotate"/></svg></div>
+                      <div class="type-label">Return Request</div>
+                    </div>
+                  </td>
+                  <td><div class="cell-strong">Dewi</div><div class="cell-muted">Staff Order · 40 menit lalu</div></td>
+                  <td><div class="preview-text">Order #ORD-2198 · Order Status → Return Requested · AWB sudah terbit, belum fisik dikirim · Alasan: warna tidak sesuai pesanan.</div></td>
+                  <td><span class="pill pill-warn">Menunggu Approval</span></td>
+                  <td>
+                    <div class="row-actions">
+                      <span class="icon-action" title="Buka detail"><svg class="icon-sm"><use href="#icon-eye"/></svg></span>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Row 5 — Refund Request (Flow 6: Wulan submits, nominal pre-filled
+                     at Max Refund %, lowered per agreement with customer). -->
+                <tr>
+                  <td>
+                    <div class="type-cell">
+                      <div class="type-ico"><svg class="icon"><use href="#icon-wallet"/></svg></div>
+                      <div class="type-label">Refund Request</div>
+                    </div>
+                  </td>
+                  <td><div class="cell-strong">Wulan</div><div class="cell-muted">Staff Finance · 1 jam lalu</div></td>
+                  <td><div class="preview-text">Order #ORD-2054 · Nominal Rp 1.250.000 (dalam rentang Min–Max Refund %) · Order sudah Returned.</div></td>
+                  <td><span class="pill pill-warn">Menunggu Approval</span></td>
+                  <td>
+                    <div class="row-actions">
+                      <span class="icon-action" title="Buka detail"><svg class="icon-sm"><use href="#icon-eye"/></svg></span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<svg style="display:none">
+  <defs>
+    <symbol id="icon-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+    <symbol id="icon-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l9-5 9 5-9 5-9-5z"/><path d="M3 8v9l9 5 9-5V8"/><path d="M12 13v9"/></symbol>
+    <symbol id="icon-receipt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v17l-3-2-3 2-3-2-3 2V3z"/><path d="M9 8h6M9 12h6"/></symbol>
+    <symbol id="icon-rotate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></symbol>
+    <symbol id="icon-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="16" cy="14.3" r="1.1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="icon-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2.5 12h3M18.5 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/></symbol>
+    <symbol id="icon-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></symbol>
+    <symbol id="icon-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></symbol>
+    <symbol id="icon-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2L12 3z"/><line x1="12" y1="9" x2="12" y2="14"/><circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></symbol>
+    <symbol id="icon-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="4 4 20 4 14 12 14 18 10 20 10 12 4 4"/></symbol>
+    <symbol id="icon-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="M21 16l-5.5-5.5L8 18"/></symbol>
+    <symbol id="icon-activity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 12 7 12 9.5 5 14.5 19 17 12 22 12"/></symbol>
+    <symbol id="icon-inbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16l2 9v5a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-5l2-9z"/><path d="M2 13h5l1.5 3h7L17 13h5"/></symbol>
+    <symbol id="icon-message" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H8l-4 4V5z"/></symbol>
+    <symbol id="icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></symbol>
+    <symbol id="icon-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></symbol>
+    <symbol id="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></symbol>
+  </defs>
+</svg>
+</body>
+</html>

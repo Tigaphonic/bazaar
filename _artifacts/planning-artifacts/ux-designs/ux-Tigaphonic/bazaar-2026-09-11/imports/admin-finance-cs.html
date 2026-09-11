@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArmyWatch Admin — Finance &amp; CS (Key Screen Mock)</title>
+<style>
+/* =====================================================================
+   ARMYWATCH ADMIN PORTAL — key-screen mock: FINANCE & CS
+   Governed by: DESIGN.md § Components, Elevation · EXPERIENCE.md § IA
+   > Admin Portal > Finance & CS · prd.md FR-36 (Refund Entry
+   maker-checker), FR-47 (rekonsiliasi/settlement), FR-51 (histori CS),
+   FR-28 (Disputed/Chargeback).
+   Same design kit as key-admin-dashboard.html — inherits shell, tokens,
+   icon sprite verbatim. Menunjukkan boundary RBAC: Staff Finance & CS
+   bisa "ajukan" tapi tombol "approve" terkunci — Owner-only (FR-36).
+   Inline CSS, system-font fallback, no JS, no network — offline mock.
+   ===================================================================== */
+  :root{
+    --primary:#00609e; --primary-700:#00527f; --primary-50:#eef6fb; --primary-100:#d9ecf7;
+    --bluegray:#5a6a82; --charcoal:#333333; --soft:#f7f7f7;
+    --border:#e3e6ea; --white:#ffffff; --ink:#22262b; --muted:#5c6875;
+    --success-bg:#e8f5ec; --success-text:#1e7d3c; --success-ring:#bfe3cb;
+    --warn-bg:#fdf3e2;    --warn-text:#a15c00;    --warn-ring:#f3d9a3;
+    --info-bg:#e8f1fb;    --info-text:#00609e;    --info-ring:#bcd9ef;
+    --danger-bg:#fbeaea;  --danger-text:#b0292b;  --danger-ring:#f0c2c3;
+    --neutral-bg:#eef0f2; --neutral-text:#5b6472; --neutral-ring:#dbdfe4;
+    --done-bg:#eef1f5;    --done-text:#3d4655;    --done-ring:#d7dce3;
+    --r-lg:8px; --r-xl:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.04), 0 2px 6px rgba(16,24,40,.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#dfe3e7; color:var(--ink); font-family:'Mulish','Segoe UI',system-ui,-apple-system,sans-serif; font-size:14px; line-height:1.5;}
+  h1,h2,h3,h4,.font-heading{font-family:'Poppins','Segoe UI',system-ui,-apple-system,sans-serif; margin:0;}
+  p{margin:0;}
+  .icon{width:18px;height:18px;display:inline-block;vertical-align:-4px;flex:none;}
+  .icon-sm{width:14px;height:14px;vertical-align:-2px;}
+  .device-frame{max-width:1440px;margin:28px auto;border-radius:14px;overflow:hidden;box-shadow:0 24px 60px rgba(16,24,40,.22);border:1px solid #cfd4d9;background:var(--white);}
+  .browser-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#e9ebee;border-bottom:1px solid var(--border);}
+  .browser-dot{width:10px;height:10px;border-radius:50%;}
+  .browser-url{margin-left:10px;background:#fff;border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:12px;color:var(--muted);flex:1;max-width:460px;font-family:'Mulish',sans-serif;}
+  .shell{display:grid;grid-template-columns:250px 1fr;min-height:840px;background:var(--soft);}
+  .sidebar{background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;}
+  .brand{padding:20px 18px 14px;border-bottom:1px solid #f0f1f3;}
+  .brand-mark{display:flex;align-items:center;gap:9px;}
+  .brand-badge{width:32px;height:32px;border-radius:9px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;}
+  .brand-name{font-family:'Poppins',sans-serif;font-weight:700;font-size:15px;color:var(--charcoal);}
+  .brand-sub{font-size:11px;color:var(--bluegray);margin-top:1px;}
+  .env-row{display:flex;align-items:center;gap:6px;margin-top:10px;}
+  .env-dot{width:6px;height:6px;border-radius:50%;background:#2fae5c;}
+  .env-label{font-size:11px;color:var(--bluegray);}
+  nav.nav{flex:1;padding:10px 12px;overflow-y:auto;}
+  .nav-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 11px;border-radius:var(--r-lg);color:var(--charcoal);font-family:'Poppins',sans-serif;font-weight:500;font-size:13.5px;cursor:default;margin-bottom:2px;}
+  .nav-item .nav-left{display:flex;align-items:center;gap:11px;}
+  .nav-item:hover{background:#f4f6f7;}
+  .nav-item.active{background:var(--primary-50);color:var(--primary-700);position:relative;}
+  .nav-item.active::before{content:"";position:absolute;left:-12px;top:6px;bottom:6px;width:3px;background:var(--primary);border-radius:0 3px 3px 0;}
+  .nav-item .icon{color:var(--bluegray);}
+  .nav-item.active .icon{color:var(--primary);}
+  .nav-foot{padding:14px 18px;border-top:1px solid #f0f1f3;display:flex;align-items:center;gap:10px;}
+  .avatar{width:32px;height:32px;border-radius:50%;background:var(--primary-100);color:var(--primary-700);display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-weight:700;font-size:12px;flex:none;}
+  .nav-foot-name{font-size:12.5px;font-weight:700;color:var(--charcoal);font-family:'Poppins',sans-serif;}
+  .nav-foot-role{font-size:11px;color:var(--bluegray);}
+  .main{display:flex;flex-direction:column;min-width:0;}
+  .topbar{height:62px;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;padding:0 22px;flex:none;}
+  .search-wrap{flex:1;max-width:420px;position:relative;}
+  .search-wrap .icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#9aa3ab;}
+  .search-input{width:100%;border:1px solid var(--border);background:var(--soft);border-radius:var(--r-lg);padding:8px 12px 8px 34px;font-size:13px;color:var(--muted);font-family:'Mulish',sans-serif;}
+  .topbar-actions{display:flex;align-items:center;gap:8px;margin-left:auto;}
+  .icon-btn{position:relative;width:34px;height:34px;border-radius:var(--r-lg);border:1px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;color:var(--bluegray);}
+  .user-chip{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;border-radius:99px;border:1px solid var(--border);}
+  .user-chip .name{font-size:12.5px;font-weight:700;font-family:'Poppins',sans-serif;color:var(--charcoal);}
+  .content{padding:26px 28px 40px;flex:1;}
+  .page-head{margin-bottom:20px;}
+  .breadcrumb{font-size:12px;color:var(--bluegray);margin-bottom:4px;}
+  .page-title{font-size:21px;font-weight:700;color:var(--charcoal);}
+  .page-desc{font-size:12.5px;color:var(--bluegray);margin-top:4px;}
+  .btn{font-family:'Poppins',sans-serif;font-weight:500;font-size:13px;border-radius:var(--r-lg);padding:9px 15px;display:inline-flex;align-items:center;gap:7px;border:1px solid transparent;cursor:default;white-space:nowrap;}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-secondary{background:#fff;color:var(--charcoal);border-color:#d7dbdf;}
+  .btn-sm{padding:7px 13px;font-size:12.5px;}
+  .btn[disabled]{opacity:.45;}
+  .card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow);}
+  .card-pad{padding:18px 18px;}
+  .section{margin-bottom:22px;}
+  .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .section-title{font-size:14.5px;font-weight:700;color:var(--charcoal);}
+  .section-sub{font-size:11.5px;color:var(--bluegray);margin-top:2px;}
+  .alert-banner{display:flex;align-items:flex-start;gap:12px;background:var(--danger-bg);border:1px solid var(--danger-ring);color:var(--danger-text);border-radius:var(--r-lg);padding:14px 16px;margin-bottom:18px;font-size:13px;}
+  .alert-banner b{font-weight:700;}
+  .evidence-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+  .evidence-chip{display:flex;align-items:center;gap:5px;background:#fff;border:1px solid var(--danger-ring);border-radius:99px;padding:4px 10px;font-size:11px;color:var(--danger-text);font-weight:700;}
+  .pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;border:1px solid transparent;font-family:'Mulish',sans-serif;white-space:nowrap;}
+  .pill-neutral{background:var(--neutral-bg);color:var(--neutral-text);border-color:var(--neutral-ring);}
+  .pill-info{background:var(--info-bg);color:var(--info-text);border-color:var(--info-ring);}
+  .pill-warn{background:var(--warn-bg);color:var(--warn-text);border-color:var(--warn-ring);}
+  .pill-success{background:var(--success-bg);color:var(--success-text);border-color:var(--success-ring);}
+  .pill-danger{background:var(--danger-bg);color:var(--danger-text);border-color:var(--danger-ring);}
+  .pill-done{background:var(--done-bg);color:var(--done-text);border-color:var(--done-ring);}
+  .refund-row{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid #f1f2f4;}
+  .refund-row:last-child{border-bottom:none;}
+  .refund-ico{width:34px;height:34px;border-radius:9px;background:var(--soft);display:flex;align-items:center;justify-content:center;color:var(--bluegray);flex:none;}
+  .refund-body{flex:1;min-width:0;}
+  .refund-title{font-size:13px;font-weight:700;color:var(--charcoal);}
+  .refund-sub{font-size:11.5px;color:var(--bluegray);margin-top:2px;}
+  .refund-amt{font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;color:var(--charcoal);white-space:nowrap;}
+  .table-wrap{overflow-x:auto;}
+  table.admin-table{width:100%;border-collapse:collapse;font-size:13px;}
+  table.admin-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.02em;color:var(--bluegray);font-weight:700;padding:0 14px 10px;border-bottom:1px solid var(--border);white-space:nowrap;}
+  table.admin-table td{padding:11px 14px;border-bottom:1px solid #f1f2f4;vertical-align:middle;}
+  table.admin-table tr:last-child td{border-bottom:none;}
+  table.admin-table tfoot td{font-weight:700;color:var(--charcoal);border-top:2px solid var(--border);border-bottom:none;padding-top:12px;}
+  .cell-strong{font-weight:700;color:var(--charcoal);}
+  .cell-muted{color:var(--bluegray);font-size:12px;}
+  .cs-row{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #f1f2f4;}
+  .cs-row:last-child{border-bottom:none;}
+  .cs-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex:none;}
+  .cs-ico.wa{background:var(--success-bg);color:var(--success-text);}
+  .cs-ico.mail{background:var(--info-bg);color:var(--info-text);}
+</style>
+</head>
+<body>
+<div class="device-frame">
+  <div class="browser-bar">
+    <span class="browser-dot" style="background:#ec6a5e"></span><span class="browser-dot" style="background:#f5bd4f"></span><span class="browser-dot" style="background:#61c454"></span>
+    <span class="browser-url">admin.armywatch.id/finance-cs</span>
+  </div>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark"><div class="brand-badge">AW</div><div><div class="brand-name">ArmyWatch</div><div class="brand-sub">Admin Portal</div></div></div>
+        <div class="env-row"><span class="env-dot"></span><span class="env-label">Live · Brand Store</span></div>
+      </div>
+      <nav class="nav">
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-grid"/></svg>Dashboard</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-box"/></svg>Manajemen Katalog</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-receipt"/></svg>Manajemen Order</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-rotate"/></svg>Retur &amp; Pembatalan</span></div>
+        <div class="nav-item active"><span class="nav-left"><svg class="icon"><use href="#icon-wallet"/></svg>Finance &amp; CS</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-gear"/></svg>Pengaturan Sistem</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-shield"/></svg>System / Users</span></div>
+      </nav>
+      <div class="nav-foot"><div class="avatar">ND</div><div><div class="nav-foot-name">Nadia</div><div class="nav-foot-role">Staff Finance &amp; CS</div></div></div>
+    </aside>
+    <div class="main">
+      <header class="topbar">
+        <div class="search-wrap"><svg class="icon"><use href="#icon-search"/></svg><input class="search-input" placeholder="Cari Order ID atau nama customer…" readonly></div>
+        <div class="topbar-actions">
+          <button class="icon-btn"><svg class="icon"><use href="#icon-bell"/></svg></button>
+          <div class="user-chip"><div class="avatar" style="width:26px;height:26px;font-size:10.5px;">ND</div><div class="name">Nadia</div><svg class="icon-sm"><use href="#icon-chevron"/></svg></div>
+        </div>
+      </header>
+      <main class="content">
+        <div class="page-head">
+          <div class="breadcrumb">Admin Portal</div>
+          <div class="page-title">Finance &amp; CS</div>
+          <div class="page-desc">Refund Entry, rekonsiliasi settlement, dan histori customer service.</div>
+        </div>
+
+        <div class="alert-banner">
+          <svg class="icon"><use href="#icon-alert"/></svg>
+          <div>
+            <div><b>Disputed/Chargeback — Order #ORD-10502.</b> Bank penerbit kartu mengajukan dispute. Lampirkan bukti pendukung untuk representment sebelum tenggat.</div>
+            <div class="evidence-row">
+              <span class="evidence-chip"><svg class="icon-sm"><use href="#icon-image"/></svg>Foto Packing</span>
+              <span class="evidence-chip"><svg class="icon-sm"><use href="#icon-truck"/></svg>Bukti AWB</span>
+              <span class="evidence-chip"><svg class="icon-sm"><use href="#icon-message"/></svg>Histori Chat CS</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- FR-36: Refund Entry maker-checker -->
+        <div class="section card card-pad">
+          <div class="section-head">
+            <div><div class="section-title">Refund Entry</div><div class="section-sub">Maker-checker — Nadia ajukan, Bara (Owner) approve. Nominal selalu penuh, tidak ada opsi partial.</div></div>
+            <button class="btn btn-primary btn-sm"><svg class="icon-sm"><use href="#icon-plus"/></svg>Ajukan Refund Entry</button>
+          </div>
+          <div class="refund-row">
+            <div class="refund-ico"><svg class="icon"><use href="#icon-wallet"/></svg></div>
+            <div class="refund-body">
+              <div class="refund-title">Order #ORD-10398 — Farah Ramadhani</div>
+              <div class="refund-sub">Order Status: Dibatalkan · diajukan Nadia · 1 jam lalu</div>
+            </div>
+            <span class="pill pill-warn">Menunggu approval Bara</span>
+            <div class="refund-amt">Rp 1.050.000</div>
+          </div>
+          <div class="refund-row">
+            <div class="refund-ico"><svg class="icon"><use href="#icon-wallet"/></svg></div>
+            <div class="refund-body">
+              <div class="refund-title">Order #ORD-10355 — Agus Wibowo</div>
+              <div class="refund-sub">Order Status: Retur Selesai · diajukan Nadia · kemarin</div>
+            </div>
+            <span class="pill pill-success">Disetujui Bara</span>
+            <div class="refund-amt">Rp 1.890.000</div>
+          </div>
+        </div>
+
+        <!-- FR-47: Manajemen Pembayaran — laporan settlement -->
+        <div class="section card card-pad">
+          <div class="section-head">
+            <div><div class="section-title">Laporan Settlement</div><div class="section-sub">Breakdown ongkir, Biaya Admin Shipping, dan biaya gateway per order — untuk analisis margin.</div></div>
+          </div>
+          <div class="table-wrap">
+            <table class="admin-table">
+              <thead><tr><th>Order</th><th>Gateway</th><th>Tarif Ongkir</th><th>Biaya Admin</th><th>Biaya Gateway</th><th>Diterima Bersih</th></tr></thead>
+              <tbody>
+                <tr><td class="cell-strong">#ORD-10441</td><td>VA BCA</td><td>Rp 42.000</td><td>Rp 10.000</td><td>Rp 4.000</td><td class="cell-strong">Rp 3.264.000</td></tr>
+                <tr><td class="cell-strong">#ORD-10452</td><td>QRIS (GoPay)</td><td>Rp 38.000</td><td>Rp 10.000</td><td>Rp 27.500</td><td class="cell-strong">Rp 2.674.500</td></tr>
+                <tr><td class="cell-strong">#ORD-10481</td><td>Kartu Kredit</td><td>Rp 35.000</td><td>Rp 10.000</td><td>Rp 55.650</td><td class="cell-strong">Rp 1.749.350</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- FR-51: Histori CS terkait order -->
+        <div class="section card card-pad">
+          <div class="section-head">
+            <div><div class="section-title">Histori Customer Service</div><div class="section-sub">Chat/WhatsApp &amp; tiket komplain yang tercatat manual terhubung ke Order.</div></div>
+          </div>
+          <div class="cs-row">
+            <div class="cs-ico wa"><svg class="icon-sm"><use href="#icon-message"/></svg></div>
+            <div style="flex:1;">
+              <div class="refund-title">Rendra Prakoso · Order #ORD-10475 &amp; 2 order lain</div>
+              <div class="refund-sub">WhatsApp — "Mau beli 3 unit beda, ongkirnya bisa digabung nggak?" · dikoordinasikan manual oleh CS (lihat UJ-2)</div>
+            </div>
+            <span class="cell-muted">15 menit lalu</span>
+          </div>
+          <div class="cs-row">
+            <div class="cs-ico wa"><svg class="icon-sm"><use href="#icon-message"/></svg></div>
+            <div style="flex:1;">
+              <div class="refund-title">Joko Prasetyo · Order #ORD-10467</div>
+              <div class="refund-sub">WhatsApp — "Tolong batalin, saya ganti pikiran pilih warna lain."</div>
+            </div>
+            <span class="cell-muted">42 menit lalu</span>
+          </div>
+          <div class="cs-row">
+            <div class="cs-ico mail"><svg class="icon-sm"><use href="#icon-mail"/></svg></div>
+            <div style="flex:1;">
+              <div class="refund-title">Siti Nuraini · Order #ORD-10391</div>
+              <div class="refund-sub">Email — Tanya proses retur untuk tali kulit yang sobek.</div>
+            </div>
+            <span class="cell-muted">2 jam lalu</span>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+<svg style="display:none">
+  <defs>
+    <symbol id="icon-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+    <symbol id="icon-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l9-5 9 5-9 5-9-5z"/><path d="M3 8v9l9 5 9-5V8"/><path d="M12 13v9"/></symbol>
+    <symbol id="icon-receipt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v17l-3-2-3 2-3-2-3 2V3z"/><path d="M9 8h6M9 12h6"/></symbol>
+    <symbol id="icon-rotate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></symbol>
+    <symbol id="icon-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="16" cy="14.3" r="1.1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="icon-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2.5 12h3M18.5 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/></symbol>
+    <symbol id="icon-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></symbol>
+    <symbol id="icon-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></symbol>
+    <symbol id="icon-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2L12 3z"/><line x1="12" y1="9" x2="12" y2="14"/><circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></symbol>
+    <symbol id="icon-truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="7" width="13" height="9" rx="1"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="6" cy="18" r="1.6"/><circle cx="17.5" cy="18" r="1.6"/></symbol>
+    <symbol id="icon-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="4 4 20 4 14 12 14 18 10 20 10 12 4 4"/></symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+    <symbol id="icon-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><polyline points="7 9 12 4 17 9"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></symbol>
+    <symbol id="icon-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="M21 16l-5.5-5.5L8 18"/></symbol>
+    <symbol id="icon-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c.7-3.4 3.3-5.5 6.5-5.5s5.8 2.1 6.5 5.5"/><circle cx="17.5" cy="8.5" r="2.5"/><path d="M16 14.3c2.6.4 4.5 2.3 5 5.7"/></symbol>
+    <symbol id="icon-activity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 12 7 12 9.5 5 14.5 19 17 12 22 12"/></symbol>
+    <symbol id="icon-inbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16l2 9v5a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-5l2-9z"/><path d="M2 13h5l1.5 3h7L17 13h5"/></symbol>
+    <symbol id="icon-message" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H8l-4 4V5z"/></symbol>
+    <symbol id="icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></symbol>
+    <symbol id="icon-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12"/><polyline points="7 11 12 16 17 11"/><path d="M4 20h16"/></symbol>
+    <symbol id="icon-video" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="14" height="12" rx="2"/><polygon points="17 9 21 7 21 17 17 15"/></symbol>
+    <symbol id="icon-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4 11-11 3 3-11 11-4 1z"/></symbol>
+    <symbol id="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></symbol>
+  </defs>
+</svg>
+</body>
+</html>

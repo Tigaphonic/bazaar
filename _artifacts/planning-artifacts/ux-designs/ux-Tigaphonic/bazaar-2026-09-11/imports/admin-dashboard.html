@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArmyWatch Admin — Dashboard (Key Screen Mock)</title>
+<style>
+/* =====================================================================
+   ARMYWATCH ADMIN PORTAL — key-screen mock: DASHBOARD
+   Governed by: DESIGN.md § Colors (admin.*), Typography (admin.*),
+   Layout & Spacing (Admin: sidebar+topbar, grid kartu statistik),
+   Elevation (soft shadow), Shapes (rounded 8/12px), Components
+   (Admin Sidebar, Admin Table) · EXPERIENCE.md § Information
+   Architecture > Admin Portal > Dashboard.
+   Visual language inherited from imports/admin-theme.html ("Erasys
+   CMS" direction — sidebar/topbar/card shell only; all content below
+   is ArmyWatch-specific, per .memlog.md decision 2026-09-10).
+   Inline CSS, system-font fallback, no JS, no network — offline mock.
+   ===================================================================== */
+  :root{
+    --primary:#00609e; --primary-700:#00527f; --primary-50:#eef6fb; --primary-100:#d9ecf7;
+    --bluegray:#5a6a82; --charcoal:#333333; --soft:#f7f7f7;
+    --border:#e3e6ea; --white:#ffffff; --ink:#22262b; --muted:#5c6875;
+    --success-bg:#e8f5ec; --success-text:#1e7d3c; --success-ring:#bfe3cb;
+    --warn-bg:#fdf3e2;    --warn-text:#a15c00;    --warn-ring:#f3d9a3;
+    --info-bg:#e8f1fb;    --info-text:#00609e;    --info-ring:#bcd9ef;
+    --danger-bg:#fbeaea;  --danger-text:#b0292b;  --danger-ring:#f0c2c3;
+    --neutral-bg:#eef0f2; --neutral-text:#5b6472; --neutral-ring:#dbdfe4;
+    --done-bg:#eef1f5;    --done-text:#3d4655;    --done-ring:#d7dce3;
+    --r-lg:8px; --r-xl:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.04), 0 2px 6px rgba(16,24,40,.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:#dfe3e7; color:var(--ink);
+    font-family:'Mulish','Segoe UI',system-ui,-apple-system,sans-serif;
+    font-size:14px; line-height:1.5;
+  }
+  h1,h2,h3,h4,.font-heading{font-family:'Poppins','Segoe UI',system-ui,-apple-system,sans-serif; margin:0;}
+  p{margin:0;}
+  .icon{width:18px;height:18px;display:inline-block;vertical-align:-4px;flex:none;}
+  .icon-sm{width:14px;height:14px;vertical-align:-2px;}
+
+  /* device frame */
+  .device-frame{max-width:1440px;margin:28px auto;border-radius:14px;overflow:hidden;
+    box-shadow:0 24px 60px rgba(16,24,40,.22);border:1px solid #cfd4d9;background:var(--white);}
+  .browser-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#e9ebee;border-bottom:1px solid var(--border);}
+  .browser-dot{width:10px;height:10px;border-radius:50%;}
+  .browser-url{margin-left:10px;background:#fff;border:1px solid var(--border);border-radius:6px;
+    padding:5px 12px;font-size:12px;color:var(--muted);flex:1;max-width:460px;font-family:'Mulish',sans-serif;}
+
+  /* shell */
+  .shell{display:grid;grid-template-columns:250px 1fr;min-height:840px;background:var(--soft);}
+  .sidebar{background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;}
+  .brand{padding:20px 18px 14px;border-bottom:1px solid #f0f1f3;}
+  .brand-mark{display:flex;align-items:center;gap:9px;}
+  .brand-badge{width:32px;height:32px;border-radius:9px;background:var(--primary);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;}
+  .brand-name{font-family:'Poppins',sans-serif;font-weight:700;font-size:15px;color:var(--charcoal);}
+  .brand-sub{font-size:11px;color:var(--bluegray);margin-top:1px;}
+  .env-row{display:flex;align-items:center;gap:6px;margin-top:10px;}
+  .env-dot{width:6px;height:6px;border-radius:50%;background:#2fae5c;}
+  .env-label{font-size:11px;color:var(--bluegray);}
+
+  nav.nav{flex:1;padding:10px 12px;overflow-y:auto;}
+  .nav-item{display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:9px 11px;border-radius:var(--r-lg);color:var(--charcoal);
+    font-family:'Poppins',sans-serif;font-weight:500;font-size:13.5px;
+    cursor:default;margin-bottom:2px;}
+  .nav-item .nav-left{display:flex;align-items:center;gap:11px;}
+  .nav-item:hover{background:#f4f6f7;}
+  .nav-item.active{background:var(--primary-50);color:var(--primary-700);position:relative;}
+  .nav-item.active::before{content:"";position:absolute;left:-12px;top:6px;bottom:6px;width:3px;
+    background:var(--primary);border-radius:0 3px 3px 0;}
+  .nav-item .icon{color:var(--bluegray);}
+  .nav-item.active .icon{color:var(--primary);}
+  .nav-count{font-size:11px;font-weight:700;padding:1px 7px;border-radius:99px;background:var(--warn-bg);color:var(--warn-text);}
+  .nav-foot{padding:14px 18px;border-top:1px solid #f0f1f3;display:flex;align-items:center;gap:10px;}
+  .avatar{width:32px;height:32px;border-radius:50%;background:var(--primary-100);color:var(--primary-700);
+    display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-weight:700;font-size:12px;flex:none;}
+  .nav-foot-name{font-size:12.5px;font-weight:700;color:var(--charcoal);font-family:'Poppins',sans-serif;}
+  .nav-foot-role{font-size:11px;color:var(--bluegray);}
+
+  .main{display:flex;flex-direction:column;min-width:0;}
+  .topbar{height:62px;background:var(--white);border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:16px;padding:0 22px;flex:none;}
+  .search-wrap{flex:1;max-width:420px;position:relative;}
+  .search-wrap .icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#9aa3ab;}
+  .search-input{width:100%;border:1px solid var(--border);background:var(--soft);border-radius:var(--r-lg);
+    padding:8px 12px 8px 34px;font-size:13px;color:var(--muted);font-family:'Mulish',sans-serif;}
+  .topbar-actions{display:flex;align-items:center;gap:8px;margin-left:auto;}
+  .icon-btn{position:relative;width:34px;height:34px;border-radius:var(--r-lg);border:1px solid var(--border);
+    background:var(--white);display:flex;align-items:center;justify-content:center;color:var(--bluegray);}
+  .icon-btn .dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#e6544f;border:1.5px solid #fff;}
+  .user-chip{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;border-radius:99px;border:1px solid var(--border);}
+  .user-chip .name{font-size:12.5px;font-weight:700;font-family:'Poppins',sans-serif;color:var(--charcoal);}
+  .user-chip .role{font-size:10.5px;color:var(--bluegray);}
+
+  .content{padding:26px 28px 40px;flex:1;}
+  .page-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+  .breadcrumb{font-size:12px;color:var(--bluegray);margin-bottom:4px;}
+  .page-title{font-size:21px;font-weight:700;color:var(--charcoal);}
+  .page-desc{font-size:12.5px;color:var(--bluegray);margin-top:4px;}
+
+  .btn{font-family:'Poppins',sans-serif;font-weight:500;font-size:13px;border-radius:var(--r-lg);
+    padding:9px 15px;display:inline-flex;align-items:center;gap:7px;border:1px solid transparent;cursor:default;white-space:nowrap;}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-secondary{background:#fff;color:var(--charcoal);border-color:#d7dbdf;}
+  .btn-ghost{background:transparent;color:var(--bluegray);}
+  .btn-danger{background:#fff;color:#b0292b;border-color:#f0c2c3;}
+  .btn-sm{padding:6px 11px;font-size:12px;}
+
+  .card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow);}
+  .card-pad{padding:18px 18px;}
+  .section-head{display:flex;align-items:center;justify-content:between;justify-content:space-between;margin-bottom:14px;}
+  .section-title{font-size:14.5px;font-weight:700;color:var(--charcoal);}
+  .section-sub{font-size:11.5px;color:var(--bluegray);margin-top:2px;}
+  .link-more{font-size:12px;color:var(--primary);font-weight:700;font-family:'Poppins',sans-serif;display:inline-flex;align-items:center;gap:4px;}
+
+  .filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+  .select-chip{display:flex;align-items:center;gap:6px;border:1px solid var(--border);background:#fff;
+    border-radius:var(--r-lg);padding:7px 11px;font-size:12.5px;color:var(--charcoal);}
+  .select-chip .icon{color:var(--bluegray);}
+
+  .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
+  .stat-card{background:#fff;border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow);
+    padding:17px 18px;display:flex;flex-direction:column;gap:10px;}
+  .stat-top{display:flex;align-items:center;justify-content:space-between;}
+  .stat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;}
+  .stat-icon.ok{background:var(--success-bg);color:var(--success-text);}
+  .stat-icon.warn{background:var(--info-bg);color:var(--info-text);}
+  .stat-icon.done{background:var(--done-bg);color:var(--done-text);}
+  .stat-num{font-family:'Poppins',sans-serif;font-weight:700;font-size:26px;color:var(--charcoal);}
+  .stat-label{font-size:12.5px;color:var(--bluegray);}
+  .stat-delta{font-size:11px;font-weight:700;}
+  .stat-delta.up{color:#1e7d3c;}
+  .stat-delta.flag{color:#a15c00;}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+  .queue-list{display:flex;flex-direction:column;gap:0;}
+  .queue-row{display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-bottom:1px solid #f1f2f4;}
+  .queue-row:last-child{border-bottom:none;padding-bottom:2px;}
+  .queue-ico{width:30px;height:30px;border-radius:8px;background:var(--soft);display:flex;align-items:center;justify-content:center;flex:none;color:var(--bluegray);}
+  .queue-body{flex:1;min-width:0;}
+  .queue-title{font-size:13px;font-weight:700;color:var(--charcoal);}
+  .queue-sub{font-size:11.5px;color:var(--bluegray);margin-top:2px;}
+  .queue-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;}
+
+  .pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 9px;
+    border-radius:99px;border:1px solid transparent;font-family:'Mulish',sans-serif;white-space:nowrap;}
+  .pill-neutral{background:var(--neutral-bg);color:var(--neutral-text);border-color:var(--neutral-ring);}
+  .pill-info{background:var(--info-bg);color:var(--info-text);border-color:var(--info-ring);}
+  .pill-warn{background:var(--warn-bg);color:var(--warn-text);border-color:var(--warn-ring);}
+  .pill-success{background:var(--success-bg);color:var(--success-text);border-color:var(--success-ring);}
+  .pill-danger{background:var(--danger-bg);color:var(--danger-text);border-color:var(--danger-ring);}
+  .pill-done{background:var(--done-bg);color:var(--done-text);border-color:var(--done-ring);}
+
+  .table-wrap{overflow-x:auto;}
+  table.admin-table{width:100%;border-collapse:collapse;font-size:13px;}
+  table.admin-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.02em;
+    color:var(--bluegray);font-weight:700;padding:0 14px 10px;border-bottom:1px solid var(--border);white-space:nowrap;}
+  table.admin-table td{padding:12px 14px;border-bottom:1px solid #f1f2f4;vertical-align:middle;}
+  table.admin-table tr:last-child td{border-bottom:none;}
+  table.admin-table tr.row-highlight td{background:var(--success-bg);}
+  .cell-strong{font-weight:700;color:var(--charcoal);}
+  .cell-muted{color:var(--bluegray);font-size:12px;}
+
+  .activity-item{display:flex;gap:11px;padding:10px 0;border-bottom:1px solid #f1f2f4;}
+  .activity-item:last-child{border-bottom:none;padding-bottom:2px;}
+  .activity-dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex:none;}
+  .activity-text{font-size:12.5px;color:var(--charcoal);}
+  .activity-text b{font-weight:700;}
+  .activity-time{font-size:11px;color:var(--bluegray);margin-top:2px;}
+
+  .empty-note{font-size:12px;color:var(--bluegray);text-align:center;padding:18px 0;}
+</style>
+</head>
+<body>
+<div class="device-frame">
+  <div class="browser-bar">
+    <span class="browser-dot" style="background:#ec6a5e"></span>
+    <span class="browser-dot" style="background:#f5bd4f"></span>
+    <span class="browser-dot" style="background:#61c454"></span>
+    <span class="browser-url">admin.armywatch.id/dashboard</span>
+  </div>
+
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">
+          <div class="brand-badge">AW</div>
+          <div>
+            <div class="brand-name">ArmyWatch</div>
+            <div class="brand-sub">Admin Portal</div>
+          </div>
+        </div>
+        <div class="env-row"><span class="env-dot"></span><span class="env-label">Live · Brand Store</span></div>
+      </div>
+
+      <nav class="nav">
+        <div class="nav-item active"><span class="nav-left"><svg class="icon"><use href="#icon-grid"/></svg>Dashboard</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-box"/></svg>Manajemen Katalog</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-receipt"/></svg>Manajemen Order</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-rotate"/></svg>Retur &amp; Pembatalan</span><span class="nav-count">3</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-wallet"/></svg>Finance &amp; CS</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-gear"/></svg>Pengaturan Sistem</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-shield"/></svg>System / Users</span></div>
+      </nav>
+
+      <div class="nav-foot">
+        <div class="avatar">BR</div>
+        <div>
+          <div class="nav-foot-name">Bara</div>
+          <div class="nav-foot-role">Owner</div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div class="search-wrap">
+          <svg class="icon"><use href="#icon-search"/></svg>
+          <input class="search-input" placeholder="Cari Unit ID, Order ID, atau nama customer…" readonly>
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-btn"><svg class="icon"><use href="#icon-bell"/></svg><span class="dot"></span></button>
+          <div class="user-chip">
+            <div class="avatar" style="width:26px;height:26px;font-size:10.5px;">BR</div>
+            <div><div class="name">Bara</div></div>
+            <svg class="icon-sm"><use href="#icon-chevron"/></svg>
+          </div>
+        </div>
+      </header>
+
+      <main class="content">
+        <div class="page-head">
+          <div>
+            <div class="breadcrumb">Admin Portal</div>
+            <div class="page-title">Dashboard</div>
+            <div class="page-desc">Ringkasan operasional harian — stok, antrian approval, dan aktivitas tim.</div>
+          </div>
+          <div class="filter-bar" style="margin:0;">
+            <span class="select-chip"><svg class="icon-sm"><use href="#icon-filter"/></svg>Semua Kategori<svg class="icon-sm"><use href="#icon-chevron"/></svg></span>
+            <span class="select-chip">Semua Brand<svg class="icon-sm"><use href="#icon-chevron"/></svg></span>
+          </div>
+        </div>
+
+        <!-- FR-44: ringkasan status Unit -->
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-top">
+              <div class="stat-icon ok"><svg class="icon"><use href="#icon-check"/></svg></div>
+              <span class="stat-delta up">+12 minggu ini</span>
+            </div>
+            <div class="stat-num">128</div>
+            <div class="stat-label">Unit Tersedia (Published)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-top">
+              <div class="stat-icon warn"><svg class="icon"><use href="#icon-clock"/></svg></div>
+              <span class="stat-delta flag">2 &gt; 15 menit</span>
+            </div>
+            <div class="stat-num">4</div>
+            <div class="stat-label">Unit On Process (checkout berjalan)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-top">
+              <div class="stat-icon done"><svg class="icon"><use href="#icon-box"/></svg></div>
+              <span class="stat-delta up">+7 minggu ini</span>
+            </div>
+            <div class="stat-num">342</div>
+            <div class="stat-label">Unit Terjual (sepanjang waktu)</div>
+          </div>
+        </div>
+
+        <!-- UJ-4: 4 antrian approval Owner -->
+        <div class="grid-2">
+          <div class="card card-pad">
+            <div class="section-head">
+              <div>
+                <div class="section-title">Menunggu Publish</div>
+                <div class="section-sub">Listing Draft yang sudah ditandai lengkap staff</div>
+              </div>
+              <span class="pill pill-warn">6 antrian</span>
+            </div>
+            <div class="queue-list">
+              <div class="queue-row">
+                <div class="queue-ico"><svg class="icon"><use href="#icon-box"/></svg></div>
+                <div class="queue-body">
+                  <div class="queue-title">Garmin Instinct 2S — AW-0231</div>
+                  <div class="queue-sub">Diajukan Sari · Grade Sangat Baik · 18 menit lalu</div>
+                </div>
+                <button class="btn btn-secondary btn-sm">Review</button>
+              </div>
+              <div class="queue-row">
+                <div class="queue-ico"><svg class="icon"><use href="#icon-box"/></svg></div>
+                <div class="queue-body">
+                  <div class="queue-title">Seiko 5 Sports SRPD — AW-0229</div>
+                  <div class="queue-sub">Diajukan Sari · Grade Baik · 1 jam lalu</div>
+                </div>
+                <button class="btn btn-secondary btn-sm">Review</button>
+              </div>
+              <div class="queue-row">
+                <div class="queue-ico"><svg class="icon"><use href="#icon-box"/></svg></div>
+                <div class="queue-body">
+                  <div class="queue-title">Casio G-Shock GA-2100 — AW-0225</div>
+                  <div class="queue-sub">Diajukan Sari · Grade Seperti Baru · 3 jam lalu</div>
+                </div>
+                <button class="btn btn-secondary btn-sm">Review</button>
+              </div>
+            </div>
+            <a class="link-more" style="margin-top:12px;">Lihat semua 6 antrian <svg class="icon-sm"><use href="#icon-arrow"/></svg></a>
+          </div>
+
+          <div class="card card-pad">
+            <div class="section-head">
+              <div>
+                <div class="section-title">Retur, Pembatalan &amp; Refund</div>
+                <div class="section-sub">Butuh keputusan Owner hari ini</div>
+              </div>
+              <span class="pill pill-danger">4 antrian</span>
+            </div>
+            <div class="queue-list">
+              <div class="queue-row">
+                <div class="queue-ico"><svg class="icon"><use href="#icon-rotate"/></svg></div>
+                <div class="queue-body">
+                  <div class="queue-title">Request Retur — Order #ORD-10452</div>
+                  <div class="queue-sub">Diajukan Dimas · alasan: strap rusak saat pemakaian awal</div>
+                </div>
+                <span class="pill pill-warn">Retur</span>
+              </div>
+              <div class="queue-row">
+                <div class="queue-ico"><svg class="icon"><use href="#icon-rotate"/></svg></div>
+                <div class="queue-body">
+                  <div class="queue-title">Request Pembatalan — Order #ORD-10467</div>
+                  <div class="queue-sub">Diajukan Dimas · Status Pengiriman: Belum Dicek</div>
+                </div>
+                <span class="pill pill-warn">Batal</span>
+              </div>
+              <div class="queue-row">
+                <div class="queue-ico"><svg class="icon"><use href="#icon-wallet"/></svg></div>
+                <div class="queue-body">
+                  <div class="queue-title">Refund Entry — Order #ORD-10398</div>
+                  <div class="queue-sub">Diajukan Nadia (Finance) · Rp 2.450.000 · penuh</div>
+                </div>
+                <span class="pill pill-info">Refund</span>
+              </div>
+            </div>
+            <a class="link-more" style="margin-top:12px;">Lihat semua 4 antrian <svg class="icon-sm"><use href="#icon-arrow"/></svg></a>
+          </div>
+        </div>
+
+        <!-- FR-30: dashboard antrian follow-up Dikirim -->
+        <div class="card card-pad" style="margin-bottom:16px;">
+          <div class="section-head">
+            <div>
+              <div class="section-title">Follow-up Pengiriman</div>
+              <div class="section-sub">Order berstatus Dikirim, diurutkan sejak resi diinput — cek &amp; konfirmasi Diterima</div>
+            </div>
+            <a class="link-more">Buka Manajemen Order <svg class="icon-sm"><use href="#icon-arrow"/></svg></a>
+          </div>
+          <div class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr><th>Order</th><th>Unit</th><th>Lama sejak resi</th><th>Status Pengiriman</th><th>Terakhir dicek</th><th></th></tr>
+              </thead>
+              <tbody>
+                <tr class="row-highlight">
+                  <td class="cell-strong">#ORD-10381</td>
+                  <td>Amazfit GTR 3 — AW-0198</td>
+                  <td>4 hari 2 jam</td>
+                  <td><span class="pill pill-success">Terkirim</span></td>
+                  <td class="cell-muted">Hari ini, 08:12</td>
+                  <td><button class="btn btn-primary btn-sm">Konfirmasi Diterima</button></td>
+                </tr>
+                <tr>
+                  <td class="cell-strong">#ORD-10390</td>
+                  <td>Citizen Promaster — AW-0205</td>
+                  <td>2 hari 6 jam</td>
+                  <td><span class="pill pill-info">Dalam Perjalanan</span></td>
+                  <td class="cell-muted">Kemarin, 16:40</td>
+                  <td><button class="btn btn-secondary btn-sm">Cek Resi</button></td>
+                </tr>
+                <tr>
+                  <td class="cell-strong">#ORD-10403</td>
+                  <td>Orient Bambino — AW-0211</td>
+                  <td>1 hari 1 jam</td>
+                  <td><span class="pill pill-neutral">Belum Dicek</span></td>
+                  <td class="cell-muted">—</td>
+                  <td><button class="btn btn-secondary btn-sm">Cek Resi</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- FR-54/55: Recent Activity (Audit Log ringkas) -->
+        <div class="card card-pad">
+          <div class="section-head">
+            <div>
+              <div class="section-title">Recent Activity</div>
+              <div class="section-sub">Jejak aksi terbaru seluruh tim — Global Audit Log lengkap di System / Users</div>
+            </div>
+            <a class="link-more">Buka Audit Log <svg class="icon-sm"><use href="#icon-arrow"/></svg></a>
+          </div>
+          <div>
+            <div class="activity-item">
+              <span class="activity-dot" style="background:#1e7d3c;"></span>
+              <div>
+                <div class="activity-text"><b>Bara</b> mem-publish Unit <b>AW-0224</b> (Seiko Presage)</div>
+                <div class="activity-time">9 menit lalu</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <span class="activity-dot" style="background:#00609e;"></span>
+              <div>
+                <div class="activity-text"><b>Dimas</b> mengubah Status Pengiriman Order <b>#ORD-10390</b> → Dalam Perjalanan</div>
+                <div class="activity-time">34 menit lalu</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <span class="activity-dot" style="background:#a15c00;"></span>
+              <div>
+                <div class="activity-text"><b>Sari</b> mengajukan Unit <b>AW-0231</b> ke antrian Menunggu Publish</div>
+                <div class="activity-time">18 menit lalu</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <span class="activity-dot" style="background:#b0292b;"></span>
+              <div>
+                <div class="activity-text"><b>Bara</b> approve Refund Entry Order <b>#ORD-10355</b> — Rp 1.890.000</div>
+                <div class="activity-time">1 jam lalu</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<svg style="display:none">
+  <defs>
+    <symbol id="icon-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+    <symbol id="icon-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l9-5 9 5-9 5-9-5z"/><path d="M3 8v9l9 5 9-5V8"/><path d="M12 13v9"/></symbol>
+    <symbol id="icon-receipt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v17l-3-2-3 2-3-2-3 2V3z"/><path d="M9 8h6M9 12h6"/></symbol>
+    <symbol id="icon-rotate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></symbol>
+    <symbol id="icon-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="16" cy="14.3" r="1.1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="icon-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2.5 12h3M18.5 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/></symbol>
+    <symbol id="icon-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></symbol>
+    <symbol id="icon-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></symbol>
+    <symbol id="icon-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2L12 3z"/><line x1="12" y1="9" x2="12" y2="14"/><circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></symbol>
+    <symbol id="icon-truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="7" width="13" height="9" rx="1"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="6" cy="18" r="1.6"/><circle cx="17.5" cy="18" r="1.6"/></symbol>
+    <symbol id="icon-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="4 4 20 4 14 12 14 18 10 20 10 12 4 4"/></symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+    <symbol id="icon-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><polyline points="7 9 12 4 17 9"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></symbol>
+    <symbol id="icon-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="M21 16l-5.5-5.5L8 18"/></symbol>
+    <symbol id="icon-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c.7-3.4 3.3-5.5 6.5-5.5s5.8 2.1 6.5 5.5"/><circle cx="17.5" cy="8.5" r="2.5"/><path d="M16 14.3c2.6.4 4.5 2.3 5 5.7"/></symbol>
+    <symbol id="icon-activity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 12 7 12 9.5 5 14.5 19 17 12 22 12"/></symbol>
+    <symbol id="icon-inbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16l2 9v5a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-5l2-9z"/><path d="M2 13h5l1.5 3h7L17 13h5"/></symbol>
+    <symbol id="icon-message" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H8l-4 4V5z"/></symbol>
+    <symbol id="icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></symbol>
+    <symbol id="icon-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12"/><polyline points="7 11 12 16 17 11"/><path d="M4 20h16"/></symbol>
+    <symbol id="icon-video" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="14" height="12" rx="2"/><polygon points="17 9 21 7 21 17 17 15"/></symbol>
+    <symbol id="icon-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4 11-11 3 3-11 11-4 1z"/></symbol>
+    <symbol id="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></symbol>
+  </defs>
+</svg>
+</body>
+</html>

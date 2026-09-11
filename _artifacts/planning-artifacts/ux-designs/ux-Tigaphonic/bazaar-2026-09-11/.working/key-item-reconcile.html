@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bazaar Admin — Item Edit, Attribute Reconcile Banner (Key Screen Mock)</title>
+<style>
+/* =====================================================================
+   BAZAAR ADMIN — key screen: ITEM EDIT + ATTRIBUTE RECONCILE BANNER
+   Governed by:
+   · DESIGN.md § Components > "Attribute Reconcile Banner" (anatomy:
+     warn-bg/warn-ring/rounded-md; collapsed single-line summary; expanded
+     two-column Ditambahkan/Dihapus list; single button-primary
+     "Selaraskan"/"Reconcile" bottom-right; "Never a modal")
+   · DESIGN.md § Components > Form Input/Select, Dropzone, Checkbox
+   · EXPERIENCE.md § Component Patterns row "Attribute Reconcile Banner"
+     ("Inline, collapsible banner at the top of the form — not a modal ...
+     Collapsed state summarizes the diff count; expanded state lists
+     Added/Removed fields in two columns; a single Reconcile action runs
+     the merge synchronously and fires a toast")
+   · EXPERIENCE.md § Key Flow 3 — Sari reconciles an Attribute Template
+     diff (exact scenario: Sub-Category gained "Warna", lost "Ukuran
+     Kardus"; Added column empty for the new field, Removed column still
+     shows the stale value; existing unrelated values untouched)
+   Item form shell/anatomy reused from imports/admin-katalog.html (form-grid,
+   chip-row, check-row, dropzone, divider) — same shell/tokens as the other
+   two Key Screen mocks (sidebar 250px + topbar 62px, card, pill, table,
+   button, form-input). ArmyWatch placeholder branding dropped per
+   DESIGN.md §Brand & Style; nav re-scoped to Bazaar's 9-domain IA.
+
+   Load-bearing alternate state: per Key Screens spec, this file renders
+   BOTH banner states — the EXPANDED state is the canonical/at-rest render,
+   staged in full page context (main column below); the COLLAPSED state is
+   rendered as a second, smaller section above it, isolated and captioned,
+   since it is a load-bearing alternate state of the same component.
+
+   Inline CSS, system-font fallback, no JS, no network — offline mock.
+   ===================================================================== */
+  :root{
+    --primary:#00609e; --primary-700:#00527f; --primary-50:#eef6fb; --primary-100:#d9ecf7;
+    --bluegray:#5a6a82; --charcoal:#333333; --soft:#f7f7f7;
+    --border:#e3e6ea; --white:#ffffff; --ink:#22262b; --muted:#5c6875;
+    --success-bg:#e8f5ec; --success-text:#1e7d3c; --success-ring:#bfe3cb;
+    --warn-bg:#fdf3e2;    --warn-text:#a15c00;    --warn-ring:#f3d9a3;
+    --info-bg:#e8f1fb;    --info-text:#00609e;    --info-ring:#bcd9ef;
+    --danger-bg:#fbeaea;  --danger-text:#b0292b;  --danger-ring:#f0c2c3;
+    --neutral-bg:#eef0f2; --neutral-text:#5b6472; --neutral-ring:#dbdfe4;
+    --done-bg:#eef1f5;    --done-text:#3d4655;    --done-ring:#d7dce3;
+    --r-lg:8px; --r-xl:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.04), 0 2px 6px rgba(16,24,40,.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#dfe3e7; color:var(--ink); font-family:'Mulish','Segoe UI',system-ui,-apple-system,sans-serif; font-size:14px; line-height:1.5;}
+  h1,h2,h3,h4,.font-heading{font-family:'Poppins','Segoe UI',system-ui,-apple-system,sans-serif; margin:0;}
+  p{margin:0;}
+  .icon{width:18px;height:18px;display:inline-block;vertical-align:-4px;flex:none;}
+  .icon-sm{width:14px;height:14px;vertical-align:-2px;}
+  .device-frame{max-width:1440px;margin:28px auto;border-radius:14px;overflow:hidden;box-shadow:0 24px 60px rgba(16,24,40,.22);border:1px solid #cfd4d9;background:var(--white);}
+  .browser-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#e9ebee;border-bottom:1px solid var(--border);}
+  .browser-dot{width:10px;height:10px;border-radius:50%;}
+  .browser-url{margin-left:10px;background:#fff;border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:12px;color:var(--muted);flex:1;max-width:460px;font-family:'Mulish',sans-serif;}
+  .shell{display:grid;grid-template-columns:250px 1fr;min-height:840px;background:var(--soft);}
+  .sidebar{background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;}
+  .brand{padding:20px 18px 14px;border-bottom:1px solid #f0f1f3;}
+  .brand-mark{display:flex;align-items:center;gap:9px;}
+  .brand-badge{width:32px;height:32px;border-radius:9px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;}
+  .brand-name{font-family:'Poppins',sans-serif;font-weight:700;font-size:15px;color:var(--charcoal);}
+  .brand-sub{font-size:11px;color:var(--bluegray);margin-top:1px;}
+  .env-row{display:flex;align-items:center;gap:6px;margin-top:10px;}
+  .env-dot{width:6px;height:6px;border-radius:50%;background:#2fae5c;}
+  .env-label{font-size:11px;color:var(--bluegray);}
+  nav.nav{flex:1;padding:10px 12px;overflow-y:auto;}
+  .nav-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 11px;border-radius:var(--r-lg);color:var(--charcoal);font-family:'Poppins',sans-serif;font-weight:500;font-size:13.5px;cursor:default;margin-bottom:2px;}
+  .nav-item .nav-left{display:flex;align-items:center;gap:11px;}
+  .nav-item:hover{background:#f4f6f7;}
+  .nav-item.active{background:var(--primary-50);color:var(--primary-700);position:relative;}
+  .nav-item.active::before{content:"";position:absolute;left:-12px;top:6px;bottom:6px;width:3px;background:var(--primary);border-radius:0 3px 3px 0;}
+  .nav-item .icon{color:var(--bluegray);}
+  .nav-item.active .icon{color:var(--primary);}
+  .nav-count{font-size:11px;font-weight:700;padding:1px 7px;border-radius:99px;background:var(--warn-bg);color:var(--warn-text);}
+  .nav-foot{padding:14px 18px;border-top:1px solid #f0f1f3;display:flex;align-items:center;gap:10px;}
+  .avatar{width:32px;height:32px;border-radius:50%;background:var(--primary-100);color:var(--primary-700);display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-weight:700;font-size:12px;flex:none;}
+  .nav-foot-name{font-size:12.5px;font-weight:700;color:var(--charcoal);font-family:'Poppins',sans-serif;}
+  .nav-foot-role{font-size:11px;color:var(--bluegray);}
+  .main{display:flex;flex-direction:column;min-width:0;}
+  .topbar{height:62px;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;padding:0 22px;flex:none;}
+  .search-wrap{flex:1;max-width:420px;position:relative;}
+  .search-wrap .icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#9aa3ab;}
+  .search-input{width:100%;border:1px solid var(--border);background:var(--soft);border-radius:var(--r-lg);padding:8px 12px 8px 34px;font-size:13px;color:var(--muted);font-family:'Mulish',sans-serif;}
+  .topbar-actions{display:flex;align-items:center;gap:8px;margin-left:auto;}
+  .icon-btn{position:relative;width:34px;height:34px;border-radius:var(--r-lg);border:1px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;color:var(--bluegray);}
+  .icon-btn .dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#e6544f;border:1.5px solid #fff;}
+  .user-chip{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;border-radius:99px;border:1px solid var(--border);}
+  .user-chip .name{font-size:12.5px;font-weight:700;font-family:'Poppins',sans-serif;color:var(--charcoal);}
+  .content{padding:26px 28px 40px;flex:1;}
+  .page-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+  .breadcrumb{font-size:12px;color:var(--bluegray);margin-bottom:4px;}
+  .page-title{font-size:21px;font-weight:700;color:var(--charcoal);}
+  .page-desc{font-size:12.5px;color:var(--bluegray);margin-top:4px;}
+  .btn{font-family:'Poppins',sans-serif;font-weight:500;font-size:13px;border-radius:var(--r-lg);padding:9px 15px;display:inline-flex;align-items:center;gap:7px;border:1px solid transparent;cursor:default;white-space:nowrap;}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-secondary{background:#fff;color:var(--charcoal);border-color:#d7dbdf;}
+  .btn-ghost{background:transparent;color:var(--bluegray);}
+  .btn-sm{padding:6px 11px;font-size:12px;}
+  .card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow);}
+  .card-pad{padding:18px 18px;}
+  .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .section-title{font-size:14.5px;font-weight:700;color:var(--charcoal);}
+  .section-sub{font-size:11.5px;color:var(--bluegray);margin-top:2px;}
+  .select-chip{display:flex;align-items:center;gap:6px;border:1px solid var(--border);background:#fff;border-radius:var(--r-lg);padding:7px 11px;font-size:12.5px;color:var(--charcoal);}
+  .pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;border:1px solid transparent;font-family:'Mulish',sans-serif;white-space:nowrap;}
+  .pill-neutral{background:var(--neutral-bg);color:var(--neutral-text);border-color:var(--neutral-ring);}
+  .pill-warn{background:var(--warn-bg);color:var(--warn-text);border-color:var(--warn-ring);}
+  .pill-success{background:var(--success-bg);color:var(--success-text);border-color:var(--success-ring);}
+  /* form */
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .form-group{display:flex;flex-direction:column;gap:6px;}
+  .form-group.span-2{grid-column:1 / -1;}
+  .form-label{font-size:12px;font-weight:700;color:var(--charcoal);font-family:'Poppins',sans-serif;}
+  .form-label .req{color:#b0292b;}
+  .form-hint{font-size:11px;color:var(--bluegray);}
+  .form-input,.form-select{border:1px solid var(--border);border-radius:var(--r-lg);padding:9px 11px;font-size:13px;color:var(--ink);background:#fff;font-family:'Mulish',sans-serif;}
+  .chip-row{display:flex;gap:8px;flex-wrap:wrap;}
+  .grade-chip{border:1.5px solid var(--border);border-radius:99px;padding:6px 13px;font-size:12px;font-weight:700;color:var(--bluegray);}
+  .grade-chip.selected{border-color:var(--primary);background:var(--primary-50);color:var(--primary-700);}
+  .check-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #f4f5f6;font-size:13px;}
+  .check-row:last-child{border-bottom:none;}
+  .check-box{width:17px;height:17px;border-radius:5px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex:none;color:#fff;}
+  .check-box.on{background:var(--primary);border-color:var(--primary);}
+  .dropzone{border:1.5px dashed #c6ccd1;border-radius:var(--r-lg);padding:22px;text-align:center;color:var(--bluegray);background:var(--soft);}
+  .dropzone .icon{color:#9aa3ab;}
+  .dropzone-title{font-size:12.5px;font-weight:700;color:var(--charcoal);margin-top:8px;}
+  .dropzone-sub{font-size:11px;margin-top:3px;}
+  .divider{height:1px;background:var(--border);margin:20px 0;}
+  .thumb-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+  .thumb{width:52px;height:52px;border-radius:8px;background:var(--soft);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:#b7bec4;}
+
+  /* Attribute Reconcile Banner — DESIGN.md § Components > attribute-reconcile-banner */
+  .reconcile-banner{background:var(--warn-bg);border:1px solid var(--warn-ring);border-radius:var(--r-lg);padding:14px 16px;}
+  .reconcile-banner + .reconcile-banner{margin-top:0;}
+  .reconcile-summary{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--warn-text);}
+  .reconcile-summary b{font-weight:700;}
+  .reconcile-summary .icon{color:var(--warn-text);}
+  .reconcile-diff{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px;padding-top:14px;border-top:1px solid var(--warn-ring);}
+  .diff-col-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;color:var(--warn-text);margin-bottom:8px;}
+  .diff-item{background:#fff;border:1px solid var(--warn-ring);border-radius:7px;padding:8px 10px;font-size:12.5px;color:var(--charcoal);margin-bottom:6px;}
+  .diff-item:last-child{margin-bottom:0;}
+  .diff-item .diff-note{display:block;font-size:11px;color:var(--bluegray);font-weight:400;margin-top:2px;}
+  .reconcile-actions{display:flex;justify-content:flex-end;margin-top:14px;}
+  .alt-state-wrap{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px;}
+  .alt-state-label{flex:none;width:210px;}
+  .alt-state-label .tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;color:var(--bluegray);}
+  .alt-state-label .desc{font-size:11.5px;color:var(--bluegray);margin-top:4px;}
+  .alt-state-body{flex:1;}
+</style>
+</head>
+<body>
+<div class="device-frame">
+  <div class="browser-bar">
+    <span class="browser-dot" style="background:#ec6a5e"></span>
+    <span class="browser-dot" style="background:#f5bd4f"></span>
+    <span class="browser-dot" style="background:#61c454"></span>
+    <span class="browser-url">admin.brandstore.id/catalog/items/bz-1042/edit</span>
+  </div>
+
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">
+          <div class="brand-badge">BZ</div>
+          <div>
+            <div class="brand-name">Bazaar</div>
+            <div class="brand-sub">Admin Portal</div>
+          </div>
+        </div>
+        <div class="env-row"><span class="env-dot"></span><span class="env-label">Live · Brand Store</span></div>
+      </div>
+
+      <nav class="nav">
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-grid"/></svg>Dashboard</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-inbox"/></svg>Approvals Inbox</span></div>
+        <div class="nav-item active"><span class="nav-left"><svg class="icon"><use href="#icon-box"/></svg>Catalog</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-receipt"/></svg>Order</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-wallet"/></svg>Finance</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-shield"/></svg>User &amp; Access</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-message"/></svg>Content</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-activity"/></svg>Reporting</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-mail"/></svg>Notification</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-gear"/></svg>Global Settings</span></div>
+        <div class="nav-item"><span class="nav-left"><svg class="icon"><use href="#icon-search"/></svg>SEO &amp; Discoverability</span></div>
+      </nav>
+
+      <div class="nav-foot">
+        <div class="avatar">SR</div>
+        <div>
+          <div class="nav-foot-name">Sari</div>
+          <div class="nav-foot-role">Staff Catalog</div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div class="search-wrap">
+          <svg class="icon"><use href="#icon-search"/></svg>
+          <input class="search-input" placeholder="Cari Item, Brand, atau SKU…" readonly>
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-btn"><svg class="icon"><use href="#icon-bell"/></svg></button>
+          <div class="user-chip">
+            <div class="avatar" style="width:26px;height:26px;font-size:10.5px;">SR</div>
+            <div class="name">Sari</div>
+            <svg class="icon-sm"><use href="#icon-chevron"/></svg>
+          </div>
+        </div>
+      </header>
+
+      <main class="content">
+        <div class="page-head">
+          <div>
+            <div class="breadcrumb">Catalog / Items</div>
+            <div class="page-title">Edit Item — Sepatu Lari (Second)</div>
+            <div class="page-desc">SKU BZ-1042 · Sub-Category: Sepatu · dibuka untuk update harga.</div>
+          </div>
+          <span class="pill pill-success">Published</span>
+        </div>
+
+        <!-- Load-bearing alternate state, per Key Screens spec: the COLLAPSED
+             banner state, isolated in its own small labeled section so both
+             states of this component are visible in one file. -->
+        <div class="alt-state-wrap">
+          <div class="alt-state-label">
+            <div class="tag">Alternate state</div>
+            <div class="desc">Collapsed — the banner's at-rest state before Sari clicks to expand it. Single summary line only.</div>
+          </div>
+          <div class="alt-state-body">
+            <div class="reconcile-banner">
+              <div class="reconcile-summary">
+                <svg class="icon"><use href="#icon-alert"/></svg>
+                <span>Template atribut berubah — <b>1 field baru, 1 field dihapus.</b></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Canonical state for this Key Screen: EXPANDED banner, in full context
+             at the top of the live Item edit form. EXPERIENCE.md § Key Flow 3:
+             Sub-Category "Sepatu" gained "Warna", lost "Ukuran Kardus" since this
+             Item's attribute snapshot was last touched. -->
+        <div class="card card-pad">
+          <div class="reconcile-banner" style="margin-bottom:20px;">
+            <div class="reconcile-summary">
+              <svg class="icon"><use href="#icon-alert"/></svg>
+              <span>Template atribut berubah — <b>1 field baru, 1 field dihapus.</b></span>
+            </div>
+            <div class="reconcile-diff">
+              <div>
+                <div class="diff-col-label">Ditambahkan</div>
+                <div class="diff-item">Warna<span class="diff-note">Field baru dari Template — belum diisi</span></div>
+              </div>
+              <div>
+                <div class="diff-col-label">Dihapus</div>
+                <div class="diff-item">Ukuran Kardus<span class="diff-note">Masih tersimpan di data Item ini — akan dihapus dari snapshot saat diselaraskan</span></div>
+              </div>
+            </div>
+            <div class="reconcile-actions">
+              <button class="btn btn-primary btn-sm">Selaraskan</button>
+            </div>
+          </div>
+
+          <div class="section-head">
+            <div>
+              <div class="section-title">Detail Item</div>
+              <div class="section-sub">Field lain tidak berubah — diff hanya memengaruhi Template Atribut Sub-Category</div>
+            </div>
+            <span class="select-chip">Sub-Category: Sepatu<svg class="icon-sm"><use href="#icon-chevron"/></svg></span>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">Brand</label><div class="form-select">Brand Terpilih</div></div>
+            <div class="form-group"><label class="form-label">Nama Item</label><input class="form-input" value="Sepatu Lari" readonly></div>
+            <div class="form-group"><label class="form-label">Harga (Rp)</label><input class="form-input" value="450.000" readonly></div>
+            <div class="form-group"><label class="form-label">Condition</label><div class="form-select">Second</div></div>
+            <div class="form-group"><label class="form-label">Inventory Strategy</label><div class="form-select">Serialized</div></div>
+            <div class="form-group"><label class="form-label">Warehouse</label><input class="form-input" value="Gudang Utama (Default)" disabled style="color:var(--bluegray);background:var(--soft);"></div>
+
+            <div class="form-group span-2">
+              <label class="form-label">Grading <span class="req">*</span></label>
+              <div class="form-hint">Wajib diisi untuk Condition = Second — hasil appraisal fisik manual staff.</div>
+              <div class="chip-row">
+                <span class="grade-chip">Baru</span>
+                <span class="grade-chip">Sangat Baik</span>
+                <span class="grade-chip selected">Baik</span>
+                <span class="grade-chip">Cukup</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="section-title" style="margin-bottom:10px;">Kondisi Fisik — Template Atribut: Sepatu</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Warna <span class="req">*</span></label>
+              <div class="form-hint">Field baru dari Template — isi setelah Reconcile</div>
+              <div class="form-select" style="color:var(--muted);">Pilih Warna</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Bahan</label>
+              <div class="form-select">Kulit Sintetis</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Ukuran Kardus</label>
+              <div class="form-hint" style="color:var(--warn-text);">Akan dihapus dari snapshot saat Reconcile dijalankan</div>
+              <input class="form-input" value="42" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Ukuran Sepatu</label>
+              <input class="form-input" value="42" readonly>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="form-grid">
+            <div>
+              <div class="section-title" style="margin-bottom:10px;">Checklist Kelengkapan</div>
+              <div class="check-row"><span class="check-box on"><svg class="icon-sm"><use href="#icon-check"/></svg></span>Kotak Sepatu</div>
+              <div class="check-row"><span class="check-box on"><svg class="icon-sm"><use href="#icon-check"/></svg></span>Nota Pembelian</div>
+              <div class="check-row"><span class="check-box"></span>Tali Cadangan</div>
+            </div>
+            <div>
+              <div class="section-title" style="margin-bottom:10px;">Foto &amp; Video</div>
+              <div class="thumb-row">
+                <div class="thumb"><svg class="icon"><use href="#icon-image"/></svg></div>
+                <div class="thumb"><svg class="icon"><use href="#icon-image"/></svg></div>
+                <div class="thumb"><svg class="icon"><use href="#icon-image"/></svg></div>
+              </div>
+              <div class="dropzone">
+                <svg class="icon" style="width:26px;height:26px;"><use href="#icon-image"/></svg>
+                <div class="dropzone-title">Tarik &amp; lepas foto/video di sini</div>
+                <div class="dropzone-sub">3 foto diunggah · alt text otomatis dari nama Item</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+          <div style="display:flex;justify-content:flex-end;gap:8px;">
+            <button class="btn btn-ghost">Batalkan</button>
+            <button class="btn btn-secondary">Simpan Perubahan</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<svg style="display:none">
+  <defs>
+    <symbol id="icon-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+    <symbol id="icon-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l9-5 9 5-9 5-9-5z"/><path d="M3 8v9l9 5 9-5V8"/><path d="M12 13v9"/></symbol>
+    <symbol id="icon-receipt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v17l-3-2-3 2-3-2-3 2V3z"/><path d="M9 8h6M9 12h6"/></symbol>
+    <symbol id="icon-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="16" cy="14.3" r="1.1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="icon-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2.5 12h3M18.5 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.2" y2="16.2"/></symbol>
+    <symbol id="icon-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></symbol>
+    <symbol id="icon-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></symbol>
+    <symbol id="icon-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2L12 3z"/><line x1="12" y1="9" x2="12" y2="14"/><circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="icon-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="M21 16l-5.5-5.5L8 18"/></symbol>
+    <symbol id="icon-inbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16l2 9v5a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-5l2-9z"/><path d="M2 13h5l1.5 3h7L17 13h5"/></symbol>
+    <symbol id="icon-message" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H8l-4 4V5z"/></symbol>
+    <symbol id="icon-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></symbol>
+    <symbol id="icon-activity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 12 7 12 9.5 5 14.5 19 17 12 22 12"/></symbol>
+  </defs>
+</svg>
+</body>
+</html>
