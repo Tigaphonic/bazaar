@@ -40,7 +40,7 @@ testbench.yaml
 .github/skills
 !.augment/code_review_guidelines.yaml
 !/docs/draft/
-_artifacts/
+#_artifacts/
 
 # AI Agents
 .agents/
