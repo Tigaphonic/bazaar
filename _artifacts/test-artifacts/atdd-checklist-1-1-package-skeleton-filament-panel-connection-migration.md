@@ -1,7 +1,7 @@
 ---
 stepsCompleted: ['step-01-preflight-and-context', 'step-02-generation-mode', 'step-03-test-strategy', 'step-04-generate-tests', 'step-04c-aggregate', 'step-05-validate-and-complete']
 lastStep: 'step-05-validate-and-complete'
-lastSaved: '2026-09-13'
+lastSaved: '2026-09-14'
 workflowType: 'testarch-atdd'
 storyId: '1.1'
 storyKey: '1-1-package-skeleton-filament-panel-connection-migration'
@@ -94,11 +94,13 @@ Level selection per panduan backend: **Unit** untuk logika murni & manifest, **I
 | TS-5 | AC1 | P1 | Unit | `composer.json` mendeklarasikan `filament/filament` ^5.8 + constraint PHP/Laravel sesuai stack |
 | TS-6 | AC2 | P1 | Unit | Struktur `src/{Domain}/` (Install, User, Settings minimal) tersedia sesuai Structural Seed |
 | TS-7 | AC4 | P1 | Integration | `bazaar:status` berjalan & melaporkan heartbeat scheduler+queue (AD-17) |
-| TS-8 | AC3 | P1 | Integration | Migration baru pakai ULID primary key (AD-18), bukan auto-increment |
+| TS-8 | AC3 | P1 | Integration | Migration yang *ditulis Bazaar sendiri* (jika ada) pakai ULID (AD-18, diamandemen 2026-09-14 — tabel milik dependency dikecualikan) |
 | TS-9 | AC3 | P2 | Static | Tidak ada SQL spesifik-engine di file migration (AD-23) |
 | TS-10 | AC4 | P2 | Integration | Nav group "User & Access" & "Global Settings" tampil di panel setelah install (UX-DR13) |
 
 **Red phase confirmation:** semua 10 skenario dipastikan gagal sekarang — `bazaar:install`/`bazaar:status` belum ada (baru `BazaarCommand` generik dari skeleton), `filament/filament` belum jadi dependency, `database/migrations/` kosong, tidak ada `src/{Domain}/` selain skeleton generik, `tests/ArchTest.php` belum punya rule boundary domain.
+
+> **Update 2026-09-14 (amandemen AD-18):** TS-8/TS-9 direvisi. AD-18 kini secara eksplisit dilingkupi ke *migration yang ditulis Bazaar sendiri* — tabel milik dependency (`users` core Laravel, tabel `spatie/laravel-permission`, storage `spatie/laravel-settings`) tetap pakai skema native mereka, tidak pernah disalin ke `database/migrations/` milik package ini. Konsekuensinya: Story 1.1 berpotensi **tidak punya migration baru sama sekali** kalau domain User & Access + Global Settings sepenuhnya tertutup oleh skema bawaan dependency. `DomainMigrationTest.php`'s ULID/engine-neutral tests diubah agar tidak lagi mewajibkan `$migrationFiles` non-empty (assersi lama akan gagal permanen kalau folder migration package memang sengaja kosong) — sekarang menegakkan aturan hanya pada file yang benar-benar ada, vacuously-true kalau kosong. Lihat test file untuk komentar lengkap.
 
 ### Confidence Gate
 
@@ -109,10 +111,9 @@ Rationale: AC dikutip langsung dari epics.md Story 1.1 (baris 268–294); mekani
   literal dari AD-5; heartbeat TS-7 dikutip literal dari AD-17 (scheduler_last_tick/queue_last_processed);
   composer.json TS-5 diverifikasi langsung (filament/filament memang belum ada di require).
 Unknowns:
-  - Nama tabel konkret untuk User/Role/Permission/Settings BELUM ditentukan di dokumen manapun (risiko
-    collision dengan tabel host app karena AD-10: satu DB per install, tanpa tenant_id) — TS-3/TS-8 sengaja
-    tidak hardcode nama tabel, hanya assert command exit + pola migration; keputusan penamaan jadi task
-    eksplisit di Implementation Checklist sebelum GREEN phase.
+  - ~~Nama tabel konkret untuk User/Role/Permission/Settings~~ — **Resolved 2026-09-14** oleh amandemen AD-18:
+    tidak ada nama baru, Bazaar menempel ke tabel bawaan Laravel/spatie apa adanya (lihat catatan di Test
+    Strategy dan Implementation Checklist).
   - Format output persis `bazaar:status` (AD-17 cuma menjelaskan mekanisme, bukan format tampilan) — TS-7
     diasersikan longgar (exit code + menyebut kata kunci scheduler/queue), bukan string persis.
 ```
@@ -188,7 +189,7 @@ Step 4/4C skill ini dirancang untuk dual-subagent (Worker A: API, Worker B: E2E)
 
 - [ ] Tambahkan `filament/filament: ^5.8` ke `composer.json` (`require`)
 - [ ] Set up fixture Testbench (`workbench/` belum ada) dengan 1 Filament panel kosong yang sudah terpasang — mensimulasikan "proyek klien" di AC1's Given clause
-- [ ] **Putuskan konvensi penamaan tabel** untuk domain User & Access + Global Settings (Unknown dari Step 3 — AD-10: satu DB per install tanpa `tenant_id`, jadi ada risiko collision nama tabel dengan host app; belum ada keputusan di planning docs manapun)
+- [x] ~~Putuskan konvensi penamaan tabel untuk domain User & Access + Global Settings~~ — **Resolved 2026-09-14 (amandemen AD-18):** tidak ada nama baru untuk diputuskan — User pakai tabel `users` core Laravel apa adanya, Role/Permission & Settings pakai nama tabel bawaan `spatie/laravel-permission`/`spatie/laravel-settings` apa adanya. Risiko collision AD-10 gugur karena Bazaar sengaja *menempel*, bukan menciptakan nama baru yang bisa bentrok.
 
 ### Test: `PackageManifestTest` (AC1)
 
@@ -211,10 +212,13 @@ Step 4/4C skill ini dirancang untuk dual-subagent (Worker A: API, Worker B: E2E)
 
 ### Test: `DomainMigrationTest` (AC3)
 
-- [ ] Tulis migration nyata untuk domain User & Access (User, Role, Permission tables via `spatie/laravel-permission`) + Global Settings
-- [ ] Semua PK pakai `->ulid('id')`, bukan `->id()` (AD-18)
-- [ ] Hindari fungsi JSON spesifik-MySQL/Postgres (AD-23)
-- [ ] Hapus `database/migrations/create_bazaar_table.php.stub` (placeholder skeleton)
+- [ ] User: pakai tabel `users` core Laravel yang sudah ada di proyek klien — **tidak** membuat migration `create_users_table` baru (AD-18 amandemen)
+- [ ] Role/Permission: publish migration bawaan `spatie/laravel-permission` **apa adanya** dari vendor (atau biarkan ter-load lewat `loadMigrationsFrom()` paket itu sendiri) — jangan disalin/diedit ke `database/migrations/` milik Bazaar, jangan dipaksa ULID
+- [ ] Global Settings: storage `spatie/laravel-settings` **apa adanya** dari vendor — perlakuan sama seperti di atas
+- [ ] Tempelkan kapabilitas RBAC/`FilamentUser` ke model User milik host lewat seam AD-16 (trait/container-binding), bukan tabel/model baru
+- [ ] Kalau memang ada tabel baru yang harus ditulis Bazaar sendiri untuk domain ini — pakai `->ulid('id')`, bukan `->id()` (AD-18, hanya berlaku untuk migration Bazaar sendiri)
+- [ ] Hindari fungsi JSON spesifik-MySQL/Postgres pada migration Bazaar sendiri, jika ada (AD-23)
+- [ ] Hapus `database/migrations/create_bazaar_table.php.stub` (placeholder skeleton) — folder ini boleh berakhir kosong, itu bukan bug
 - [ ] Jalankan: `vendor/bin/pest --filter=DomainMigrationTest`
 
 ### Test: `BazaarStatusCommandTest` (AC4)
@@ -354,7 +358,7 @@ Exit code: 0
 ## Notes
 
 - File story individual (`create-story`) belum dijalankan — checklist ini merujuk `epics.md` langsung. Ketika file story dibuat, mirror artifact paths ke `Dev Notes`-nya.
-- **Unknown terbuka (perlu keputusan sebelum GREEN):** nama tabel konkret domain User & Access + Global Settings (risiko collision karena AD-10 no-tenant-id/satu-DB); format output persis `bazaar:status`.
+- **Unknown terbuka (perlu keputusan sebelum GREEN):** format output persis `bazaar:status`. (Nama tabel konkret domain User & Access + Global Settings sudah resolved 2026-09-14 — lihat amandemen AD-18 di atas.)
 - `ArchDomainBoundaryTest` sengaja dibuat aktif (bukan skip) karena nilainya adalah pencegahan regresi sejak commit pertama yang menambah domain — bukan sesuatu yang "diaktifkan" satu-per-satu seperti scaffold lain.
 
 ---

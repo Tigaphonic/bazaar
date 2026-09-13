@@ -7,7 +7,7 @@ paradigm: 'Modular Monolith with Hexagonal ports at the Payment/Shipping boundar
 scope: 'Full Bazaar package — all 9 in-scope domains (Catalog, Order, Finance, User & Access, Content, Reporting, Notification, Global Settings, SEO & Discoverability) plus Package Installation & Integration. Governs FR-1 through FR-40.'
 status: final
 created: '2026-09-12'
-updated: '2026-09-12'
+updated: '2026-09-14'
 binds: ['Catalog', 'Order', 'Finance', 'User & Access', 'Content', 'Reporting', 'Notification', 'Global Settings', 'SEO & Discoverability', 'Package Installation & Integration']
 sources:
   - _artifacts/planning-artifacts/prds/prd-Tigaphonic/bazaar-2026-09-11/prd.md
@@ -136,11 +136,11 @@ companions: []
 - **Prevents:** a dead scheduler or queue worker silently breaking auto-cancellation/auto-completion/notification dispatch with no visible symptom; the self-defeating design of detecting "the scheduler is dead" through a mechanism that itself depends on the scheduler
 - **Rule:** A frequent trivial scheduled task writes a `scheduler_last_tick` timestamp; the same task dispatches a trivial queued job that writes `queue_last_processed` when actually executed. Staleness is evaluated on **pull** (page render / CLI call), never on push: via `bazaar:status` (Artisan — usable any time post-install, not just at install, to catch config drift) and a Global Settings dashboard widget. When staleness crosses a threshold and no active alert already exists, a `StaffNotification` (AD-14) is raised to the ops-permission Role.
 
-### AD-18 — Identifiers: universal ULID + transaction numbers
+### AD-18 — Identifiers: ULID for Bazaar-owned tables + transaction numbers
 
 - **Binds:** all domains
-- **Prevents:** domains picking different PK strategies (leaking sequential business volume in some tables but not others); UUIDv4-style random-insert index fragmentation on high-concurrency tables (Stock, under AD-8)
-- **Rule:** Every Model's primary key is a ULID (Laravel's native `HasUlids`), no per-table exception. Transactional entities meant for human reference — Order, Payment, RefundRequest, Shipment, CancelRequest, ReturnRequest — additionally carry a human-readable transaction number (e.g. `ORD-20260912-000123`). All of them are generated through **one shared mechanism**: a single `transaction_counters` table keyed by `(prefix, date)`, mutated only via the same atomic guarded-`UPDATE` pattern as AD-8 — never `spatie/laravel-settings` or any cached/non-atomic read-then-write, which cannot satisfy this AD's own no-collision guarantee under concurrent checkout. One implementation, reused by every entity in this list — never reinvented per domain.
+- **Prevents:** domains picking different PK strategies (leaking sequential business volume in some tables but not others); UUIDv4-style random-insert index fragmentation on high-concurrency tables (Stock, under AD-8); vendor migrations hand-patched to force a PK type they were never designed around
+- **Rule:** Every Model whose migration is authored by Bazaar itself uses a ULID primary key (Laravel's native `HasUlids`), no exception. Tables and identifiers owned by a first-party Laravel/ecosystem dependency — Laravel's own `users` table, `spatie/laravel-permission`'s tables, Sanctum's `personal_access_tokens`, `spatie/laravel-settings`' own storage — keep that dependency's native schema unmodified; Bazaar never hand-edits a vendor migration to force ULID, and any Bazaar-owned FK column pointing at such a table matches that table's native key type rather than assuming ULID. This scoping holds because the leakage/fragmentation risks above are about Bazaar's own business-data tables, not low-write identity/RBAC tables a dependency already ships and maintains. Transactional entities meant for human reference — Order, Payment, RefundRequest, Shipment, CancelRequest, ReturnRequest — additionally carry a human-readable transaction number (e.g. `ORD-20260912-000123`). All of them are generated through **one shared mechanism**: a single `transaction_counters` table keyed by `(prefix, date)`, mutated only via the same atomic guarded-`UPDATE` pattern as AD-8 — never `spatie/laravel-settings` or any cached/non-atomic read-then-write, which cannot satisfy this AD's own no-collision guarantee under concurrent checkout. One implementation, reused by every entity in this list — never reinvented per domain.
 
 ### AD-19 — Money stored as whole-Rupiah integer
 
