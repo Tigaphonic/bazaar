@@ -11,7 +11,7 @@ $domainDirectories = collect(glob(__DIR__.'/../src/*', GLOB_ONLYDIR))
 
 it('has at least one domain-grouped src/{Domain} directory to enforce AD-5/AD-6 boundaries against', function () use ($domainDirectories) {
     expect($domainDirectories)->not->toBeEmpty();
-})->skip('AC4 / AD-5 — only the generic package skeleton exists so far, no domain directories yet (Story 1.1)');
+});
 
 foreach ($domainDirectories as $domain) {
     $modelsNamespace = "Tigaphonic\\Bazaar\\{$domain}\\Models";
