@@ -2,7 +2,7 @@
 
 *Companion to `prd.md`. Holds architecture-how content that doesn't belong in the PRD narrative: mechanism/transport decisions, schema-level detail, rejected-alternative rationale. PRD sections cross-reference here with "→ addendum". This is input to `bmad-architecture`, not a spec to re-litigate the PRD's product decisions.*
 
-## A. Architecture Principles (source: `docs/draft/brandstore-package-brief.md` §3, carried forward unchanged)
+## A. Architecture Principles (source: `_artifacts/business-draft/brandstore-package-brief.md` §3, carried forward unchanged)
 
 | # | Prinsip | Ringkasan |
 |---|---|---|

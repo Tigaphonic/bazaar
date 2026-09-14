@@ -1,6 +1,6 @@
 # Input Reconciliation — Brand Store Package Brief vs. PRD + Addendum
 
-**Source input:** `docs/draft/brandstore-package-brief.md`
+**Source input:** `_artifacts/business-draft/brandstore-package-brief.md`
 **Checked against:** `_artifacts/planning-artifacts/prds/prd-Tigaphonic/bazaar-2026-09-11/prd.md` + `addendum.md`
 **Date:** 2026-09-11
 

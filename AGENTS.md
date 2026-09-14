@@ -11,6 +11,6 @@ Laravel package (`tigaphonic/bazaar`) providing a headless Filament admin backen
 - Technical addendum: `addendum.md` in the same folder — architecture principles (P1–P10), schema detail, gateway choices. Superseded as the binding source by the architecture spine below; kept as its verified input.
 - Architecture spine: `_artifacts/planning-artifacts/architecture/architecture-Tigaphonic/bazaar-2026-09-12/ARCHITECTURE-SPINE.md` — status final, 32 architecture decisions (AD-1–AD-32) governing domain boundaries, stack, identifiers, and the operational envelope. Read this before writing any domain code.
 - UX spine: `DESIGN.md` + `EXPERIENCE.md` in `_artifacts/planning-artifacts/ux-designs/ux-Tigaphonic/bazaar-2026-09-11/` — visual tokens and dashboard behavior for the Filament admin.
-- Original product brief: `docs/draft/brandstore-package-brief.md`.
+- Original product brief: `_artifacts/business-draft/brandstore-package-brief.md`.
 
 <!-- /bmad:context -->
