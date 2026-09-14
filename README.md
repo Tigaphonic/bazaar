@@ -5,7 +5,7 @@
 [![GitHub Code Style Action Status](https://github.com/spatie/package-bazaar-laravel/actions/workflows/fix-php-code-style-issues.yml/badge.svg)](https://github.com/tigaphonic/bazaar/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/tigaphonic/bazaar.svg?style=flat-square)](https://packagist.org/packages/tigaphonic/bazaar)
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+Bazaar is a Composer package that installs a full Filament admin backend for an eCommerce Brand Store — catalog, order, finance, content, and more — into your existing Laravel + Filament project. It connects to your project's own panel; it never creates a second one.
 
 ## Support us
 
@@ -23,24 +23,16 @@ You can install the package via composer:
 composer require tigaphonic/bazaar
 ```
 
-You can publish and run the migrations with:
+Then connect it to your project's existing Filament panel:
 
 ```bash
-php artisan vendor:publish --tag="bazaar-migrations"
-php artisan migrate
+php artisan bazaar:install
 ```
 
 You can publish the config file with:
 
 ```bash
 php artisan vendor:publish --tag="bazaar-config"
-```
-
-This is the contents of the published config file:
-
-```php
-return [
-];
 ```
 
 Optionally, you can publish the views using
@@ -51,9 +43,20 @@ php artisan vendor:publish --tag="bazaar-views"
 
 ## Usage
 
-```php
-$bazaar = new Tigaphonic\Bazaar();
-echo $bazaar->echoPhrase('Hello, Tigaphonic!');
+### `bazaar:install`
+
+Connects Bazaar's Resources and Pages to your project's default Filament panel (or the one named in `config('bazaar.panel')`) — it never registers a new panel.
+
+```bash
+php artisan bazaar:install
+```
+
+### `bazaar:status`
+
+Reports whether the scheduler and queue worker are actually running, via the heartbeat mechanism Bazaar's service provider registers (a scheduled task and a queued job, each writing a timestamp to cache). Safe to run any time, not just right after install — useful for catching config drift later.
+
+```bash
+php artisan bazaar:status
 ```
 
 ## Testing
