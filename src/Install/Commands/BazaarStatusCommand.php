@@ -12,9 +12,9 @@ use Illuminate\Support\Facades\Cache;
  */
 class BazaarStatusCommand extends Command
 {
-    public $signature = 'bazaar:status';
+    protected $signature = 'bazaar:status';
 
-    public $description = 'Report scheduler and queue worker heartbeat staleness.';
+    protected $description = 'Report scheduler and queue worker heartbeat staleness.';
 
     private const STALE_AFTER_MINUTES = 2;
 

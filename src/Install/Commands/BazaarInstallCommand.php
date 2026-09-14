@@ -8,9 +8,9 @@ use Tigaphonic\Bazaar\Install\Support\PanelResolver;
 
 class BazaarInstallCommand extends Command
 {
-    public $signature = 'bazaar:install';
+    protected $signature = 'bazaar:install';
 
-    public $description = 'Connect Bazaar to the client project\'s existing Filament panel.';
+    protected $description = 'Connect Bazaar to the client project\'s existing Filament panel.';
 
     public function handle(PanelRegistry $registry): int
     {

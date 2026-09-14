@@ -13,3 +13,11 @@ it('resolves to bazaar.models.user when the client overrides it', function () {
 
     config()->set('bazaar.models.user', null);
 });
+
+it('throws RuntimeException when both config models are null', function () {
+    config()->set('bazaar.models.user', null);
+    config()->set('auth.providers.users.model', null);
+
+    expect(fn () => UserResource::getModel())
+        ->toThrow(RuntimeException::class, "Bazaar could not resolve a User & Access model.");
+});

@@ -105,3 +105,23 @@ context: [
 - `composer update` -- expected: resolves cleanly, `filament/filament` ^5.8-compatible, `illuminate/contracts` locked to `^12.0||^13.0`
 - `vendor/bin/pest` -- expected: all tests pass, zero `->skip()` remaining in the 7 target files
 - `vendor/bin/pest --filter=ArchDomainBoundaryTest` -- expected: passes once `src/{Install,User,Settings}` exist
+
+### Review Findings
+
+- [x] [Review][Patch] Unverified failure paths in PanelResolver [src/Install/Support/PanelResolver.php:24]
+- [x] [Review][Patch] Unverified exception path for missing User model configuration [src/User/Filament/Resources/UserResource.php:24]
+- [x] [Review][Patch] Missing verification that the queue heartbeat job is actually scheduled [src/BazaarServiceProvider.php:65]
+- [x] [Review][Patch] Missing strict property typing in Commands [src/Install/Commands/BazaarInstallCommand.php:11]
+
+**Rejected:**
+- `Missing runningInConsole check`: The overhead is negligible; an additional check adds unnecessary complexity.
+- `Missing string parsing in BazaarStatusCommand`: Laravel's Cache drivers automatically serialize and deserialize Carbon instances.
+- `Fatal exception on app requests when panel config is missing`: The exception is intentionally thrown to fail loudly and clearly on misconfiguration, as required by the spec.
+- `Missing explicit cache store targeting`: It is correct behavior for a package to use the default cache store; custom split setups are the client's responsibility.
+- `Missing schema safeguards in UserResource`: Filament handles missing attributes gracefully by rendering empty text, and this is explicitly a minimal placeholder.
+- `Missing basic list usability features in UserResource`: Explicitly stated as a minimal placeholder in the spec; full functionality belongs to Story 1.4.
+- `Missing strict type assertions in BazaarStatusCommand`: The write path uses a Carbon instance; it will never return a boolean `false`.
+- `Missing localization for Artisan command output`: Bilingual requirements apply to the Filament UI, not to developer-facing CLI command outputs.
+- `Missing configurable staleness threshold`: Not mandated by the spec; hardcoded value is sufficient for the MVP.
+- `Empty string bypasses exception for missing User model configuration`: Missing config returns `null`; setting it to empty string is a deliberate misconfiguration.
+- `TypeError in PanelRegistry::get(string $id)`: An array in a string config is a severe misconfiguration; the resulting exception is acceptable.
