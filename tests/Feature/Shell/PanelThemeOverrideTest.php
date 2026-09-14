@@ -1,20 +1,47 @@
 <?php
 
-// Story 1.2 RED-PHASE scaffold: BazaarServiceProvider does not yet register a custom
-// panel theme/colors. ARCHITECTURE-SPINE.md line 42: "Per-client visual differences go
-// through Filament's own theme-override mechanism ... never a second panel
-// implementation." AC1: shell must render as a Filament panel theme override, not the
-// stock Filament theme.
+// Story 1.2 RED-PHASE scaffold: BazaarServiceProvider does not yet register Shell's
+// theme. ARCHITECTURE-SPINE.md AD-33 fixes the exact shape (updated 2026-09-14,
+// after Winston's spine amendment):
+//   FilamentAsset::register(
+//       [Css::make('bazaar-shell', ...), Js::make('bazaar-shell', ...)],
+//       package: 'bazaar',
+//   );
+//   $panel->theme('bazaar-shell');
+// — never ->viteTheme(), which is Filament's Vite-paired API and would silently
+// require a host-side Vite build, defeating AD-33's entire "zero Node for host
+// apps" reason for existing. `package: 'bazaar'` scopes the asset path away from
+// the host app's own 'app'-scoped assets (Filament\Support\Assets\Css::
+// getRelativePublicPath() keys the URL by package).
 
 use Filament\Facades\Filament;
+use Filament\Support\Facades\FilamentAsset;
 
-it('registers a Bazaar theme asset distinct from Filament stock default', function () {
+it('registers Shell\'s theme under the exact "bazaar-shell" asset id, distinct from Filament stock', function () {
     $this->artisan('bazaar:install');
 
     $panel = Filament::getDefaultPanel();
 
-    expect($panel->getTheme()->getId())->not->toBe('app');
-})->skip('Story 1.2 not implemented — panel does not yet call ->theme()/->viteTheme()');
+    expect($panel->getTheme()->getId())->toBe('bazaar-shell');
+})->skip('Story 1.2 not implemented — panel does not yet call ->theme(\'bazaar-shell\')');
+
+it('never uses ->viteTheme(), which would silently require a host-side Vite build', function () {
+    $this->artisan('bazaar:install');
+
+    $panel = Filament::getDefaultPanel();
+
+    expect($panel->getViteTheme())->toBeNull();
+})->skip('Story 1.2 not implemented — panel does not yet call ->theme()');
+
+it('registers Shell\'s CSS and JS under the "bazaar" package, not the default "app" scope', function () {
+    $this->artisan('bazaar:install');
+
+    $styleIds = collect(FilamentAsset::getStyles(['bazaar']))->map(fn ($asset) => $asset->getId());
+    $scriptIds = collect(FilamentAsset::getScripts(['bazaar']))->map(fn ($asset) => $asset->getId());
+
+    expect($styleIds)->toContain('bazaar-shell')
+        ->and($scriptIds)->toContain('bazaar-shell');
+})->skip('Story 1.2 not implemented — BazaarServiceProvider does not yet call FilamentAsset::register()');
 
 it('overrides the panel primary color to DESIGN.md primary #00609e', function () {
     $this->artisan('bazaar:install');

@@ -1,6 +1,6 @@
 ---
-stepsCompleted: ['step-01-preflight-and-context', 'step-02-generation-mode', 'step-03-test-strategy', 'step-04-generate-tests', 'step-05-validate-and-complete']
-lastStep: 'step-05-validate-and-complete'
+stepsCompleted: ['step-01-preflight-and-context', 'step-02-generation-mode', 'step-03-test-strategy', 'step-04-generate-tests', 'step-05-validate-and-complete', 'step-e-01-assess', 'step-e-02-apply-edit']
+lastStep: 'step-e-02-apply-edit'
 lastSaved: '2026-09-14'
 storyId: '1.2'
 storyKey: 'design-token-system-shell-ui-bilingual-dual-theme'
@@ -13,12 +13,15 @@ generatedTestFiles:
   - 'tests/Feature/Shell/UserThemePreferenceTest.php'
   - 'tests/Feature/Shell/UserLocalePreferenceTest.php'
   - 'tests/Feature/Shell/AccessibilityTest.php'
-  - 'tests/Feature/Shell/Components/DataTableTest.php'
   - 'tests/Feature/Shell/Components/ModalTest.php'
   - 'tests/Feature/Shell/Components/ToastTest.php'
   - 'tests/Feature/Shell/Components/TabsTest.php'
   - 'tests/Feature/Shell/Components/EmptyStateTest.php'
   - 'tests/Feature/Shell/Components/AlertBannerTest.php'
+  - 'tests/Browser/theme-toggle.spec.ts'
+  - 'tests/Browser/locale-toggle.spec.ts'
+  - 'tests/Browser/responsive-breakpoints.spec.ts'
+  - 'tests/Browser/accessibility-contrast.spec.ts'
 inputDocuments:
   - '_artifacts/planning-artifacts/epics.md (Story 1.2, lines 295-317)'
   - '_artifacts/planning-artifacts/ux-designs/ux-Tigaphonic/bazaar-2026-09-11/DESIGN.md'
@@ -86,14 +89,14 @@ inputDocuments:
 |---|---|---|
 | AC1 — Shell renders DESIGN.md tokens as panel theme override (not stock Filament) | Panel registers a Bazaar-owned theme asset distinct from Filament's stock `filament/filament::css/app.css` | ✅ Integration |
 | AC1 | Bazaar's shipped token source (CSS/config) contains the exact DESIGN.md values (primary `#00609e`, Poppins/Mulish, sidebar 250px, topbar 62px, radius/spacing scale) | ✅ Unit/content |
-| AC2 — Theme toggle instant, no reload | Actual instant DOM swap with no reload | ❌ Manual QA (JS runtime, no browser tooling) |
+| AC2 — Theme toggle instant, no reload | Actual instant DOM swap with no reload | ✅ **Playwright** (`framenavigated` listener + `dark` class assertion) — promoted 2026-09-14 |
 | AC2 | Theme preference persists per-User across requests once toggled | ✅ Integration |
 | AC2 | Dark-mode token values match DESIGN.md's net-new dark palette exactly (guards against a naive literal color inversion slipping in) | ✅ Unit/content |
-| AC3 — Language toggle instant, no reload | Actual instant DOM swap with no reload | ❌ Manual QA |
+| AC3 — Language toggle instant, no reload | Actual instant DOM swap with no reload | ✅ **Playwright** — promoted 2026-09-14 |
 | AC3 | Locale preference persists per-User across requests once toggled | ✅ Integration |
 | AC3 | EN and ID translation files exist with identical key sets (no missing key breaks a locale) | ✅ Unit |
-| AC3 | No chrome element clipped by longer ID strings | ❌ Manual QA (visual/layout) |
-| Component kit — Data Table (skeleton-loading + pagination) | Table component exposes pagination and a loading/skeleton state | ✅ Integration |
+| AC3 | No chrome element clipped by longer ID strings | ✅ **Playwright** (`scrollWidth`/`clientWidth` overflow check) — promoted 2026-09-14 |
+| Component kit — Data Table (skeleton-loading + pagination) | **Retired 2026-09-14** — AD-33 classifies Data Table as a restyle of Filament's own Table Builder, not a bespoke Shell component; no separate red-phase contract to scaffold (see Edit Log) | N/A |
 | Component kit — Modal (1-level) | Opening a second action from within a modal opens a new view, never a nested modal | ✅ Integration |
 | Component kit — Toast (required every action) | A sample state-changing action dispatches a Filament/Livewire notification | ✅ Integration |
 | Component kit — Tabs | Tabs component renders and switches active panel | ✅ Integration |
@@ -101,8 +104,8 @@ inputDocuments:
 | Component kit — Alert Banner (3 variants) | Banner renders `danger`/`warn`/`info` with the correct semantic classes/colors, rejects a 4th | ✅ Integration |
 | Accessibility — tab order matches visual order | DOM order of shell nav/topbar controls matches visual/reading order | ✅ Integration (DOM order proxy) |
 | Accessibility — icon-only controls have accessible name | Every icon-only control in sidebar/topbar renders `aria-label` (or equivalent) | ✅ Integration |
-| Accessibility — focus ring native, AA-contrast | Actual rendered contrast | ❌ Manual QA (visual) |
-| Responsive breakpoints (Desktop/Tablet/Mobile) | Sidebar rail/drawer collapse behavior at 768px/1280px | ❌ Manual QA (CSS media query, no browser tooling) |
+| Accessibility — focus ring native, AA-contrast | Actual rendered contrast | ✅ **Playwright** (`@axe-core/playwright` + computed-style outline check) — promoted 2026-09-14, see Edit Log |
+| Responsive breakpoints (Desktop/Tablet/Mobile) | Sidebar rail/drawer collapse behavior at 768px/1280px | ✅ **Playwright** (`page.setViewportSize`) — promoted 2026-09-14, see Edit Log |
 
 ### 2. Test Levels Selected (backend stack)
 
@@ -126,11 +129,41 @@ None of the above exists yet (`src/` has no Theme/Shell/UI-kit domain, no lang f
 
 ### 5. Manual QA Gate (not scaffolded — hand off to human/visual review)
 
-- Instant no-reload theme and language switch (JS/Livewire runtime behavior)
-- Focus ring visible at AA contrast in both themes
-- Responsive breakpoint collapse (sidebar → rail at 768–1279px, sidebar → drawer at <768px)
-- No chrome element clipped by longer Indonesian strings
-- Dark-mode palette reads correctly against real rendered surfaces (beyond token-value equality)
+**Superseded 2026-09-14 — see Edit Log below.** 4 of the original 5 items were promoted to automated Playwright coverage once ARCHITECTURE-SPINE.md AD-33 confirmed Node/Tailwind are legitimate dev-tooling in this repo. Only the genuinely non-automatable item remains:
+
+- Dark-mode palette reads correctly (aesthetic judgment) against real rendered surfaces — mechanical token-value correctness is covered (Unit + Playwright), but "does it look right" stays a human call regardless of tooling.
+
+~~Instant no-reload theme and language switch~~ → `tests/Browser/theme-toggle.spec.ts`, `tests/Browser/locale-toggle.spec.ts`
+~~Focus ring visible at AA contrast in both themes~~ → `tests/Browser/accessibility-contrast.spec.ts`
+~~Responsive breakpoint collapse~~ → `tests/Browser/responsive-breakpoints.spec.ts`
+~~No chrome element clipped by longer Indonesian strings~~ → `tests/Browser/locale-toggle.spec.ts`
+
+## Edit Log — 2026-09-14 (Edit mode, re-check after Winston's AD-33)
+
+**Trigger:** ARCHITECTURE-SPINE.md amended with AD-33 (Shell domain, self-contained Tailwind-built theme) — see `_artifacts/implementation-artifacts/ad-brief-theme-css-distribution-and-browser-testing.md` for the original gap and `.memlog.md` under the architecture run folder for the full coaching trail. AD-33 explicitly hands the concrete browser-testing tool choice to this workflow ("the concrete tool choice itself is bmad-tea's call").
+
+**Tool decision: Playwright**, confirmed (not Dusk, which was the initial lean before the user pushed back on WebDriver-vs-CDP performance, and before AD-33 confirmed Node/Tailwind become real dev-tooling regardless — removing Playwright's main setup-friction argument). Grounded further by AD-33 itself: Shell's JS is "vanilla-or-Alpine," which plays directly to Playwright's CDP-based auto-waiting strength for exactly the "instant no-reload" scenarios this story needs to prove.
+
+**Infrastructure added:**
+- `package.json` (`@playwright/test` ^1.62.1, `@axe-core/playwright` ^4.13.0 — devDependencies only, never shipped; verified current 2026-09-14) + `playwright.config.ts`, wired to `vendor/bin/testbench serve` against the `workbench/` app (idempotent DB drop/create/migrate/seed on each webServer boot).
+- **Pre-existing gap fixed in passing:** `testbench.yaml` existed locally but was gitignored with no `.dist` fallback — unlike this project's own `phpunit.xml.dist`/`phpstan.neon.dist` convention — so Playwright's `webServer` would have failed on any fresh checkout. Added `testbench.yaml.dist` (Testbench itself supports this fallback chain natively — confirmed in `vendor/orchestra/testbench-core/src/Foundation/Console/Concerns/CopyTestbenchFiles.php`).
+- Verified end-to-end manually: `testbench serve` boots, `/admin` returns HTTP 200 real Filament markup — the panel currently has no `->login()` configured (Story 1.1 shipped no auth UI), so these specs need no login step yet; will need one added once Story 1.3 ships panel auth.
+- `.gitignore`: added `package-lock.json` (same non-committed-lockfile convention as `composer.lock`, since Bazaar is a library), `/test-results`, `/playwright-report`, `/blob-report`.
+- `_bmad/tea/config.yaml`: `test_stack_type` set explicitly to `fullstack` (was `auto`) with a comment clarifying this is one PHP package with a Playwright browser-test layer, not a decoupled JS frontend — the label just unlocks E2E-eligible profile loading for future runs.
+
+**4 Playwright red-phase specs added** (`test.skip()`, 10 scenarios) — see Manual QA Gate strikethroughs above for the AC mapping.
+
+**`PanelThemeOverrideTest.php` revised** to match AD-33's exact registration shape (confirmed via `vendor/filament/support/src/Assets/AssetManager.php`): asset id must be exactly `bazaar-shell`, `->viteTheme()` must stay null, and CSS/JS must register under `package: 'bazaar'` (not the default `'app'` scope, which would collide with the host app's own assets) — 2 new test cases added for the package-scoping and anti-`viteTheme()` guarantees.
+
+**3 findings surfaced against AD-33's own component classification** (independently verified, not just re-read) — confirmed with the user, to be relayed to Winston for a spine correction:
+
+1. **Alert Banner** — AD-33 classifies it as "restyle Filament's own primitives." Verified false: Filament core ships no alert/banner component at all (only third-party plugins fill this gap — checked via web search). `AlertBannerTest.php` unchanged (bespoke `Shell\Livewire\AlertBanner` was already correct).
+2. **Toast** — AD-33 says "no Filament... equivalent." Filament core does ship a native transient `Notification` system (`assertNotified()` confirmed against `vendor/filament/notifications`) that functions as a toast. `ToastTest.php` unchanged (wrapping Filament's native Notification was already correct, consistent with the original Step 4 reasoning).
+3. **Data Table** — AD-33's classification (restyle Filament's Table Builder) is correct here; Table Builder is genuinely Filament core. This meant the *original scaffold* was wrong: `DataTableTest.php` assumed a bespoke `Shell\Livewire\DataTable` class that shouldn't exist. **Retired** (deleted) rather than rewritten — Shell has no separate component to red-phase test here; the real contract is CSS tokens applied to Filament's existing Table Builder, which is a Playwright/visual concern on an actual Resource's list page in a later epic, not a Story 1.2 unit.
+
+**Verification:** `npx playwright test --list` → 10 tests across 4 files, clean parse, no browser needed for listing. `vendor/bin/pest` → **27 skipped, 32 passed (48 assertions)** — same total as before (PanelThemeOverrideTest.php's +2 cases exactly offset DataTableTest.php's -2), confirming nothing else regressed.
+
+**Next:** hand the 3 AD-33 classification findings to Winston for a spine correction (Toast/Alert Banner reclassified, or their wording loosened to not overclaim a Filament equivalent). CI wiring for the new Playwright suite (installing browsers, a GitHub Actions job) is explicitly **not** done here — out of this re-check's scope, flagged as follow-up work (`bmad-testarch-ci` territory).
 
 ## Step 4: Red-Phase Test Scaffold Generation
 

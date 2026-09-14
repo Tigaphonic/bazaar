@@ -2,8 +2,14 @@
 composer.lock
 /vendor
 
-# Frontend Assets
+# Frontend Assets (AD-33: devDependency tooling only, never shipped to consumers)
 /node_modules
+package-lock.json
+
+# Playwright (Story 1.2 browser tests, AD-33)
+/test-results
+/playwright-report
+/blob-report
 
 # Logs
 npm-debug.log

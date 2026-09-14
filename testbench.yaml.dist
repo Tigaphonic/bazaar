@@ -1,0 +1,10 @@
+providers:
+  - Workbench\App\Providers\Filament\TestPanelProvider
+
+workbench:
+  start: '/admin'
+  install: true
+  discovers:
+    web: true
+  build:
+    - workbench:create-sqlite-db
