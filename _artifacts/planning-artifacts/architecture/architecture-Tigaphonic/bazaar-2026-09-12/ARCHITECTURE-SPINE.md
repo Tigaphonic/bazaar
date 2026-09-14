@@ -128,7 +128,7 @@ companions: []
   2. **Laravel Events** — the sanctioned seam for additive side-effects/reactions (the AD-6 backbone).
   3. **Config-registered Filament Resource class** (`config('bazaar.resources.*')`) — a client overrides the entry to their own subclass instead of editing the package's Resource.
 
-  No class in the package is "just edit it directly."
+  No class in the package is "just edit it directly." *(Amended 2026-09-14, AD-33: this prohibition covers Shell's shipped compiled assets — its CSS/JS in `vendor/` — the same as it covers classes; hand-patching the compiled output is forking, not a seam, even though it's a file and not a class.)*
 
 ### AD-17 — Operational health-check: pull-based queue/scheduler heartbeat
 
@@ -226,6 +226,32 @@ companions: []
 - **Prevents:** an unauthenticated, portal-triggered write endpoint (no Customer/User identity to hold accountable) being left open to unbounded volume — flagged by the addendum itself as an architecture-owned decision, not a product one
 - **Rule:** FR-40's broken-link-report endpoint sits behind Laravel's rate-limiting middleware from day one — this is a fixed invariant, not optional. The concrete threshold/window is implementation detail (Deferred); that *some* throttle exists is not.
 
+### AD-33 — Shell: Foundation-tier UI substrate, self-contained Tailwind-built theme
+
+- **Binds:** every domain that renders a Filament UI (all of them) — raised by Story 1.2's ATDD run (bmad-tea), which found this spine had no architectural home for the DESIGN.md token system at all
+- **Prevents:** (a) the DESIGN.md token system / reusable UI kit being rebuilt or drifting per-domain instead of shared once; (b) a client's host app needing its own Tailwind/Node build just to render Bazaar's panel, which would break Story 1.1's "composer require + one Artisan command, no greenfield scaffold" install promise; (c) Bazaar's own visual token layer silently diverging from DESIGN.md through ad hoc per-screen CSS; (d) a developer reopening the same "host app needs Node" hole through the JS half of the component kit (Modal/Toast/Tabs/Dropzone), or through an install-time build hook, after the CSS half is closed; (e) Shell and Settings (AD-21) both plausibly owning per-Staff theme/locale preference and diverging on it
+- **Rule:** A new Foundation-tier domain, `src/Shell`, owns the DESIGN.md token system (as a Filament panel theme override, never the stock Filament theme) plus the reusable UI kit (Data Table, Modal, Toast, Tabs, Pagination, Empty State, Alert Banner, Dropzone) plus bilingual EN/ID and dual light/dark-theme mechanics. It sits alongside User & Settings in the Foundation tier — every other domain depends on it for its Filament UI (see the explicit edges added to the Structural Seed diagram); it depends on nothing else in-package, so it may never itself depend on User or Settings (that would be a cycle no other AD would catch). Unlike the FR-mapped domains, Shell is cross-cutting substrate, not itself an FR area (Capability → Architecture Map below is unchanged).
+
+  **Both CSS and JS** for the component kit are Tailwind v4 / vanilla-or-Alpine JS (Filament v5's own theming target — verified 2026-09-14, CSS-first config, no `tailwind.config.js`) **compiled once, at Bazaar's own dev/release time only, and committed as static package assets** — never generated, rebuilt, or fetched at install time or on any client request (`bazaar:install`/`bazaar:status` must never shell out to `npm`/`node`; that would reintroduce the Node dependency this AD exists to remove). Tailwind/PostCSS/Node are devDependencies of the Bazaar repo itself, never a runtime requirement for a client's host app.
+
+  **Exact registration shape (unambiguous — only this shape satisfies this AD):** `FilamentAsset::register([Css::make('bazaar-shell', __DIR__.'/../../resources/dist/shell.css'), Js::make('bazaar-shell', __DIR__.'/../../resources/dist/shell.js')])` in `packageBooted()`, with the panel then referencing the *registered id* — `$panel->theme('bazaar-shell')` (which resolves the already-registered asset; see `Filament\Panel\Concerns\HasTheme::getTheme()`), never `$panel->viteTheme(...)`, which is Filament's Vite-paired API and would require a host-side Vite build. `Css`/`Js` are Filament's own pre-built-static-asset primitives (`Filament\Support\Assets\{Css,Js}`) — both take a plain file path, no build step to consume.
+
+  This is a **deliberate departure** from Filament's own generic plugin-theming guidance — verified 2026-09-14 against the current `filamentphp/plugin-skeleton` README, which actually recommends the opposite ("purist") pattern: the consuming app adds the plugin's Blade paths to its own `@source` directive and compiles its own Tailwind build. That default is correct for a plugin riding on an app that already has its own Filament theme pipeline; it's wrong for Bazaar specifically, because Bazaar *is* the panel's whole theme (DESIGN.md, not a per-client addition) and Story 1.1 promises zero manual setup. The self-contained pre-built path instead follows the technique documented by [Adam Weston](https://aw.codes/blog/keep-your-filament-plugins-light) — purge Shell's compiled output against Filament core's own shipped classes to avoid duplication — since that's real-world precedent for plugin authors who *do* need to ship pre-built CSS, which the current plugin-skeleton itself does not attempt.
+
+  **Per-Staff theme/locale preference is Shell-owned data**, not `Settings`/AD-21 (which governs install-wide, deploy-time-vs-runtime-editable *operational* parameters — not a per-User preference). It persists in a Bazaar-owned table (ULID PK per AD-18's default), never a column on the host app's own `users` table, consistent with AD-18's amendment scoping Bazaar away from owning host-app tables.
+
+  **No shortcut around the still-undesigned client override seam:** until AD-16's fourth seam (Deferred) is actually designed, no domain may add a raw-CSS-injection escape hatch (e.g. a `custom_css` field on Settings rendered into a `<style>` tag via a render hook) to unblock a client wanting brand colors — that would ship an unreviewed seam through the back door, with no CSP/injection review, that other clients then start depending on. A client wanting visual customization before the fourth seam exists is a Deferred limitation, not a reason to invent one under deadline pressure.
+
+  **Single owner of Filament asset registration:** only Shell's own `ServiceProvider` may call `FilamentAsset::register()` for CSS/JS. Other domains consume Shell's kit through its Blade components; they never register their own Filament CSS/JS assets — this keeps asset-key ownership and load order unambiguous as more domains ship UI.
+
+  **Scope relative to AD-5:** Shell has no `Models`/`Actions` and is carved out of AD-5's Service-call discipline — it is pure presentation substrate (Blade/Livewire + compiled assets), not a business-logic domain. Other domains' Filament Resources may reference Shell's Blade components directly; this is not a violation of "presentation code may only call a Service," since Shell has no Service to bypass.
+
+  **Shell is the admin/staff Filament panel only — it never reaches the customer-facing storefront.** Confirmed with the user: the admin dashboard is built entirely on Filament's own primitives (Resource/Page/Table Builder/Notifications/etc.), Tailwind-themed by Shell, never Filament's stock appearance. The storefront stays governed entirely by AD-3's two pre-existing integration paths (Service Layer, consumed directly by a client's own Laravel/Livewire build; or the optional Sanctum API Layer for a headless frontend) — Bazaar ships **zero** storefront UI or styling either way; that is the client's own build regardless of which path they pick. Shell's component kit is not required to be portable outside Filament.
+
+  **Which components restyle Filament's own primitives vs. are built net-new is fixed per-component by DESIGN.md itself, not by one blanket policy here** — DESIGN.md tags each: Modal, Toast, Tabs, Pagination, Empty State, and the Countdown/Deadline Indicator are explicitly "Net-new" (no Filament or reference-mockup equivalent, built from scratch as Blade/Livewire); Data Table, Sidebar, Topbar, Notification Dropdown, Card, Stat Card, Status Pills, Button, Form Input/Select, and Alert Banner extract/restyle Filament's own building blocks (Table Builder, Panel layout, Notifications, Badge, etc.) rather than being rebuilt in parallel. A Shell implementer follows DESIGN.md's own tagging component-by-component; this AD fixes only that the *decision rule* is DESIGN.md's tag, not a developer's individual judgment call.
+
+  **Consequence, fixed here so it isn't re-litigated per story:** Node/npm/Tailwind are now legitimate, real **dev-time tooling** in this repo (never client-runtime infrastructure — see Deployment & operational envelope, which is about what a client's install must provide, and stays unchanged by this AD) — this is the deciding constraint for any browser-based test tooling Shell's visual/runtime behavior needs; the concrete tool choice itself is bmad-tea's call (see Deferred).
+
 ## Consistency Conventions
 
 | Concern | Convention |
@@ -247,13 +273,15 @@ companions: []
 | `spatie/laravel-permission` | ^8.3 |
 | `spatie/laravel-model-states` | ^2.14 |
 | `spatie/laravel-medialibrary` | ^11.23 |
-| `spatie/laravel-activitylog` | ^5.1 *(5.1.1+ supports both Laravel 12 and 13 — superseded the earlier 5.0/5.1 split)* |
+| `spatie/laravel-activitylog` | ^5.1 *(require 5.1.1+ — 5.1.0 regressed Laravel 12 support, restored in 5.1.1, released 2026-09-08)* |
 | `spatie/laravel-settings` | ^3.9 |
 | `filament/spatie-laravel-settings-plugin` | latest compatible *(Filament UI for Settings, AD-21)* |
 | `laravel/sanctum` | latest compatible *(API Layer, AD-3/AD-20)* |
 | `maatwebsite/excel` | ^4.0 *(Reporting CSV/XLSX export, AD-28)* |
 | `barryvdh/laravel-dompdf` | ^3.1 *(Reporting PDF export, AD-28)* |
 | Pest / Testbench / Pint / Larastan | existing skeleton versions, unchanged |
+| Tailwind CSS | ^4.0 *(Shell's theme build, AD-33 — devDependency of the Bazaar repo only, never a host-app requirement; CSS-first config, no `tailwind.config.js`)* |
+| Node.js / npm | dev-tooling only (AD-33) — compiles Shell's theme CSS at Bazaar's own release time; exact Node version floor and package.json contents are Story 1.2 implementation detail |
 
 ## Structural Seed
 
@@ -261,6 +289,13 @@ companions: []
 
 ```text
 src/
+  Shell/          DESIGN.md token system (Filament panel theme override, Tailwind v4
+                   compiled at Bazaar's own dev/release time, AD-33) + reusable UI kit
+                   (Data Table, Modal, Toast, Tabs, Pagination, Empty State, Alert
+                   Banner, Dropzone) + bilingual EN/ID + dual light/dark-theme mechanics.
+                   Foundation tier — every domain below depends on it for its Filament
+                   UI; it depends on nothing else in-package. Cross-cutting substrate,
+                   not itself an FR area.
   Catalog/        Models: Brand, Category, AttributeTemplate, Item, Stock, Warehouse
                    (Item/Category carry FR-24 SEO fields as their own inline columns, AD-30)
   Order/          Models: Customer, Order, Cart, CartItem, Shipment, CancelRequest,
@@ -295,6 +330,7 @@ graph LR
   subgraph Foundation["Foundation — everything may depend on; nothing depends back"]
     User["User & Access"]
     Settings["Global Settings"]
+    Shell["Shell (AD-33)"]
   end
 
   HttpApi["Http/Api (opt-in)"] --> Order
@@ -312,13 +348,18 @@ graph LR
 
   Order --> User
   Order --> Settings
+  Order --> Shell
   Catalog --> User
   Catalog --> Settings
+  Catalog --> Shell
   Content --> User
+  Content --> Shell
   Payment --> Settings
   Shipping --> Settings
   Notification --> User
   Notification --> Settings
+  Seo --> Shell
+  Reporting --> Shell
 
   Reporting["Reporting (read-only)"] -.reads.-> Order
   Reporting -.reads.-> Catalog
@@ -395,3 +436,6 @@ Bazaar has no infrastructure of its own — each client install is deployed and 
 - **Portal-service Sanctum token issuance/rotation**: AD-20 fixes who is authenticated; issuance/rotation mechanics are epic-level work.
 - **Member Login v2 activation flow**: schema is auth-ready (AD-26); the activation flow itself is out of scope for v1.
 - **Global SEO defaults field detail** (FR-29): PRD §6.2 itself flags this as needing further specification — not this spine's job to invent.
+- **Browser/visual test tooling for Shell** (Playwright vs Laravel Dusk vs other): AD-33 fixes the deciding constraint — Node/Tailwind are now legitimate dev-tooling infrastructure in this repo, not foreign tooling introduced solely for tests — but the concrete tool choice, CI wiring, and version pinning is `bmad-tea` (Murat) execution work, same division of labor as the PostgreSQL CI matrix above.
+- **Client-side visual token override**: DESIGN.md states clients "can theme-override later through Filament's standard theming mechanism," but this doesn't yet fit any of AD-16's three sanctioned seams (container binding, Events, config-registered Resource class) — a CSS-variable/token override point may need a fourth. Not resolved now — but unlike the other Deferred items, this one is not a comfortable future timeline: Shell ships in Story 1.2, the very next story, so the pressure to invent an unreviewed shortcut (AD-33's raw-CSS-injection guard above exists specifically to close that exit) arrives immediately. Design the fourth seam before a client actually asks, not after.
+- **Shell's exact `package.json` / build script contents**: AD-33 fixes that Tailwind v4 compiles once at Bazaar's dev/release time and ships pre-built; the concrete devDependency list, purge configuration (avoiding duplicate classes against Filament core's own CSS, per real-world plugin precedent), and npm script names are Story 1.2 implementation detail.
