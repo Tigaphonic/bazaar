@@ -2,9 +2,10 @@
 
 namespace Tigaphonic\Bazaar\User\Filament\Resources;
 
-use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\TextInput;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -41,7 +42,7 @@ class RoleResource extends Resource
             TextInput::make('name')
                 ->required()
                 ->trim()
-                ->unique(table: 'roles'),
+                ->unique(table: fn () => config('permission.table_names.roles', 'roles')),
             CheckboxList::make('permissions')
                 ->options(fn () => Permission::pluck('name', 'name'))
                 ->searchable(),
@@ -52,11 +53,17 @@ class RoleResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
+                TextColumn::make('name')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('permissions_count')
+                    ->counts('permissions')
+                    ->label('Permissions'),
             ])
             ->recordActions([
+                EditAction::make(),
                 DeleteAction::make()
-                    ->using(fn (Role $record) => app(RoleService::class)->delete($record)),
+                    ->using(function (Role $record) { app(RoleService::class)->delete($record); return true; }),
             ]);
     }
 

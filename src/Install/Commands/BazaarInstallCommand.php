@@ -44,10 +44,18 @@ class BazaarInstallCommand extends Command
         // pending host-app migration, a bigger side effect than this
         // command should have.
         if ($this->getApplication()?->has('vendor:publish')) {
-            $this->callSilently('vendor:publish', [
+            if ($this->callSilently('vendor:publish', [
                 '--provider' => PermissionServiceProvider::class,
                 '--tag' => 'laravel-permission-migrations',
-            ]);
+            ]) !== static::SUCCESS) {
+                $this->components->error('Failed to publish spatie/laravel-permission migrations.');
+
+                return static::FAILURE;
+            }
+        } else {
+            $this->components->error('The vendor:publish command is not available.');
+            
+            return static::FAILURE;
         }
 
         $this->components->info("Bazaar connected to the '{$panel->getId()}' Filament panel.");

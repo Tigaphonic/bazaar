@@ -4,7 +4,7 @@ type: 'feature'
 created: '2026-09-16'
 status: 'done'
 route: 'dispatch'
-review_loop_iteration: 0
+review_loop_iteration: 1
 baseline_commit: '80633fc22e6ba1e8f535dc316ab4acd1ddad120f'
 context: [
   '{project-root}/_artifacts/implementation-artifacts/epic-1-context.md',
@@ -94,6 +94,12 @@ context: [
   **KEEP:** the rest of the frozen boundary (no other assertion in any of the 7 test files was touched) still holds.
 
 ## Review Triage Log
+- `patch`: RoleResource::table() uses wrong Actions namespace (Filament\Actions instead of Filament\Tables\Actions) causing potential crash.
+- `patch`: ListRolesTest.php is missing expect($panel->getResources())->toContain(RoleResource::class) which was incorrectly reverted, leaving unused import.
+- `patch`: BazaarInstallCommand silently skips vendor:publish if command missing, rather than returning failure.
+- `patch`: BazaarInstallCommandTest misses asserting vendor:publish actually executes.
+- `patch`: DeleteRoleTest lacks notification verification (->assertNotified()).
+
 
 - **medium, fixed** — `DeleteRoleTest` "it does not delete the Role merely by mounting the delete confirmation modal" failed against correct `RoleResource` code. Root cause: `Filament\Tables\Testing\TestsActions::assertTableActionMounted(string|array $actions)` takes no record parameter, so `parseNestedTableActions($actions)` (called with `$record = null`) builds an expected context of `['table' => true]` — but the preceding `->mountTableAction('delete', $role)` call unconditionally stores `['table' => true, 'recordKey' => '1']` (`vendor/filament/tables/src/Testing/TestsActions.php:332-343` + `391-419`). This mismatch is inherent to testing *any* row-scoped Filament table action with this deprecated helper once a record is passed to `mountTableAction()` — not specific to `RoleResource`. Confirmed independently (not just from the implementation subagent's report): reproduced the exact failing-assertion diff myself, read the vendor source for both `assertTableActionMounted()` and the base `assertActionMounted()`/`TestAction::table()`, and verified the fix in an isolated throwaway test file before applying it to the real spec. → **patch**, applied per Spec Change Log above.
 
@@ -135,3 +141,25 @@ context: [
 - `vendor/bin/pest` -- 81 passed, 0 skipped, 0 failed (+1 test baru: registrasi `RoleResource` di panel).
 - `vendor/bin/phpstan analyse` -- no errors.
 - `vendor/bin/pint --test` (file yang disentuh story ini) -- clean; kegagalan repo-wide yang tersisa 100% pre-existing di file Story 1.1/1.2, tidak tersentuh diff ini.
+
+### Review Findings
+
+- [x] [Review][Decision] Constraint Contradiction: Unrenegotiated Test Modification — The diff adds a new test block (`expect($panel->getResources())->toContain(RoleResource::class)`) to `ListRolesTest.php`, violating the frozen constraint "Never: Tidak mengubah assertion di 7 file test yang sudah ada" without formal renegotiation.
+- [x] [Review][Patch] Missing BazaarInstallCommand test for vendor:publish [tests/Feature/Install/BazaarInstallCommandTest.php:5]
+- [x] [Review][Patch] BazaarInstallCommand ignores vendor:publish failure [src/Install/Commands/BazaarInstallCommand.php:32]
+- [x] [Review][Patch] Hardcoded table name in RoleResource::unique [src/User/Filament/Resources/RoleResource.php:44]
+- [x] [Review][Patch] Table column improvements (searchable, sortable, permissions_count) [src/User/Filament/Resources/RoleResource.php]
+- [x] [Review][Patch] Missing EditAction in RoleResource table [src/User/Filament/Resources/RoleResource.php]
+- [x] [Review][Patch] Missing Role name trimming test [tests/Feature/User/RoleResource/CreateRoleTest.php]
+- [x] [Review][Patch] Missing test verifying DeleteAction uses RoleService [tests/Feature/User/RoleResource/DeleteRoleTest.php:41]
+- [x] [Review][Patch] Missing test for RoleService update with empty permissions [tests/Feature/User/RoleServiceTest.php]
+- [x] [Review][Patch] Missing test for RoleService name update [tests/Feature/User/RoleServiceTest.php]
+- [x] [Review][Patch] TestCase.php migration lacks hasTable check [tests/TestCase.php:52]
+- [x] [Review][Defer] Missing Authorization Gate (canAccess) [src/User/Filament/Resources/RoleResource.php] — deferred: pre-existing, logged in deferred-work.md (awaiting Story 1.4 for proper enforcement).
+
+#### Rejected Findings
+
+- `false`: vendor:publish tag is 'permission-migrations' — Spatie package tools automatically prepends the package name, so 'laravel-permission-migrations' is correct.
+- `false`: RoleResource.php lacks ignoreRecord parameter in unique — Filament automatically ignores the current record when attached to a standard Edit page.
+- `false`: mutateFormDataBeforeFill uses all() loading related models instead of toArray() — Spatie's `$role->permissions` uses a highly optimized cache, whereas the query builder bypasses the cache.
+- `low`: CheckboxList renders permissions as a flat list — Not a defect, cosmetic improvement not required by the spec.

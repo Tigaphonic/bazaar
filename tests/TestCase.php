@@ -52,8 +52,10 @@ class TestCase extends Orchestra
         // `include`-ing the stub and running ->up() on the instance it
         // returns.
         (function (): void {
-            $migration = include __DIR__.'/../vendor/spatie/laravel-permission/database/migrations/create_permission_tables.php.stub';
-            $migration->up();
+            if (!\Illuminate\Support\Facades\Schema::hasTable(config('permission.table_names.roles', 'roles'))) {
+                $migration = include __DIR__.'/../vendor/spatie/laravel-permission/database/migrations/create_permission_tables.php.stub';
+                $migration->up();
+            }
         })();
 
         // Several Shell tests instantiate the framework's own base

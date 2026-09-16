@@ -58,3 +58,20 @@ it('deletes a Role', function () {
 
     expect(Role::find($role->id))->toBeNull();
 });
+
+it('removes all permissions on update when none are provided', function () {
+    Permission::create(['name' => 'approve return']);
+    $role = app(RoleService::class)->create(['name' => 'Supervisor Retur', 'permissions' => ['approve return']]);
+
+    app(RoleService::class)->update($role, ['name' => 'Supervisor Retur', 'permissions' => []]);
+
+    expect($role->fresh()->permissions)->toHaveCount(0);
+});
+
+it('updates the Role name', function () {
+    $role = app(RoleService::class)->create(['name' => 'Old Name', 'permissions' => []]);
+
+    app(RoleService::class)->update($role, ['name' => 'New Name', 'permissions' => []]);
+
+    expect($role->fresh()->name)->toBe('New Name');
+});

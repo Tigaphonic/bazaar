@@ -22,3 +22,6 @@
 - source_spec: `_artifacts/implementation-artifacts/spec-1-3-manage-role-permission.md`
   summary: Menghapus Role yang masih dipegang User tidak memberi peringatan "Role ini masih dipakai N User" di luar modal konfirmasi generik, dan belum ada hook eksplisit ke Audit Trail (Story 1.5).
   evidence: AC3 hanya mensyaratkan modal konfirmasi generik (sudah ada); audit trail eksplisit discope ke Story 1.5 oleh epic-1-context.md ("auto-capture-nya harus berfungsi tanpa instrumentasi manual di semua epic berikutnya") — perlu diverifikasi ulang begitu Story 1.5 shipped bahwa mutasi `RoleService::delete()` benar-benar tercatat otomatis tanpa perubahan kode di sini.
+
+## Deferred from: code review (spec-1-3-manage-role-permission.md)
+- [ ] Missing Authorization Gate (canAccess) in RoleResource — Pre-existing gap logged previously, awaiting Story 1.4 for proper user management and panel auth.

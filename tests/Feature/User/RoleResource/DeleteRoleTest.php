@@ -39,7 +39,20 @@ it('deletes the Role once the delete action is confirmed', function () {
     $role = Role::create(['name' => 'Temporary Role']);
 
     Livewire::test(ListRoles::class)
-        ->callTableAction('delete', $role);
+        ->callTableAction('delete', $role)
+        ->assertNotified();
 
     expect(Role::find($role->id))->toBeNull();
+});
+
+it('uses RoleService to delete the Role', function () {
+    $role = Role::create(['name' => 'Temporary Role']);
+
+    $mock = Mockery::mock(\Tigaphonic\Bazaar\User\Services\RoleService::class);
+    $mock->shouldReceive('delete')->withArgs(fn ($r) => $r->id === $role->id)->once();
+    app()->instance(\Tigaphonic\Bazaar\User\Services\RoleService::class, $mock);
+
+    Livewire::test(ListRoles::class)
+        ->callTableAction('delete', $role)
+        ->assertNotified();
 });

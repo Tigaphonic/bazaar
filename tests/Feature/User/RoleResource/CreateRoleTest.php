@@ -46,3 +46,15 @@ it('rejects a duplicate Role name', function () {
         ->call('create')
         ->assertHasFormErrors(['name' => 'unique']);
 });
+
+it('trims whitespace from the Role name', function () {
+    Livewire::test(CreateRole::class)
+        ->fillForm([
+            'name' => '   Supervisor Spasi   ',
+            'permissions' => [],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    expect(Role::where('name', 'Supervisor Spasi')->exists())->toBeTrue();
+});
