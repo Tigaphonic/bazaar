@@ -26,7 +26,10 @@ class BazaarInstallCommand extends Command
         // there -- a real client install always has it (ships with
         // filament/support, which filament/filament always requires).
         if ($this->getApplication()?->has('filament:assets')) {
-            $this->callSilently('filament:assets');
+            if ($this->callSilently('filament:assets') !== static::SUCCESS) {
+                $this->components->error('Failed to publish Filament assets.');
+                return static::FAILURE;
+            }
         }
 
         $this->components->info("Bazaar connected to the '{$panel->getId()}' Filament panel.");

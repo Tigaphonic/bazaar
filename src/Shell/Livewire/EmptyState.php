@@ -18,12 +18,15 @@ class EmptyState extends Component
     public ?string $caption = null;
 
     public ?string $actionLabel = null;
+    
+    public ?string $icon = null;
 
-    public function mount(string $headline, ?string $caption = null, ?string $actionLabel = null): void
+    public function mount(string $headline, ?string $caption = null, ?string $actionLabel = null, ?string $icon = null): void
     {
         $this->headline = $headline;
         $this->caption = $caption;
         $this->actionLabel = $actionLabel;
+        $this->icon = $icon;
     }
 
     public function triggerAction(): void

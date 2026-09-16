@@ -143,3 +143,26 @@ context: [
 - `vendor/bin/pest` -- expected: full suite lulus, tidak ada regresi Story 1.1
 - `vendor/bin/pint --test` && `vendor/bin/phpstan analyse` -- expected: bersih
 - `npx playwright test --list` -- expected: 10 test ter-parse; `npx playwright test` -- expected: semua lulus (butuh `testbench serve` via webServer config yang sudah ada)
+
+### Review Findings
+
+- [ ] [Review][Decision] ServiceProvider Configuration Location Conflict — Terdapat modifikasi pada `packageRegistered()`, padahal spesifikasi menetapkan modifikasi harus pada `packageBooted()` dan melarang mengubah `packageRegistered()`.
+- [x] [Review][Patch] N+1 database query di UserPreferences [src/Shell/Support/UserPreferences.php:35]
+- [x] [Review][Patch] Modal State Retention [src/Shell/Livewire/Modal.php:38]
+- [x] [Review][Patch] ToastTest Verification Gap [tests/Feature/Shell/Components/ToastTest.php:15]
+- [x] [Review][Patch] ModalTest State Verification Gap [tests/Feature/Shell/Components/ModalTest.php:16]
+- [x] [Review][Patch] PanelThemeOverrideTest Value Verification Gap [tests/Feature/Shell/PanelThemeOverrideTest.php:46]
+- [x] [Review][Patch] BazaarInstallCommand Silent Failure [src/Install/Commands/BazaarInstallCommand.php:28]
+- [x] [Review][Patch] EmptyState Configurable Icon [resources/views/shell/livewire/empty-state.blade.php:2]
+- [x] [Review][Defer] Locale Middleware Auth Context [src/Shell/Http/Middleware/ApplyUserLocale.php:26] — deferred: membutuhkan konteks implementasi autentikasi panel pada Story 1.3
+- [x] [Review][Defer] AccessibilityTest String Matching [tests/Feature/Shell/AccessibilityTest.php:15] — deferred: perlu diperbaiki pada tinjauan kualitas tes yang terpisah
+
+#### Rejected Findings
+
+- `false`: Duplicate theme assets — Quirks ini disengaja dan terdokumentasi di spesifikasi untuk melewati resolusi tema Filament.
+- `false`: AlertBanner validation throws ValidationException — Spesifikasi memang mengharuskan pengecekan lewat \`assertHasErrors('variant')\`.
+- `low`: Tabs lack tab key validation — Hanya bisa dipicu melalui manipulasi pemanggilan komponen Livewire secara langsung, dan menambah kompleksitas yang tidak perlu.
+- `low`: EmptyState ambiguous generic event — Sama seperti Tabs, hanya berdampak pada manipulasi langsung.
+- `low`: EmptyState missing action presence check — Sama seperti Tabs.
+- `low`: UserPreferences lacks deletion cleanup — Dampaknya sangat minim (timbunan data kecil) dan tidak akan memicu eror di skenario harian.
+- `low`: UserPreferences saves against empty string ID — Pemanggil selalu menjamin ada model user yang sudah tersimpan.

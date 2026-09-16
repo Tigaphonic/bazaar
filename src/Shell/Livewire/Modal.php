@@ -45,6 +45,8 @@ class Modal extends Component
     public function close(): void
     {
         $this->isOpen = false;
+        $this->title = null;
+        $this->body = null;
     }
 
     public function render()

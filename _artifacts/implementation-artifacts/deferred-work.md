@@ -5,3 +5,8 @@
 - source_spec: `_artifacts/implementation-artifacts/spec-1-2-design-token-system-shell-ui-bilingual-dual-theme.md`
   summary: Tulis ulang assertion `tests/Feature/Shell/AccessibilityTest.php` agar memeriksa atribut `aria-label` nyata lewat parsing DOM, bukan substring literal pesan kegagalan Pest, lalu hapus komentar HTML inert workaround di `resources/views/shell/topbar.blade.php`.
   evidence: Bentuk assertion (`toContain("aria-label", "Expected an aria-label near the {$control} control")`) sudah ada sejak baseline scaffold ATDD, bukan diperkenalkan Story 1.2 — memperbaikinya berarti mengubah assertion test yang frozen, di luar boundary story ini. Assertion saat ini bisa lolos meski aria-label nyata dihapus di masa depan, selama komentar inert-nya tetap ada.
+
+## Deferred from: code review of spec-1-2-design-token-system-shell-ui-bilingual-dual-theme.md (2026-09-16)
+
+- Locale Middleware Auth Context (`ApplyUserLocale.php`): Membutuhkan konteks implementasi autentikasi panel pada Story 1.3 untuk benar-benar menguji urutan middleware.
+- AccessibilityTest String Matching (`AccessibilityTest.php`): Perlu diperbaiki (menggunakan DOM parsing) pada tinjauan kualitas tes yang terpisah.

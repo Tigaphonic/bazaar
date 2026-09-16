@@ -14,9 +14,10 @@ it('opens with a title, body, and footer action pair', function () {
 });
 
 it('refuses to open a second modal while one is already open', function () {
-    Livewire::test(Modal::class, ['isOpen' => true])
+    Livewire::test(Modal::class, ['isOpen' => true, 'title' => 'First modal title'])
         ->call('open', ['title' => 'Second modal'])
         ->assertSet('isOpen', true)
+        ->assertSet('title', 'First modal title')
         // The component must not silently stack a second modal state; opening
         // a second one while the first is open is a no-op at this level (the
         // real "opens a new view instead" behavior lives one level up, at the

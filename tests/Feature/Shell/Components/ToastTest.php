@@ -15,7 +15,9 @@ use function Filament\Notifications\Testing\assertNotified;
 it('fires a success toast that later epics can call after a state-changing action', function () {
     Toast::success('AWB berhasil dibuat');
 
-    assertNotified();
+    Notification::assertNotified(
+        Notification::make()->success()->title('AWB berhasil dibuat')
+    );
 });
 
 it('maps each Toast variant to the matching DESIGN.md semantic family', function () {
@@ -23,5 +25,17 @@ it('maps each Toast variant to the matching DESIGN.md semantic family', function
 
     Notification::assertNotified(
         Notification::make()->danger()->title('Gagal memproses')
+    );
+    
+    Toast::warning('Stok menipis');
+
+    Notification::assertNotified(
+        Notification::make()->warning()->title('Stok menipis')
+    );
+    
+    Toast::info('Sistem sedang sinkronisasi');
+
+    Notification::assertNotified(
+        Notification::make()->info()->title('Sistem sedang sinkronisasi')
     );
 });

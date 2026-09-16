@@ -52,5 +52,5 @@ it('overrides the panel primary color to DESIGN.md primary #00609e', function ()
     expect($colors)->toHaveKey('primary');
     // Filament stores colors as an array or a Filament\Support\Colors\Color instance;
     // the red-phase intent is simply that primary is no longer Filament's stock amber.
-    expect($colors['primary'])->not->toBeNull();
+    expect($colors['primary'])->toBe(\Filament\Support\Colors\Color::hex(\Tigaphonic\Bazaar\Shell\Support\DesignTokens::colors()['primary']));
 });

@@ -21,6 +21,11 @@ final class UserPreferences
 {
     private const TABLE = 'bazaar_user_preferences';
 
+    /**
+     * @var array<string, ?object>
+     */
+    private array $memoizedRows = [];
+
     public function setTheme(Model $user, string $theme): void
     {
         $this->upsert($user, ['theme' => $theme]);
@@ -55,8 +60,14 @@ final class UserPreferences
 
     private function row(Model $user): ?object
     {
-        return DB::table(self::TABLE)
-            ->where('user_id', $this->userId($user))
+        $userId = $this->userId($user);
+
+        if (array_key_exists($userId, $this->memoizedRows)) {
+            return $this->memoizedRows[$userId];
+        }
+
+        return $this->memoizedRows[$userId] = DB::table(self::TABLE)
+            ->where('user_id', $userId)
             ->first();
     }
 
@@ -66,6 +77,7 @@ final class UserPreferences
     private function upsert(Model $user, array $attributes): void
     {
         $userId = $this->userId($user);
+        unset($this->memoizedRows[$userId]);
 
         // Atomic: a separate exists()-then-insert()/update() would race two
         // concurrent first-writes for the same Staff member into the unique
