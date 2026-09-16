@@ -13,10 +13,10 @@ it('renders every configured tab and marks the first as active by default', func
         ->assertSet('activeTab', 'timeline')
         ->assertSee('Timeline')
         ->assertSee('Shipments');
-})->skip('Story 1.2 not implemented — Shell\Livewire\Tabs does not exist yet');
+});
 
 it('switches the active tab when a tab is selected', function () {
     Livewire::test(Tabs::class, ['tabs' => ['timeline' => 'Timeline', 'shipments' => 'Shipments']])
         ->call('select', 'shipments')
         ->assertSet('activeTab', 'shipments');
-})->skip('Story 1.2 not implemented — Shell\Livewire\Tabs does not exist yet');
+});

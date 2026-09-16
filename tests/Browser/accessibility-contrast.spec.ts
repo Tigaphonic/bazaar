@@ -16,7 +16,7 @@ import AxeBuilder from '@axe-core/playwright';
  * (no removed outline) since axe has no reliable focus-indicator-contrast rule yet.
  */
 
-test.skip('admin panel has no automated accessibility violations in light mode', async ({ page }) => {
+test('admin panel has no automated accessibility violations in light mode', async ({ page }) => {
   await page.goto('/admin');
 
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
@@ -24,7 +24,7 @@ test.skip('admin panel has no automated accessibility violations in light mode',
   expect(results.violations).toEqual([]);
 });
 
-test.skip('admin panel has no automated accessibility violations in dark mode', async ({ page }) => {
+test('admin panel has no automated accessibility violations in dark mode', async ({ page }) => {
   await page.goto('/admin');
   await page.getByRole('button', { name: /user menu|menu pengguna/i }).click();
   await page.getByRole('button', { name: /theme|tema/i }).click();
@@ -34,7 +34,7 @@ test.skip('admin panel has no automated accessibility violations in dark mode', 
   expect(results.violations).toEqual([]);
 });
 
-test.skip('a focused interactive element keeps a visible native focus ring, never a removed outline', async ({ page }) => {
+test('a focused interactive element keeps a visible native focus ring, never a removed outline', async ({ page }) => {
   await page.goto('/admin');
 
   // Tab to the first focusable chrome control and read its computed outline.

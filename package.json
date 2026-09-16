@@ -3,10 +3,14 @@
   "private": true,
   "description": "Dev-only tooling for Bazaar (ARCHITECTURE-SPINE.md AD-33): compiles Shell's Tailwind v4 CSS/JS and runs Playwright browser tests against the admin panel. Never a runtime dependency for a client's host app -- see AD-33's 'compiled once, at Bazaar's own dev/release time only' rule.",
   "scripts": {
+    "build": "tailwindcss -i resources/css/shell.css -o resources/dist/shell.css --minify && node scripts/build-js.mjs",
     "test:e2e": "playwright test"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
-    "@playwright/test": "^1.62.1"
+    "@playwright/test": "^1.62.1",
+    "@tailwindcss/cli": "^4.3.3",
+    "esbuild": "^0.28.2",
+    "tailwindcss": "^4.3.3"
   }
 }

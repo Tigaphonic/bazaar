@@ -20,4 +20,4 @@ it('ships an id/shell.php translation file with the exact same keys as en/shell.
 
     expect($missingFromId)->toBeEmpty("Keys present in en but missing from id: ".implode(', ', $missingFromId))
         ->and($missingFromEn)->toBeEmpty("Keys present in id but missing from en: ".implode(', ', $missingFromEn));
-})->skip('Story 1.2 not implemented — resources/lang/{en,id}/shell.php do not exist yet');
+});

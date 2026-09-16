@@ -11,7 +11,7 @@ it('exposes the DESIGN.md primary color and its dark-mode pair', function () {
 
     expect($colors['primary'])->toBe('#00609e')
         ->and($colors['primary-dark'])->toBe('#3d94c9');
-})->skip('Story 1.2 not implemented — DesignTokens::colors() does not exist yet');
+});
 
 it('does not derive dark tokens by literally inverting the light color', function () {
     // DESIGN.md §Colors: dark pairs are a net-new palette that preserves hue
@@ -24,18 +24,18 @@ it('does not derive dark tokens by literally inverting the light color', functio
     ));
 
     expect($colors['primary-dark'])->not->toBe($literalInversion);
-})->skip('Story 1.2 not implemented — DesignTokens::colors() does not exist yet');
+});
 
 it('exposes the two-family DESIGN.md typography (Poppins headings, Mulish body)', function () {
     $typography = DesignTokens::typography();
 
     expect($typography['heading-family'])->toContain('Poppins')
         ->and($typography['body-family'])->toContain('Mulish');
-})->skip('Story 1.2 not implemented — DesignTokens::typography() does not exist yet');
+});
 
 it('exposes the fixed shell dimensions from DESIGN.md Layout & Spacing', function () {
     $spacing = DesignTokens::spacing();
 
     expect($spacing['sidebar-width'])->toBe('250px')
         ->and($spacing['topbar-height'])->toBe('62px');
-})->skip('Story 1.2 not implemented — DesignTokens::spacing() does not exist yet');
+});

@@ -1,0 +1,7 @@
+- source_spec: `_artifacts/implementation-artifacts/spec-1-2-design-token-system-shell-ui-bilingual-dual-theme.md`
+  summary: Verifikasi `ApplyUserLocale` middleware tetap resolve user yang benar lewat `$request->user()` saat panel Filament host mengonfigurasi `authGuard()` kustom (bukan guard default).
+  evidence: Mekanisme resolver Filament untuk guard kustom belum ditelusuri tuntas dan saat ini tidak reachable (belum ada `->login()`/panel auth — Story 1.3). Jika benar bermasalah, severity medium (locale gagal diterapkan diam-diam pada host ber-guard kustom). Yang perlu diverifikasi: urutan middleware auth Filament vs `$panel->middleware()`, atau test nyata begitu Story 1.3 memasang panel auth dengan guard kustom.
+
+- source_spec: `_artifacts/implementation-artifacts/spec-1-2-design-token-system-shell-ui-bilingual-dual-theme.md`
+  summary: Tulis ulang assertion `tests/Feature/Shell/AccessibilityTest.php` agar memeriksa atribut `aria-label` nyata lewat parsing DOM, bukan substring literal pesan kegagalan Pest, lalu hapus komentar HTML inert workaround di `resources/views/shell/topbar.blade.php`.
+  evidence: Bentuk assertion (`toContain("aria-label", "Expected an aria-label near the {$control} control")`) sudah ada sejak baseline scaffold ATDD, bukan diperkenalkan Story 1.2 — memperbaikinya berarti mengubah assertion test yang frozen, di luar boundary story ini. Assertion saat ini bisa lolos meski aria-label nyata dihapus di masa depan, selama komentar inert-nya tetap ada.

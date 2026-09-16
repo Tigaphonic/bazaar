@@ -16,7 +16,7 @@ it('fires a success toast that later epics can call after a state-changing actio
     Toast::success('AWB berhasil dibuat');
 
     assertNotified();
-})->skip('Story 1.2 not implemented — Shell\Support\Toast does not exist yet');
+});
 
 it('maps each Toast variant to the matching DESIGN.md semantic family', function () {
     Toast::danger('Gagal memproses');
@@ -24,4 +24,4 @@ it('maps each Toast variant to the matching DESIGN.md semantic family', function
     Notification::assertNotified(
         Notification::make()->danger()->title('Gagal memproses')
     );
-})->skip('Story 1.2 not implemented — Shell\Support\Toast does not exist yet');
+});

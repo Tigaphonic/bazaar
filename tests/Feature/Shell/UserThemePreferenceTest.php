@@ -29,7 +29,7 @@ it('persists a Staff member\'s theme choice across requests', function () {
     $reread = app(UserPreferences::class)->theme($user->fresh());
 
     expect($reread)->toBe('dark');
-})->skip('Story 1.2 not implemented — Shell\Support\UserPreferences does not exist yet');
+});
 
 it('scopes theme preference per-User, never leaking between Staff accounts', function () {
     $nina = User::create(['name' => 'Nina', 'email' => 'nina2@example.com', 'password' => bcrypt('password')]);
@@ -41,4 +41,15 @@ it('scopes theme preference per-User, never leaking between Staff accounts', fun
 
     expect($preferences->theme($nina->fresh()))->toBe('dark')
         ->and($preferences->theme($budi->fresh()))->toBe('light');
-})->skip('Story 1.2 not implemented — Shell\Support\UserPreferences does not exist yet');
+});
+
+it('returns the configured default theme for a Staff member who never set one', function () {
+    // I/O & Edge-Case Matrix: "Staff A set tema dark, Staff B tidak pernah set" —
+    // UserPreferences::theme($userB) must resolve to config('bazaar.shell.default_theme'),
+    // never throw, even though no bazaar_user_preferences row exists for this user yet.
+    $budi = User::create(['name' => 'Budi', 'email' => 'budi-never-set@example.com', 'password' => bcrypt('password')]);
+
+    $theme = app(UserPreferences::class)->theme($budi);
+
+    expect($theme)->toBe(config('bazaar.shell.default_theme'));
+});

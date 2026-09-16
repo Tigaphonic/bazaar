@@ -40,4 +40,13 @@ return [
         'user' => null,
     ],
 
+    /*
+     * Shell domain defaults (AD-33, Story 1.2). Used whenever a Staff member
+     * has never set a personal preference in bazaar_user_preferences yet.
+     */
+    'shell' => [
+        'default_theme' => 'light',
+        'default_locale' => 'en',
+    ],
+
 ];

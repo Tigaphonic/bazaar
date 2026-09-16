@@ -15,9 +15,9 @@ it('renders each of the three DESIGN.md variants with its matching semantic clas
     ['danger', 'alert-banner--danger'],
     ['warn', 'alert-banner--warn'],
     ['info', 'alert-banner--info'],
-])->skip('Story 1.2 not implemented — Shell\Livewire\AlertBanner does not exist yet');
+]);
 
 it('rejects a variant outside the three DESIGN.md semantic families', function () {
     Livewire::test(AlertBanner::class, ['variant' => 'success', 'message' => 'Test'])
         ->assertHasErrors('variant');
-})->skip('Story 1.2 not implemented — Shell\Livewire\AlertBanner does not exist yet');
+});

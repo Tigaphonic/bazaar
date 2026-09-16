@@ -23,7 +23,7 @@ it('registers Shell\'s theme under the exact "bazaar-shell" asset id, distinct f
     $panel = Filament::getDefaultPanel();
 
     expect($panel->getTheme()->getId())->toBe('bazaar-shell');
-})->skip('Story 1.2 not implemented — panel does not yet call ->theme(\'bazaar-shell\')');
+});
 
 it('never uses ->viteTheme(), which would silently require a host-side Vite build', function () {
     $this->artisan('bazaar:install');
@@ -31,7 +31,7 @@ it('never uses ->viteTheme(), which would silently require a host-side Vite buil
     $panel = Filament::getDefaultPanel();
 
     expect($panel->getViteTheme())->toBeNull();
-})->skip('Story 1.2 not implemented — panel does not yet call ->theme()');
+});
 
 it('registers Shell\'s CSS and JS under the "bazaar" package, not the default "app" scope', function () {
     $this->artisan('bazaar:install');
@@ -41,7 +41,7 @@ it('registers Shell\'s CSS and JS under the "bazaar" package, not the default "a
 
     expect($styleIds)->toContain('bazaar-shell')
         ->and($scriptIds)->toContain('bazaar-shell');
-})->skip('Story 1.2 not implemented — BazaarServiceProvider does not yet call FilamentAsset::register()');
+});
 
 it('overrides the panel primary color to DESIGN.md primary #00609e', function () {
     $this->artisan('bazaar:install');
@@ -53,4 +53,4 @@ it('overrides the panel primary color to DESIGN.md primary #00609e', function ()
     // Filament stores colors as an array or a Filament\Support\Colors\Color instance;
     // the red-phase intent is simply that primary is no longer Filament's stock amber.
     expect($colors['primary'])->not->toBeNull();
-})->skip('Story 1.2 not implemented — panel does not yet call ->colors()');
+});

@@ -15,7 +15,7 @@ import { test, expect } from '@playwright/test';
  * chrome element clips the (generally longer) Indonesian string.
  */
 
-test.skip('language switch changes chrome labels instantly with no page navigation', async ({ page }) => {
+test('language switch changes chrome labels instantly with no page navigation', async ({ page }) => {
   await page.goto('/admin');
 
   const navItem = page.locator('.nav-item').first();
@@ -34,7 +34,7 @@ test.skip('language switch changes chrome labels instantly with no page navigati
   expect(navigated).toBe(false);
 });
 
-test.skip('no chrome element (nav item, button, pill) clips text after switching to the longer Indonesian labels', async ({ page }) => {
+test('no chrome element (nav item, button, pill) clips text after switching to the longer Indonesian labels', async ({ page }) => {
   await page.goto('/admin');
 
   await page.getByRole('button', { name: /user menu|menu pengguna/i }).click();

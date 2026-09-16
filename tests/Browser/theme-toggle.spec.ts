@@ -14,7 +14,7 @@ import { test, expect } from '@playwright/test';
  * navigation, and Tailwind's `dark` class strategy is actually applied to <html>.
  */
 
-test.skip('theme toggle switches dark mode instantly with no page navigation', async ({ page }) => {
+test('theme toggle switches dark mode instantly with no page navigation', async ({ page }) => {
   await page.goto('/admin');
 
   const html = page.locator('html');
@@ -36,7 +36,7 @@ test.skip('theme toggle switches dark mode instantly with no page navigation', a
   expect(navigated).toBe(false);
 });
 
-test.skip('dark mode survives a reload (persisted, not just an in-memory toggle)', async ({ page }) => {
+test('dark mode survives a reload (persisted, not just an in-memory toggle)', async ({ page }) => {
   await page.goto('/admin');
 
   await page.getByRole('button', { name: /user menu|menu pengguna/i }).click();

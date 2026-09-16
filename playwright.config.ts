@@ -37,6 +37,12 @@ export default defineConfig({
       'php vendor/bin/testbench workbench:create-sqlite-db --no-interaction && ' +
       'php vendor/bin/testbench migrate --no-interaction --force && ' +
       "php vendor/bin/testbench db:seed --no-interaction --class='Workbench\\Database\\Seeders\\DatabaseSeeder' && " +
+      // Mirrors exactly what a real client runs post-`composer require`
+      // (Story 1.1) -- among other things, this is what actually copies
+      // Shell's compiled theme CSS/JS (AD-33) into the host app's public/
+      // directory via Filament's own `filament:assets` (pure PHP file copy,
+      // never npm/node) so the browser can actually fetch them.
+      'php vendor/bin/testbench bazaar:install --no-interaction && ' +
       'php vendor/bin/testbench serve --port=8765 --no-reload',
     url: 'http://127.0.0.1:8765/admin',
     reuseExistingServer: !process.env.CI,

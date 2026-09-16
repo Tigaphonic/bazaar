@@ -14,7 +14,7 @@ it('renders the headline and supporting caption for a genuinely empty collection
     ])
         ->assertSee('Belum ada order')
         ->assertSee('Order baru akan muncul di sini.');
-})->skip('Story 1.2 not implemented — Shell\Livewire\EmptyState does not exist yet');
+});
 
 it('renders a single primary action button only when the empty state is actionable', function () {
     Livewire::test(EmptyState::class, [
@@ -25,4 +25,4 @@ it('renders a single primary action button only when the empty state is actionab
 
     Livewire::test(EmptyState::class, ['headline' => 'Belum ada order'])
         ->assertDontSee('Tambah Unit');
-})->skip('Story 1.2 not implemented — Shell\Livewire\EmptyState does not exist yet');
+});

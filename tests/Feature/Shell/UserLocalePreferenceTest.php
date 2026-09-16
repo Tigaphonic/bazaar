@@ -22,7 +22,7 @@ it('persists a Staff member\'s locale choice across requests', function () {
     $reread = app(UserPreferences::class)->locale($user->fresh());
 
     expect($reread)->toBe('id');
-})->skip('Story 1.2 not implemented — Shell\Support\UserPreferences does not exist yet');
+});
 
 it('applies the Staff member\'s persisted locale to the app on their next authenticated request', function () {
     $this->artisan('bazaar:install');
@@ -38,4 +38,15 @@ it('applies the Staff member\'s persisted locale to the app on their next authen
     $this->actingAs($user)->get('/admin');
 
     expect(App::getLocale())->toBe('id');
-})->skip('Story 1.2 not implemented — no middleware applies the persisted locale yet');
+});
+
+it('returns the configured default locale for a Staff member who never set one', function () {
+    // I/O & Edge-Case Matrix: "Staff A set tema dark, Staff B tidak pernah set" — the
+    // same per-User default-fallback guarantee applies to locale. Must resolve to
+    // config('bazaar.shell.default_locale'), never throw, with no persisted row.
+    $budi = User::create(['name' => 'Budi', 'email' => 'budi-locale-never-set@example.com', 'password' => bcrypt('password')]);
+
+    $locale = app(UserPreferences::class)->locale($budi);
+
+    expect($locale)->toBe(config('bazaar.shell.default_locale'));
+});

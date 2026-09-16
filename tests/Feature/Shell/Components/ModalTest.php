@@ -11,7 +11,7 @@ it('opens with a title, body, and footer action pair', function () {
     Livewire::test(Modal::class, ['title' => 'Konfirmasi', 'isOpen' => true])
         ->assertSee('Konfirmasi')
         ->assertSet('isOpen', true);
-})->skip('Story 1.2 not implemented — Shell\Livewire\Modal does not exist yet');
+});
 
 it('refuses to open a second modal while one is already open', function () {
     Livewire::test(Modal::class, ['isOpen' => true])
@@ -22,4 +22,4 @@ it('refuses to open a second modal while one is already open', function () {
         // real "opens a new view instead" behavior lives one level up, at the
         // page that hosts this component).
         ->assertDispatched('modal-open-refused');
-})->skip('Story 1.2 not implemented — Shell\Livewire\Modal does not exist yet');
+});

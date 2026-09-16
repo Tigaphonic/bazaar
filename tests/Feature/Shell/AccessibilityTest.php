@@ -22,7 +22,7 @@ it('gives every icon-only topbar control an accessible name', function () {
     foreach (['search', 'notifications', 'theme-toggle', 'language-switcher'] as $control) {
         expect($html)->toContain("aria-label", "Expected an aria-label near the {$control} control");
     }
-})->skip('Story 1.2 not implemented — bazaar::shell.topbar view does not exist yet');
+});
 
 it('renders shell nav items in the same order they appear visually (tab order = reading order)', function () {
     $this->artisan('bazaar:install');
@@ -35,4 +35,4 @@ it('renders shell nav items in the same order they appear visually (tab order = 
     expect($userAccessPosition)->not->toBeFalse()
         ->and($globalSettingsPosition)->not->toBeFalse()
         ->and($userAccessPosition)->toBeLessThan($globalSettingsPosition);
-})->skip('Story 1.2 not implemented — bazaar::shell.sidebar view does not exist yet');
+});

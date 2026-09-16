@@ -16,7 +16,7 @@ import { test, expect } from '@playwright/test';
  * scaffolds' proposed class names.
  */
 
-test.skip('desktop (>=1280px) keeps the sidebar at its full 250px width', async ({ page }) => {
+test('desktop (>=1280px) keeps the sidebar at its full 250px width', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/admin');
 
@@ -27,7 +27,7 @@ test.skip('desktop (>=1280px) keeps the sidebar at its full 250px width', async 
   expect(box?.width).toBeLessThanOrEqual(260);
 });
 
-test.skip('tablet (768-1279px) collapses the sidebar to a 64px icon-only rail', async ({ page }) => {
+test('tablet (768-1279px) collapses the sidebar to a 64px icon-only rail', async ({ page }) => {
   await page.setViewportSize({ width: 1000, height: 900 });
   await page.goto('/admin');
 
@@ -38,7 +38,7 @@ test.skip('tablet (768-1279px) collapses the sidebar to a 64px icon-only rail', 
   expect(box?.width).toBeLessThanOrEqual(72);
 });
 
-test.skip('mobile (<768px) hides the sidebar as an off-canvas drawer until opened from the topbar', async ({ page }) => {
+test('mobile (<768px) hides the sidebar as an off-canvas drawer until opened from the topbar', async ({ page }) => {
   await page.setViewportSize({ width: 400, height: 800 });
   await page.goto('/admin');
 
