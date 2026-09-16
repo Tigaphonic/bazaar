@@ -5,6 +5,7 @@
 // Roles" -- EXPERIENCE.md §Navigation: "Roles & Permissions | Sidebar -> User & Access
 // -> Roles | Create Role, check granular permissions, no deploy needed (FR-19)".
 
+use Filament\Facades\Filament;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
 use Tigaphonic\Bazaar\User\Filament\Resources\RoleResource;
@@ -16,10 +17,18 @@ it('lists every Role with its name column', function () {
     Livewire::test(ListRoles::class)
         ->assertCanSeeTableRecords([$role])
         ->assertTableColumnExists('name');
-})->skip('Story 1.3 not implemented — RoleResource\Pages\ListRoles does not exist yet');
+});
 
 it('registers the Roles resource under the User & Access navigation group', function () {
     $this->artisan('bazaar:install');
 
     expect(RoleResource::getNavigationGroup())->toBe('User & Access');
-})->skip('Story 1.3 not implemented — RoleResource does not exist yet');
+});
+
+it('registers RoleResource on the panel so the Roles admin screen cannot be silently dropped', function () {
+    $this->artisan('bazaar:install');
+
+    $panel = Filament::getDefaultPanel();
+
+    expect($panel->getResources())->toContain(RoleResource::class);
+});

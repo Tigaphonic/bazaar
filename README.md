@@ -29,6 +29,12 @@ Then connect it to your project's existing Filament panel:
 php artisan bazaar:install
 ```
 
+This also publishes `spatie/laravel-permission`'s own migration (`roles`, `permissions`, `model_has_roles`, `model_has_permissions`, `role_has_permissions` — needed by the Roles & Permissions screen) into your `database/migrations/`. It is published, not run automatically, so finish with:
+
+```bash
+php artisan migrate
+```
+
 You can publish the config file with:
 
 ```bash

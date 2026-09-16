@@ -8,6 +8,7 @@
 // RoleResource actually wires it in and that deletion only happens once the mounted
 // action is confirmed/called, not on mount alone.
 
+use Filament\Actions\Testing\TestAction;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
 use Tigaphonic\Bazaar\User\Filament\Resources\RoleResource\Pages\ListRoles;
@@ -17,17 +18,22 @@ it('exposes a delete table action for each Role row', function () {
 
     Livewire::test(ListRoles::class)
         ->assertTableActionExists('delete');
-})->skip('Story 1.3 not implemented — RoleResource\Pages\ListRoles does not exist yet');
+});
 
 it('does not delete the Role merely by mounting the delete confirmation modal', function () {
     $role = Role::create(['name' => 'Temporary Role']);
 
+    // assertTableActionMounted() (deprecated) takes no $record and always
+    // expects context ['table' => true] with no recordKey, but
+    // mountTableAction('delete', $role) always mounts with a recordKey --
+    // the two can never match for a record-scoped action. assertActionMounted()
+    // with a TestAction::table($role) builds the matching expected context.
     Livewire::test(ListRoles::class)
         ->mountTableAction('delete', $role)
-        ->assertTableActionMounted('delete');
+        ->assertActionMounted(TestAction::make('delete')->table($role));
 
     expect(Role::find($role->id))->not->toBeNull();
-})->skip('Story 1.3 not implemented — ListRoles does not exist yet');
+});
 
 it('deletes the Role once the delete action is confirmed', function () {
     $role = Role::create(['name' => 'Temporary Role']);
@@ -36,4 +42,4 @@ it('deletes the Role once the delete action is confirmed', function () {
         ->callTableAction('delete', $role);
 
     expect(Role::find($role->id))->toBeNull();
-})->skip('Story 1.3 not implemented — ListRoles does not exist yet');
+});

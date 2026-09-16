@@ -1,6 +1,7 @@
 <?php
 
 use Tigaphonic\Bazaar\Settings\Filament\Pages\GlobalSettings;
+use Tigaphonic\Bazaar\User\Filament\Resources\RoleResource;
 use Tigaphonic\Bazaar\User\Filament\Resources\UserResource;
 
 // config for Tigaphonic/Bazaar
@@ -20,6 +21,7 @@ return [
      */
     'resources' => [
         UserResource::class,
+        RoleResource::class,
     ],
 
     /*

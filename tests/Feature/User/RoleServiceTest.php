@@ -30,13 +30,13 @@ it('creates a Role with the given granular permissions, no deploy required', fun
         ->and($role->name)->toBe('Supervisor Retur')
         ->and($role->fresh()->hasPermissionTo('approve return'))->toBeTrue()
         ->and($role->fresh()->hasPermissionTo('approve publish item'))->toBeFalse();
-})->skip('Story 1.3 not implemented — Tigaphonic\Bazaar\User\Services\RoleService does not exist yet');
+});
 
 it('creates a Role with zero permissions when none are checked', function () {
     $role = app(RoleService::class)->create(['name' => 'Read Only', 'permissions' => []]);
 
     expect($role->fresh()->permissions)->toHaveCount(0);
-})->skip('Story 1.3 not implemented — RoleService::create() does not exist yet');
+});
 
 it('replaces a Role\'s permission set on update rather than appending to it', function () {
     Permission::create(['name' => 'approve return']);
@@ -49,7 +49,7 @@ it('replaces a Role\'s permission set on update rather than appending to it', fu
     $role = $role->fresh();
     expect($role->hasPermissionTo('approve refund'))->toBeTrue()
         ->and($role->hasPermissionTo('approve return'))->toBeFalse();
-})->skip('Story 1.3 not implemented — RoleService::update() does not exist yet');
+});
 
 it('deletes a Role', function () {
     $role = app(RoleService::class)->create(['name' => 'Temporary Role', 'permissions' => []]);
@@ -57,4 +57,4 @@ it('deletes a Role', function () {
     app(RoleService::class)->delete($role);
 
     expect(Role::find($role->id))->toBeNull();
-})->skip('Story 1.3 not implemented — RoleService::delete() does not exist yet');
+});

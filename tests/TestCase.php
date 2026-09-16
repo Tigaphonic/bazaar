@@ -17,6 +17,16 @@ class TestCase extends Orchestra
 {
     use WithWorkbench;
 
+    // Testbench ignores every vendor package's own auto-discovered
+    // ServiceProvider by default (Orchestra\Testbench\TestCase's own
+    // $enablesPackageDiscoveries = false) -- spatie/laravel-permission's
+    // PermissionServiceProvider (hasConfigFile('permission')) needs to
+    // actually boot for config('permission.*') to be populated before the
+    // migration below can run. Laravel's own Application::register()
+    // dedupes by class name, so this has no effect on the providers this
+    // class already registers explicitly in getPackageProviders().
+    protected $enablesPackageDiscoveries = true;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -30,6 +40,21 @@ class TestCase extends Orchestra
         // test that touches UserPreferences has the table available without
         // each test file needing its own `$this->artisan('migrate')` call.
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+
+        // spatie/laravel-permission's own migration (roles, permissions,
+        // model_has_roles, model_has_permissions, role_has_permissions) --
+        // loaded exactly as the package ships it (AD-18: dependency-owned
+        // tables keep their native, unmodified shape, never copied into
+        // Bazaar's own database/migrations/). The package's own
+        // PermissionServiceProvider declares hasMigrations() but never
+        // ->runsMigrations(), so nothing loads this automatically; this
+        // mirrors spatie/laravel-permission's own test suite pattern of
+        // `include`-ing the stub and running ->up() on the instance it
+        // returns.
+        (function (): void {
+            $migration = include __DIR__.'/../vendor/spatie/laravel-permission/database/migrations/create_permission_tables.php.stub';
+            $migration->up();
+        })();
 
         // Several Shell tests instantiate the framework's own base
         // Illuminate\Foundation\Auth\User directly (rather than the

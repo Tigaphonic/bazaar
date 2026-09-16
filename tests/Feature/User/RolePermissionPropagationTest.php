@@ -41,7 +41,7 @@ it('propagates a Role permission change instantly to every User holding that Rol
         ->and($rara->fresh()->hasPermissionTo('approve return'))->toBeFalse()
         ->and($bagas->fresh()->hasPermissionTo('approve refund'))->toBeTrue()
         ->and($bagas->fresh()->hasPermissionTo('approve return'))->toBeFalse();
-})->skip('Story 1.3 not implemented — RoleService does not exist yet, and Workbench\App\Models\User does not yet use Spatie\Permission\Traits\HasRoles');
+});
 
 it('never hardcodes "Approval Role" -- any Role holding the relevant permission gates the same action', function () {
     Permission::create(['name' => 'approve refund']);
@@ -56,4 +56,4 @@ it('never hardcodes "Approval Role" -- any Role holding the relevant permission 
 
     expect($rara->fresh()->hasPermissionTo('approve refund'))->toBeTrue()
         ->and($dian->fresh()->hasPermissionTo('approve refund'))->toBeTrue();
-})->skip('Story 1.3 not implemented — RoleService does not exist yet, and Workbench\App\Models\User does not yet use Spatie\Permission\Traits\HasRoles');
+});

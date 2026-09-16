@@ -29,14 +29,14 @@ it('creates a Role with checked permissions via the dashboard form', function ()
     expect($role)->not->toBeNull()
         ->and($role->hasPermissionTo('approve return'))->toBeTrue()
         ->and($role->hasPermissionTo('approve publish item'))->toBeFalse();
-})->skip('Story 1.3 not implemented — RoleResource\Pages\CreateRole does not exist yet');
+});
 
 it('rejects a Role name left blank', function () {
     Livewire::test(CreateRole::class)
         ->fillForm(['name' => '', 'permissions' => []])
         ->call('create')
         ->assertHasFormErrors(['name' => 'required']);
-})->skip('Story 1.3 not implemented — CreateRole does not exist yet');
+});
 
 it('rejects a duplicate Role name', function () {
     Role::create(['name' => 'Supervisor Retur']);
@@ -45,4 +45,4 @@ it('rejects a duplicate Role name', function () {
         ->fillForm(['name' => 'Supervisor Retur', 'permissions' => []])
         ->call('create')
         ->assertHasFormErrors(['name' => 'unique']);
-})->skip('Story 1.3 not implemented — CreateRole does not exist yet');
+});

@@ -27,7 +27,7 @@ it('pre-fills the form with the Role\'s current name and checked permissions', f
             'name' => 'Supervisor Retur',
             'permissions' => ['approve return'],
         ]);
-})->skip('Story 1.3 not implemented — RoleResource\Pages\EditRole does not exist yet');
+});
 
 it('saves an updated permission set for an existing Role', function () {
     Permission::create(['name' => 'approve return']);
@@ -44,4 +44,4 @@ it('saves an updated permission set for an existing Role', function () {
     $role = $role->fresh();
     expect($role->hasPermissionTo('approve refund'))->toBeTrue()
         ->and($role->hasPermissionTo('approve return'))->toBeFalse();
-})->skip('Story 1.3 not implemented — EditRole does not exist yet');
+});
