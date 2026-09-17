@@ -31,7 +31,10 @@ class BazaarServiceProvider extends PackageServiceProvider
             ->hasConfigFile()
             ->hasViews()
             ->hasTranslations()
-            ->hasMigration('create_bazaar_user_preferences_table')
+            ->hasMigrations([
+                'create_bazaar_user_preferences_table',
+                'create_bazaar_user_statuses_table',
+            ])
             ->runsMigrations()
             ->hasCommands([
                 BazaarInstallCommand::class,
