@@ -47,6 +47,23 @@ Optionally, you can publish the views using
 php artisan vendor:publish --tag="bazaar-views"
 ```
 
+### Manual install step: `HasRoles` trait
+
+The Users screen's roles checklist (and the Roles screen it manages) is built on `spatie/laravel-permission`. Beyond running `bazaar:install` and `migrate`, your app's own `User` model must use that package's `HasRoles` trait yourself — Bazaar never injects it into your model automatically:
+
+```php
+use Spatie\Permission\Traits\HasRoles;
+
+class User extends Authenticatable
+{
+    // Add HasRoles alongside your model's existing traits (e.g. HasFactory,
+    // Notifiable) -- don't remove them.
+    use HasFactory, Notifiable, HasRoles;
+}
+```
+
+Without this, editing a user 500s when the form tries to hydrate/save its roles.
+
 ## Usage
 
 ### `bazaar:install`

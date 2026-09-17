@@ -44,9 +44,17 @@ class BazaarInstallCommand extends Command
         // pending host-app migration, a bigger side effect than this
         // command should have.
         if ($this->getApplication()?->has('vendor:publish')) {
+            // laravel-package-tools registers this tag as
+            // "{$package->shortName()}-migrations", where shortName() strips
+            // the "laravel-" prefix off the package name
+            // ("laravel-permission" -> "permission"). The tag is therefore
+            // "permission-migrations", not "laravel-permission-migrations" --
+            // vendor:publish silently no-ops (still exits SUCCESS) on an
+            // unknown tag, so a wrong tag here fails to publish the
+            // migration without ever raising an error.
             if ($this->callSilently('vendor:publish', [
                 '--provider' => PermissionServiceProvider::class,
-                '--tag' => 'laravel-permission-migrations',
+                '--tag' => 'permission-migrations',
             ]) !== static::SUCCESS) {
                 $this->components->error('Failed to publish spatie/laravel-permission migrations.');
 
@@ -54,12 +62,13 @@ class BazaarInstallCommand extends Command
             }
         } else {
             $this->components->error('The vendor:publish command is not available.');
-            
+
             return static::FAILURE;
         }
 
         $this->components->info("Bazaar connected to the '{$panel->getId()}' Filament panel.");
         $this->components->info('Run `php artisan migrate` to create the roles/permissions tables (spatie/laravel-permission) the Roles screen needs.');
+        $this->components->warn("Manual step required: add `use Spatie\Permission\Traits\HasRoles;` to your app's User model so the Users screen's roles checklist works.");
 
         return self::SUCCESS;
     }

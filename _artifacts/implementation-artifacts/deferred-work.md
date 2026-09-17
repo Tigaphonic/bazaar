@@ -32,3 +32,7 @@
 
 ## Deferred from: code review of spec-1-4-manage-user.md (2026-09-17)
 - Ineffectual Test Assertion di UserAccessRevocationTest [tests/Feature/User/UserAccessRevocationTest.php] — Tes ini merupakan frozen boundary dari story sebelumnya, tidak boleh dimodifikasi tanpa persetujuan eksplisit.
+
+- source_spec: none
+  summary: Sederhanakan topbar Shell agar "cukup menggunakan Filament saja" — lepas custom topbar controls Bazaar (search/bell/menu/user-menu dengan dropdown theme+language sendiri, dipasang di render hook `TOPBAR_END` sejak Story 1.2) dan pakai kontrol native Filament (user menu + theme switcher bawaan panel `->login()`) sebagai gantinya.
+  evidence: Dilaporkan pengguna (2026-09-17): icon search/notification custom tidak selaras dengan icon user default Filament, dan dropdown theme-toggle custom bertabrakan/tumpang-tindih dengan popup user-menu native Filament. Filament belum punya panel auth saat Story 1.2 dibangun sehingga Bazaar terpaksa membuat kontrolnya sendiri; sejak Story 1.3 memasang `->login()`, Filament sudah render user-menu-nya sendiri, membuat kedua set kontrol berdampingan tanpa terkoordinasi. Menyentuh design commitment eksplisit di EXPERIENCE.md §Interaction Primitives ("search/staff notification bell/user chip dengan theme+language" adalah requirement topbar) — mengganti dengan kontrol native Filament berarti mundur dari sebagian requirement itu (Filament tidak native search/notification bell), perlu keputusan desain eksplisit sebelum dikerjakan, bukan sekadar bug fix CSS.

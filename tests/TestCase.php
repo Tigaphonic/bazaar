@@ -41,6 +41,22 @@ class TestCase extends Orchestra
         // each test file needing its own `$this->artisan('migrate')` call.
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
+        // Some tests (e.g. BazaarInstallCommandTest) call `bazaar:install`,
+        // which publishes spatie/laravel-permission's migration into the
+        // app's own database/migrations/ directory. Pest runs this whole
+        // package's suite in a single process against the same on-disk
+        // Testbench skeleton, so a file published by an earlier test would
+        // otherwise leak into every later test's `php artisan migrate`
+        // (DomainMigrationTest calls it plain) and collide with the
+        // roles/permissions tables this setUp() creates directly below.
+        // Purge any such leaked file before every test so each test starts
+        // from the same clean slate regardless of run order.
+        foreach (glob(database_path('migrations/*_create_permission_tables.php')) ?: [] as $leakedMigration) {
+            if (!unlink($leakedMigration)) {
+                throw new \RuntimeException("Failed to remove leaked migration file before test: {$leakedMigration}");
+            }
+        }
+
         // spatie/laravel-permission's own migration (roles, permissions,
         // model_has_roles, model_has_permissions, role_has_permissions) --
         // loaded exactly as the package ships it (AD-18: dependency-owned
