@@ -25,3 +25,7 @@
 
 ## Deferred from: code review (spec-1-3-manage-role-permission.md)
 - [ ] Missing Authorization Gate (canAccess) in RoleResource — Pre-existing gap logged previously, awaiting Story 1.4 for proper user management and panel auth.
+
+- source_spec: `_artifacts/implementation-artifacts/spec-1-4-manage-user.md`
+  summary: `UserResource` (create/edit/deactivate) masih tanpa authorization/policy gate apa pun, meski AC1 menyebut "Staff berwenang" (authorized).
+  evidence: Terkonfirmasi via grep `src/` dan `config/`: nol penggunaan `canAccess()`/Policy/`Gate::`. Sama seperti item RoleResource sebelumnya — panel auth (`->login()`) masih belum terpasang dan eksplisit di luar Boundaries Story 1.4 ("Tidak menyentuh panel auth"), jadi prasyarat untuk membangun gate ini masih belum terpenuhi. Menunggu story panel-auth.

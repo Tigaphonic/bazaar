@@ -32,7 +32,7 @@ it('creates a User with assigned Roles via the dashboard form', function () {
     expect($user)->not->toBeNull()
         ->and($user->hasRole('Supervisor Retur'))->toBeTrue()
         ->and($user->hasRole('CS Lead'))->toBeFalse();
-})->skip('Story 1.4 not implemented — UserResource\Pages\CreateUser does not exist yet');
+});
 
 it('rejects creating a User with no Role selected', function () {
     Livewire::test(CreateUser::class)
@@ -44,7 +44,7 @@ it('rejects creating a User with no Role selected', function () {
         ])
         ->call('create')
         ->assertHasFormErrors(['roles' => 'required']);
-})->skip('Story 1.4 not implemented — CreateUser does not exist yet');
+});
 
 it('rejects a duplicate email', function () {
     User::create(['name' => 'Existing', 'email' => 'rara3@example.com', 'password' => bcrypt('password')]);
@@ -59,4 +59,4 @@ it('rejects a duplicate email', function () {
         ])
         ->call('create')
         ->assertHasFormErrors(['email' => 'unique']);
-})->skip('Story 1.4 not implemented — CreateUser does not exist yet');
+});

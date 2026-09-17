@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-13-2026 00:00
-last_updated: 09-16-2026 15:45
+last_updated: 09-17-2026 10:20
 project: Tigaphonic/bazaar
 project_key: NOKEY
 tracking_system: file-system
@@ -39,7 +39,7 @@ development_status:
   1-1-package-skeleton-filament-panel-connection-migration: done
   1-2-design-token-system-shell-ui-bilingual-dual-theme: done
   1-3-manage-role-permission: done
-  1-4-manage-user: backlog
+  1-4-manage-user: review
   1-5-audit-trail: backlog
   1-6-manage-global-settings: backlog
   1-7-global-seo-defaults: backlog

@@ -13,6 +13,7 @@
 
 use Livewire\Livewire;
 use Tigaphonic\Bazaar\User\Filament\Resources\UserResource\Pages\ListUsers;
+use Tigaphonic\Bazaar\User\Services\UserService;
 use Workbench\App\Models\User;
 
 it('lists every User with name, email, and status columns', function () {
@@ -23,4 +24,15 @@ it('lists every User with name, email, and status columns', function () {
         ->assertTableColumnExists('name')
         ->assertTableColumnExists('email')
         ->assertTableColumnExists('is_active');
-})->skip('Story 1.4 not implemented — ListUsers has no status column yet');
+});
+
+it('renders the is_active column true for active Users and false for deactivated Users', function () {
+    $activeUser = User::create(['name' => 'Rara', 'email' => 'rara@example.com', 'password' => bcrypt('password')]);
+    $deactivatedUser = User::create(['name' => 'Budi', 'email' => 'budi@example.com', 'password' => bcrypt('password')]);
+
+    app(UserService::class)->deactivate($deactivatedUser);
+
+    Livewire::test(ListUsers::class)
+        ->assertTableColumnStateSet('is_active', true, $activeUser)
+        ->assertTableColumnStateSet('is_active', false, $deactivatedUser);
+});

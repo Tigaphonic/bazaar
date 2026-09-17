@@ -35,7 +35,7 @@ it('creates a User with the given Roles, stored on the host\'s own authenticatab
     expect($user)->toBeInstanceOf(User::class)
         ->and($user->name)->toBe('Rara')
         ->and($user->fresh()->hasRole($supervisor))->toBeTrue();
-})->skip('Story 1.4 not implemented — Tigaphonic\Bazaar\User\Services\UserService does not exist yet');
+});
 
 it('replaces a User\'s Role assignment on update rather than appending to it', function () {
     Role::create(['name' => 'Supervisor Retur']);
@@ -57,7 +57,7 @@ it('replaces a User\'s Role assignment on update rather than appending to it', f
     $user = $user->fresh();
     expect($user->hasRole('CS Lead'))->toBeTrue()
         ->and($user->hasRole('Supervisor Retur'))->toBeFalse();
-})->skip('Story 1.4 not implemented — UserService::update() does not exist yet');
+});
 
 it('deactivates a User, revoking access immediately', function () {
     Role::create(['name' => 'Supervisor Retur']);
@@ -74,7 +74,7 @@ it('deactivates a User, revoking access immediately', function () {
     app(UserService::class)->deactivate($user);
 
     expect(app(UserService::class)->isActive($user))->toBeFalse();
-})->skip('Story 1.4 not implemented — UserService::deactivate() / isActive() do not exist yet');
+});
 
 it('does not delete the User record when deactivating', function () {
     Role::create(['name' => 'Supervisor Retur']);
@@ -89,4 +89,4 @@ it('does not delete the User record when deactivating', function () {
     app(UserService::class)->deactivate($user);
 
     expect(User::find($user->id))->not->toBeNull();
-})->skip('Story 1.4 not implemented — UserService::deactivate() does not exist yet');
+});

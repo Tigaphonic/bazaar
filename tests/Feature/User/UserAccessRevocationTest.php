@@ -36,7 +36,7 @@ it('revokes access immediately when a User is deactivated, with no stale cached 
     // any state cached on the $user instance from the deactivate() call itself) is
     // what rules out a stale in-memory flag masquerading as "instant".
     expect(app(UserService::class)->isActive($user->fresh()))->toBeFalse();
-})->skip('Story 1.4 not implemented — UserService::deactivate() / isActive() do not exist yet');
+});
 
 it('preserves the deactivated User\'s name and email untouched, so future Audit Trail entries can still resolve to them', function () {
     Role::create(['name' => 'Supervisor Retur']);
@@ -54,4 +54,4 @@ it('preserves the deactivated User\'s name and email untouched, so future Audit 
     expect($user)->not->toBeNull()
         ->and($user->name)->toBe('Bagas')
         ->and($user->email)->toBe('bagas@example.com');
-})->skip('Story 1.4 not implemented — UserService::deactivate() does not exist yet');
+});

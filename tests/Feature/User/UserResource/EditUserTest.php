@@ -29,7 +29,7 @@ it('pre-fills the form with the User\'s current name, email, and Roles', functio
             'email' => 'rara@example.com',
             'roles' => ['Supervisor Retur'],
         ]);
-})->skip('Story 1.4 not implemented — UserResource\Pages\EditUser does not exist yet');
+});
 
 it('saves an updated Role assignment for an existing User', function () {
     Role::create(['name' => 'Supervisor Retur']);
@@ -46,7 +46,7 @@ it('saves an updated Role assignment for an existing User', function () {
     $user = $user->fresh();
     expect($user->hasRole('CS Lead'))->toBeTrue()
         ->and($user->hasRole('Supervisor Retur'))->toBeFalse();
-})->skip('Story 1.4 not implemented — EditUser does not exist yet');
+});
 
 it('rejects removing every Role from an existing User via edit', function () {
     Role::create(['name' => 'Supervisor Retur']);
@@ -58,4 +58,4 @@ it('rejects removing every Role from an existing User via edit', function () {
         ->fillForm(['roles' => []])
         ->call('save')
         ->assertHasFormErrors(['roles' => 'required']);
-})->skip('Story 1.4 not implemented — EditUser does not exist yet');
+});

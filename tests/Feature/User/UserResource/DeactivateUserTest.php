@@ -11,6 +11,7 @@
 // ->requiresConfirmation() must be added explicitly here, unlike DeleteAction's own
 // default.
 
+use Filament\Actions\Testing\TestAction;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
 use Tigaphonic\Bazaar\User\Filament\Resources\UserResource\Pages\ListUsers;
@@ -24,19 +25,25 @@ it('exposes a deactivate table action for each active User row', function () {
 
     Livewire::test(ListUsers::class)
         ->assertTableActionExists('deactivate');
-})->skip('Story 1.4 not implemented — UserResource has no deactivate table action yet');
+});
 
 it('does not deactivate the User merely by mounting the confirmation modal', function () {
     Role::create(['name' => 'Supervisor Retur']);
     $user = User::create(['name' => 'Rara', 'email' => 'rara@example.com', 'password' => bcrypt('password')]);
     $user->assignRole('Supervisor Retur');
 
+    // assertTableActionMounted() (deprecated) takes no $record and always
+    // expects context ['table' => true] with no recordKey, but
+    // mountTableAction('deactivate', $user) always mounts with a recordKey --
+    // the two can never match for a record-scoped action (same pitfall
+    // already worked around in Story 1.3's DeleteRoleTest). assertActionMounted()
+    // with a TestAction::table($user) builds the matching expected context.
     Livewire::test(ListUsers::class)
         ->mountTableAction('deactivate', $user)
-        ->assertTableActionMounted('deactivate');
+        ->assertActionMounted(TestAction::make('deactivate')->table($user));
 
     expect(app(UserService::class)->isActive($user->fresh()))->toBeTrue();
-})->skip('Story 1.4 not implemented — ListUsers deactivate action does not exist yet');
+});
 
 it('deactivates the User once the action is confirmed', function () {
     Role::create(['name' => 'Supervisor Retur']);
@@ -47,7 +54,7 @@ it('deactivates the User once the action is confirmed', function () {
         ->callTableAction('deactivate', $user);
 
     expect(app(UserService::class)->isActive($user->fresh()))->toBeFalse();
-})->skip('Story 1.4 not implemented — ListUsers deactivate action does not exist yet');
+});
 
 it('hides the deactivate action once the User is already deactivated', function () {
     Role::create(['name' => 'Supervisor Retur']);
@@ -57,4 +64,4 @@ it('hides the deactivate action once the User is already deactivated', function 
 
     Livewire::test(ListUsers::class)
         ->assertTableActionHidden('deactivate', $user->fresh());
-})->skip('Story 1.4 not implemented — deactivate action has no visibility guard yet');
+});
