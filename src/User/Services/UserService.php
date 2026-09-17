@@ -27,18 +27,22 @@ class UserService
      */
     public function create(array $data): Model
     {
-        $modelClass = $this->resolveModelClass();
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($data) {
+            $modelClass = $this->resolveModelClass();
 
-        /** @var Model&HasRolesUser $user */
-        $user = $modelClass::query()->create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => bcrypt($data['password']),
-        ]);
+            /** @var Model&HasRolesUser $user */
+            $user = new $modelClass;
+            $user->forceFill([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => bcrypt($data['password']),
+            ]);
+            $user->save();
 
-        $user->syncRoles($data['roles']);
+            $user->syncRoles($data['roles']);
 
-        return $user;
+            return $user;
+        });
     }
 
     /**
@@ -48,20 +52,23 @@ class UserService
      */
     public function update(Model $user, array $data): Model
     {
-        $attributes = [
-            'name' => $data['name'],
-            'email' => $data['email'],
-        ];
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($user, $data) {
+            $attributes = [
+                'name' => $data['name'],
+                'email' => $data['email'],
+            ];
 
-        if (filled($data['password'] ?? null)) {
-            $attributes['password'] = bcrypt($data['password']);
-        }
+            if (filled($data['password'] ?? null)) {
+                $attributes['password'] = bcrypt($data['password']);
+            }
 
-        $user->update($attributes);
+            $user->forceFill($attributes);
+            $user->save();
 
-        $user->syncRoles($data['roles']);
+            $user->syncRoles($data['roles']);
 
-        return $user;
+            return $user;
+        });
     }
 
     public function deactivate(Model $user): void

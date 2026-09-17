@@ -68,7 +68,7 @@ class UserResource extends Resource
             ->recordActions([
                 Action::make('deactivate')
                     ->requiresConfirmation()
-                    ->visible(fn (Model $record) => app(UserService::class)->isActive($record))
+                    ->visible(fn (Model $record) => app(UserService::class)->isActive($record) && (string)$record->getKey() !== (string)auth()->id())
                     ->action(fn (Model $record) => app(UserService::class)->deactivate($record)),
             ]);
     }

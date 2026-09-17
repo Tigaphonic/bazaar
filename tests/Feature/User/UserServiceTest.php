@@ -49,14 +49,18 @@ it('replaces a User\'s Role assignment on update rather than appending to it', f
     ]);
 
     app(UserService::class)->update($user, [
-        'name' => 'Rara',
-        'email' => 'rara@example.com',
+        'name' => 'Rara Updated',
+        'email' => 'rara.updated@example.com',
+        'password' => 'newpassword',
         'roles' => ['CS Lead'],
     ]);
 
     $user = $user->fresh();
     expect($user->hasRole('CS Lead'))->toBeTrue()
-        ->and($user->hasRole('Supervisor Retur'))->toBeFalse();
+        ->and($user->hasRole('Supervisor Retur'))->toBeFalse()
+        ->and($user->name)->toBe('Rara Updated')
+        ->and($user->email)->toBe('rara.updated@example.com')
+        ->and(\Illuminate\Support\Facades\Hash::check('newpassword', $user->password))->toBeTrue();
 });
 
 it('deactivates a User, revoking access immediately', function () {

@@ -29,3 +29,6 @@
 - source_spec: `_artifacts/implementation-artifacts/spec-1-4-manage-user.md`
   summary: `UserResource` (create/edit/deactivate) masih tanpa authorization/policy gate apa pun, meski AC1 menyebut "Staff berwenang" (authorized).
   evidence: Terkonfirmasi via grep `src/` dan `config/`: nol penggunaan `canAccess()`/Policy/`Gate::`. Sama seperti item RoleResource sebelumnya — panel auth (`->login()`) masih belum terpasang dan eksplisit di luar Boundaries Story 1.4 ("Tidak menyentuh panel auth"), jadi prasyarat untuk membangun gate ini masih belum terpenuhi. Menunggu story panel-auth.
+
+## Deferred from: code review of spec-1-4-manage-user.md (2026-09-17)
+- Ineffectual Test Assertion di UserAccessRevocationTest [tests/Feature/User/UserAccessRevocationTest.php] — Tes ini merupakan frozen boundary dari story sebelumnya, tidak boleh dimodifikasi tanpa persetujuan eksplisit.

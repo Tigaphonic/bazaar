@@ -126,3 +126,27 @@ context: [
 - `vendor/bin/pint --test` && `vendor/bin/phpstan analyse` -- expected: bersih
   - `phpstan analyse`: `[OK] No errors`
   - `pint --test`: bersih untuk seluruh file yang disentuh story ini (`src/User/{Models,Services,Contracts,Filament/Resources/UserResource*}`, `database/migrations/create_bazaar_user_statuses_table.php`, 6 file test). 3 file pre-existing (`RoleResource.php`, `DeleteRoleTest.php`, dan beberapa test lain di luar scope story ini) sudah gagal pint sebelum story ini dimulai dan tidak disentuh -- regresi pra-eksisting, di luar tanggung jawab story ini.
+
+### Review Findings
+
+- [x] [Review][Patch] Hallucinated `Schema` class digunakan alih-alih `Form` [src/User/Filament/Resources/UserResource.php]
+- [x] [Review][Patch] Namespace yang salah untuk Table Action [src/User/Filament/Resources/UserResource.php]
+- [x] [Review][Patch] Assertion helper `assertTableColumnStateSet` tidak valid untuk `IconColumn` yang read-only [tests/Feature/User/UserResource/ListUsersTest.php]
+- [x] [Review][Patch] Tidak ada Transaction Wrapper pada UserService `create()` dan `update()` [src/User/Services/UserService.php]
+- [x] [Review][Patch] Pengujian Update UserService tidak memverifikasi field dasar dan password [tests/Feature/User/UserServiceTest.php]
+- [x] [Review][Patch] Validasi form UserResource untuk field dasar tidak diuji [tests/Feature/User/UserResource/CreateUserTest.php]
+- [x] [Review][Patch] Risiko Mass-Assignment pada Foreign Model [src/User/Services/UserService.php]
+- [x] [Review][Patch] Tidak Ada Guard Self-Deactivation [src/User/Filament/Resources/UserResource.php]
+- [x] [Review][Defer] Ineffectual Test Assertion di UserAccessRevocationTest [tests/Feature/User/UserAccessRevocationTest.php] — deferred: Tes ini merupakan frozen boundary dari story sebelumnya, tidak boleh dimodifikasi tanpa persetujuan eksplisit.
+
+#### Rejected Findings
+
+- `low`: Isu N+1 Query pada UserService::isActive() — Jarang memengaruhi performa list internal Staff secara signifikan, sedangkan fix memerlukan perombakan arsitektur view.
+- `low`: Tidak ada Search dan Sort di UserResource — Bersifat kosmetik dan tidak diwajibkan dalam spesifikasi saat ini.
+- `low`: Tidak ada validasi maxLength(255) pada form — Jarang menimbulkan masalah dalam penggunaan normal.
+- `low`: Tidak ada Notifikasi Sukses pada aksi Deactivate — Bersifat kosmetik, dan aksi sudah berfungsi dengan konfirmasi.
+- `low`: Redundan Validation Rule pada email unique — Aturan spesifik memang ditulis demikian, tidak ada kerusakan fungsional.
+- `low`: Panggilan `deactivate()` secara konkuren bisa race condition — Kasus ekstrem yang jarang terjadi dalam penggunaan normal.
+- `false`: $data kurang key yang diharapkan (name, email, password) — Sudah dijamin dari input form yang ditandai `required`.
+- `false`: $user->getKey() null untuk model unsaved — `deactivate()` hanya bisa dipanggil dari action tabel yang modelnya sudah tersimpan.
+- `false`: Resolved model class not valid — Jika config salah, runtime exception sudah cukup benar dan diharapkan.

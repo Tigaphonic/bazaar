@@ -60,3 +60,20 @@ it('rejects a duplicate email', function () {
         ->call('create')
         ->assertHasFormErrors(['email' => 'unique']);
 });
+
+it('rejects creating a User with missing basic fields', function () {
+    Livewire::test(CreateUser::class)
+        ->fillForm([
+            'name' => '',
+            'email' => '',
+            'password' => '',
+            'roles' => [],
+        ])
+        ->call('create')
+        ->assertHasFormErrors([
+            'name' => 'required',
+            'email' => 'required',
+            'password' => 'required',
+            'roles' => 'required',
+        ]);
+});
