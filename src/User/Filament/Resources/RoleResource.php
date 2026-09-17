@@ -31,6 +31,14 @@ class RoleResource extends Resource
 {
     protected static string|UnitEnum|null $navigationGroup = 'User & Access';
 
+    /**
+     * Lets Filament's native global search (active by default,
+     * HasGlobalSearch.php:31) actually return results for Role records --
+     * without this, the search provider has no title field to match against
+     * or display.
+     */
+    protected static ?string $recordTitleAttribute = 'name';
+
     public static function getModel(): string
     {
         return Role::class;

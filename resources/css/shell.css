@@ -8,7 +8,7 @@
  * restyles Filament's own stock primitives (topbar, sidebar, card, table,
  * button, input, pill, notification/toast) to DESIGN.md's tokens, and
  * supplies the net-new component kit's own styles (modal, tabs, empty
- * state, alert banner) plus Shell's own topbar/sidebar-injected controls.
+ * state, alert banner) plus Shell's own sidebar-injected controls.
  */
 
 /* Filament's own base theme (topbar/sidebar/card/table/button/input/pill/
@@ -114,21 +114,15 @@
  * removed outline." Filament's own focus-visible rings already exist; this
  * only guards Shell's own net-new controls against ever being stripped.
  * ---------------------------------------------------------------------- */
-.bazaar-icon-btn:focus-visible,
-.bazaar-user-menu__item:focus-visible,
 .tabs__tab:focus-visible,
-[data-shell-sidebar] a:focus-visible,
-.bazaar-user-menu__language-options [role='option']:focus-visible {
+[data-shell-sidebar] a:focus-visible {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
 }
 
 :where(.dark, .dark *) :is(
-    .bazaar-icon-btn,
-    .bazaar-user-menu__item,
     .tabs__tab,
-    [data-shell-sidebar] a,
-    .bazaar-user-menu__language-options [role='option']
+    [data-shell-sidebar] a
 ):focus-visible {
     outline-color: var(--color-primary-dark);
 }
@@ -147,190 +141,6 @@
     max-width: none;
     white-space: nowrap;
     padding-inline: 0.75rem;
-}
-
-/* -------------------------------------------------------------------------
- * Shell's own topbar controls (injected at PanelsRenderHook::TOPBAR_END).
- * ---------------------------------------------------------------------- */
-.bazaar-topbar-controls {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.bazaar-icon-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    border-radius: var(--radius-md);
-    color: var(--color-bluegray);
-    background: transparent;
-    border: none;
-    cursor: pointer;
-}
-
-.bazaar-icon-btn:hover {
-    background: var(--color-soft);
-}
-
-:where(.dark, .dark *) .bazaar-icon-btn {
-    color: var(--color-muted-dark);
-}
-
-:where(.dark, .dark *) .bazaar-icon-btn:hover {
-    background: var(--color-white-dark);
-}
-
-.bazaar-icon {
-    width: 1.25rem;
-    height: 1.25rem;
-    display: inline-block;
-    background-color: currentColor;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-position: center;
-    mask-position: center;
-    -webkit-mask-size: contain;
-    mask-size: contain;
-}
-
-/* Heroicons outline glyphs (24x24, stroke-based) inlined as mask images so
- * each button's `color` (topbar default / hover / dark-mode variants above)
- * paints the glyph directly -- these classes were referenced in
- * topbar.blade.php since Story 1.2 but never actually defined, leaving every
- * icon button in the topbar/user-menu cluster visually empty. */
-.bazaar-icon--search {
-    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='black'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z'/%3E%3C/svg%3E");
-    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='black'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z'/%3E%3C/svg%3E");
-}
-
-.bazaar-icon--bell {
-    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='black'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0'/%3E%3C/svg%3E");
-    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='black'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0'/%3E%3C/svg%3E");
-}
-
-.bazaar-icon--menu {
-    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='black'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5'/%3E%3C/svg%3E");
-    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='black'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5'/%3E%3C/svg%3E");
-}
-
-.bazaar-icon--user {
-    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='black'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z'/%3E%3C/svg%3E");
-    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='black'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z'/%3E%3C/svg%3E");
-}
-
-.bazaar-mobile-menu-btn {
-    display: none;
-}
-
-@media (max-width: 767px) {
-    .bazaar-mobile-menu-btn {
-        display: inline-flex;
-    }
-
-    /* At <768px the topbar simplifies to just the hamburger -- theme/language
-     * live inside the mobile drawer's own affordances instead of a second,
-     * separately-discoverable "user menu" trigger crowding a narrow topbar. */
-    .bazaar-user-menu {
-        display: none;
-    }
-}
-
-.bazaar-user-menu {
-    position: relative;
-}
-
-.bazaar-user-menu__dropdown {
-    position: absolute;
-    inset-inline-end: 0;
-    top: calc(100% + 0.5rem);
-    min-width: 12rem;
-    background: #ffffff;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    box-shadow:
-        0 1px 2px rgba(16, 24, 40, 0.04),
-        0 2px 6px rgba(16, 24, 40, 0.06);
-    padding: 0.375rem;
-    z-index: 40;
-}
-
-:where(.dark, .dark *) .bazaar-user-menu__dropdown {
-    background: var(--color-white-dark);
-    border-color: var(--color-border-dark);
-}
-
-.bazaar-user-menu__item {
-    display: block;
-    width: 100%;
-    text-align: start;
-    padding: 0.5rem 0.75rem;
-    border-radius: var(--radius-sm);
-    border: none;
-    background: transparent;
-    font-family: var(--font-body);
-    font-size: 0.8125rem;
-    color: var(--color-ink);
-    cursor: pointer;
-    white-space: nowrap;
-}
-
-.bazaar-user-menu__item:hover,
-.bazaar-user-menu__item > button:hover {
-    background: var(--color-soft);
-}
-
-:where(.dark, .dark *) .bazaar-user-menu__item {
-    color: var(--color-ink-dark);
-}
-
-:where(.dark, .dark *) .bazaar-user-menu__item:hover,
-:where(.dark, .dark *) .bazaar-user-menu__item > button:hover {
-    background: var(--color-border-dark);
-}
-
-.bazaar-user-menu__language {
-    position: relative;
-}
-
-.bazaar-user-menu__language > button {
-    background: transparent;
-    border: none;
-    width: 100%;
-    text-align: start;
-    font: inherit;
-    color: inherit;
-    cursor: pointer;
-    padding: 0;
-}
-
-.bazaar-user-menu__language-options {
-    list-style: none;
-    margin: 0.25rem 0 0;
-    padding: 0.25rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
-    background: #ffffff;
-}
-
-:where(.dark, .dark *) .bazaar-user-menu__language-options {
-    background: var(--color-white-dark);
-    border-color: var(--color-border-dark);
-}
-
-.bazaar-user-menu__language-options [role='option'] {
-    padding: 0.375rem 0.5rem;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    white-space: nowrap;
-}
-
-.bazaar-user-menu__language-options [role='option']:hover,
-.bazaar-user-menu__language-options [role='option'][aria-selected='true'] {
-    background: var(--color-primary-50);
-    color: var(--color-primary-700);
 }
 
 /* -------------------------------------------------------------------------
@@ -374,8 +184,8 @@
 }
 
 /* -------------------------------------------------------------------------
- * Shell's own sidebar/topbar standalone contract views
- * (resources/views/shell/{sidebar,topbar}.blade.php).
+ * Shell's own sidebar standalone contract view
+ * (resources/views/shell/sidebar.blade.php).
  * ---------------------------------------------------------------------- */
 .bazaar-sidebar__brand {
     display: flex;

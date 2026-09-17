@@ -4,12 +4,7 @@
 // resources/lang/en/shell.php — ditegakkan oleh tests/Unit/Shell/TranslationParityTest.php.
 
 return [
-    'search' => 'Cari',
-    'notifications' => 'Notifikasi',
-    'theme_toggle' => 'Ganti tema',
     'language_switcher' => 'Bahasa',
-    'user_menu' => 'Menu pengguna',
-    'menu' => 'Menu',
     'sidebar_nav' => 'Navigasi utama',
     'brand_live_label' => 'Aktif',
     'modal_close' => 'Tutup',

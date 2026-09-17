@@ -2,6 +2,7 @@
 
 namespace Tigaphonic\Bazaar;
 
+use Filament\Actions\Action;
 use Filament\Navigation\NavigationGroup;
 use Filament\PanelRegistry;
 use Filament\Support\Assets\Css;
@@ -10,6 +11,7 @@ use Filament\Support\Assets\Theme;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentView;
+use Filament\Support\Icons\Heroicon;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Cache;
@@ -68,7 +70,46 @@ class BazaarServiceProvider extends PackageServiceProvider
                 // Locale application is scoped to this panel's own middleware
                 // stack, never the global `web` group (EXPERIENCE.md is explicit
                 // that bilingual EN/ID is an admin-panel-scoped requirement).
-                ->middleware([ApplyUserLocale::class]);
+                ->middleware([ApplyUserLocale::class])
+                // Language switcher (topbar-simplification refactor): the only
+                // Shell chrome control without a native Filament equivalent, so
+                // it rides inside Filament's own native user-menu dropdown
+                // rather than a second, separately-discoverable dropdown.
+                // Deliberately no ->action() (that triggers a Livewire/PHP
+                // round-trip) -- locale switching is purely client-side
+                // (localStorage + DOM swap), so an Alpine x-on:click calling
+                // the existing window.bazaarShell.setLocale() (resources/js/
+                // shell.js, unchanged) keeps the exact same mechanism the old
+                // custom dropdown used. Toggles to the other of the two
+                // supported locales on each click.
+                ->userMenuItems([
+                    Action::make('language')
+                        // Closure, not an eager __() call: this whole chain runs from
+                        // afterResolving(PanelRegistry::class, ...) in packageRegistered(),
+                        // which (per that method's own doc comment) fires during the
+                        // register phase specifically so it queues ahead of Filament's
+                        // boot()-time PanelRegistry resolution -- i.e. potentially before
+                        // this package's own hasTranslations() wiring has booted. An eager
+                        // __() call here silently returns the raw translation key; a
+                        // Closure defers it to request-time label rendering instead.
+                        ->label(fn (): string => __('bazaar::shell.language_switcher'))
+                        ->icon(Heroicon::Language)
+                        // ->alpineClickHandler() (not ->extraAttributes(['x-on:click' =>
+                        // ...])) -- passing a non-blank handler also flips
+                        // livewireClickHandlerEnabled(false) internally (Action.php:321),
+                        // which is what actually suppresses the default wire:click=
+                        // "mountAction('language')" Livewire round-trip an Action gets by
+                        // default when it has no ->url()/->action(). extraAttributes()
+                        // alone does NOT win here: Filament's own attribute bag already
+                        // declares an 'x-on:click' key (null, from getAlpineClickHandler())
+                        // before merging extraAttributes in, and ComponentAttributeBag::
+                        // merge() keeps the pre-existing key over the merged-in one for any
+                        // non-class/style attribute -- so an extraAttributes-only x-on:click
+                        // is silently dropped.
+                        ->alpineClickHandler(
+                            "window.bazaarShell && window.bazaarShell.setLocale(document.documentElement.getAttribute('lang') === 'id' ? 'en' : 'id')",
+                        ),
+                ]);
         });
     }
 
@@ -114,22 +155,23 @@ class BazaarServiceProvider extends PackageServiceProvider
     }
 
     /**
-     * Shell owns the only render hooks Bazaar injects into Filament's stock
-     * topbar/sidebar chrome (AD-33: "only Shell's own ServiceProvider may
-     * call FilamentAsset::register() ... other domains consume Shell's kit
+     * Shell owns the only render hook Bazaar injects into Filament's stock
+     * sidebar chrome (AD-33: "only Shell's own ServiceProvider may call
+     * FilamentAsset::register() ... other domains consume Shell's kit
      * through its Blade components"). This is what actually places Shell's
-     * icon-only topbar controls (search/notifications/theme/language) and
-     * its translated Dashboard nav entry onto the live panel -- restyling
-     * alone (CSS) cannot add controls Filament's stock markup doesn't render
-     * (e.g. no user menu at all while no ->login() panel auth exists yet).
+     * translated Dashboard nav entry onto the live panel -- restyling alone
+     * (CSS) cannot add a nav entry Filament's stock markup doesn't render.
+     *
+     * The topbar no longer gets a render hook here (topbar-simplification
+     * refactor): since Story 1.3 added ->login(), Filament renders its own
+     * native topbar controls (search, sidebar-toggle, avatar+user-menu)
+     * already, so a second custom TOPBAR_END control cluster only produced
+     * uncoordinated, visually-overlapping chrome. The one Shell-only control
+     * (Language) without a native equivalent moved into ->userMenuItems()
+     * in packageRegistered() instead of a render hook.
      */
     private function registerShellRenderHooks(): void
     {
-        FilamentView::registerRenderHook(
-            PanelsRenderHook::TOPBAR_END,
-            fn (): string => view('bazaar::shell.topbar')->render(),
-        );
-
         FilamentView::registerRenderHook(
             PanelsRenderHook::SIDEBAR_NAV_START,
             fn (): string => view('bazaar::shell.sidebar-nav-start')->render(),
