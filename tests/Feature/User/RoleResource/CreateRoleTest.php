@@ -63,7 +63,7 @@ it('RoleResource form schema includes manage-settings in the permissions checkbo
     app(\Tigaphonic\Bazaar\User\Services\RoleService::class)->ensureAdminRole();
 
     $component = Livewire::test(CreateRole::class);
-    $field = $component->instance()->getForm('form')->getComponent('permissions');
+    $field = $component->instance()->getSchema('form')->getComponent('permissions');
     
     expect($field->getOptions())->toHaveKey('manage-settings');
 });

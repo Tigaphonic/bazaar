@@ -5,6 +5,7 @@ namespace Tigaphonic\Bazaar\User\Support;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\Support\ActivityLogger;
+use Spatie\LaravelSettings\Events\SavingSettings;
 use Spatie\LaravelSettings\Models\SettingsProperty;
 
 /**
@@ -54,31 +55,38 @@ class AuditTrailRecorder
 
     /**
      * Global Settings are persisted through the query builder, so no Eloquent
-     * event fires for them; spatie/laravel-settings' own SavingSettings event
+     * event fires for them; spatie/laravel-settings' SavingSettings event
      * (which still carries the previous values) feeds the same trail instead.
-     * Encrypted properties (gateway credentials) are masked, never logged.
+     * Only changed properties are logged, and encrypted ones (gateway
+     * credentials) are masked, never logged.
      */
-    public function handleSettingsSaving(\Spatie\LaravelSettings\Events\SettingsSaved $event): void
+    public function handleSettingsSaving(SavingSettings $event): void
     {
         $encrypted = $event->settings::encrypted();
+        $original = $event->originalValues ?? collect();
 
         $attributes = [];
+        $old = [];
 
-        foreach ($event->settings->toArray() as $name => $value) {
+        foreach ($event->properties as $name => $value) {
+            if ($original->has($name) && $original->get($name) === $value) {
+                continue;
+            }
+
             $masked = in_array($name, $encrypted, true);
             $attributes[$name] = $masked ? self::MASK : $value;
+            $old[$name] = $masked ? self::MASK : $original->get($name);
         }
 
         if ($attributes === []) {
             return;
         }
 
-        $logger = activity('bazaar')
+        // Same log string used in the eloquent.* event handler above
+        activity('bazaar')
             ->event('updated')
-            ->withChanges(['attributes' => $attributes]);
-
-        // Same log string used in elqouent.* event handler above
-        $logger->log('updated');
+            ->withChanges(['attributes' => $attributes, 'old' => $old])
+            ->log('updated');
     }
 
     /**
@@ -120,7 +128,7 @@ class AuditTrailRecorder
         // handleSettingsSaving() instead of row by row.
         $excludedModels = [
             (string) config('activitylog.activity_model'),
-            config('settings.settings_property_model', \Spatie\LaravelSettings\Models\SettingsProperty::class),
+            config('settings.settings_property_model', SettingsProperty::class),
             ...(array) config('bazaar.audit.exclude_models', []),
         ];
 
