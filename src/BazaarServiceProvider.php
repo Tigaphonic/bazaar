@@ -176,5 +176,15 @@ class BazaarServiceProvider extends PackageServiceProvider
             PanelsRenderHook::SIDEBAR_NAV_START,
             fn (): string => view('bazaar::shell.sidebar-nav-start')->render(),
         );
+
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::SIDEBAR_LOGO_AFTER,
+            fn (): string => view('bazaar::shell.sidebar-brand')->render(),
+        );
+
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::SIDEBAR_FOOTER,
+            fn (): string => view('bazaar::shell.sidebar-footer')->render(),
+        );
     }
 }

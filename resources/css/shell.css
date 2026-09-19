@@ -37,6 +37,8 @@
  */
 :root {
     /* ---- DESIGN.md §Colors (light) ------------------------------------- */
+    --color-white: #ffffff;
+    --color-nav-hover: #f4f6f7;
     --color-primary: #00609e;
     --color-primary-700: #00527f;
     --color-primary-50: #eef6fb;
@@ -383,4 +385,476 @@
     background: var(--color-info-bg-dark);
     border-color: var(--color-info-ring-dark);
     color: var(--color-info-text-dark);
+}
+
+/* -------------------------------------------------------------------------
+ * Base layout parity with imports/admin-dashboard.html (DESIGN.md §Layout &
+ * Spacing, §Sidebar Nav, §Topbar): restyles Filament's own sidebar, topbar
+ * and main container. Unlayered on purpose so it wins over Filament's
+ * layered component CSS. No fixed pixel widths on text-bearing chrome.
+ * ---------------------------------------------------------------------- */
+
+/* ---- Main canvas + content inset --------------------------------------- */
+.fi-body {
+    --topbar-height: var(--bazaar-topbar-height);
+    background: var(--color-soft);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+:where(.dark, .dark *).fi-body,
+:where(.dark) .fi-body {
+    background: var(--color-soft-dark);
+    color: var(--color-ink-dark);
+}
+
+.fi-main {
+    max-width: none;
+    padding: 26px 28px 40px;
+}
+
+@media (max-width: 767px) {
+    .fi-main {
+        padding-inline: 16px;
+    }
+}
+
+.fi-page-header-main-ctn {
+    row-gap: 20px;
+}
+
+/* ---- Sidebar ------------------------------------------------------------ */
+.fi-sidebar {
+    background: var(--color-white);
+    border-right: 1px solid var(--color-border);
+    box-shadow: none;
+    --tw-ring-shadow: 0 0 #0000;
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-heading);
+}
+
+:where(.dark) .fi-sidebar {
+    background: var(--color-white-dark);
+    border-right-color: var(--color-border-dark);
+}
+
+.fi-sidebar-header-ctn {
+    background: transparent;
+    box-shadow: none;
+}
+
+.fi-sidebar-header {
+    display: block;
+    height: auto;
+    min-height: 0;
+    padding: 20px 18px 14px;
+    background: transparent;
+    box-shadow: none;
+    border-bottom: 1px solid var(--color-hairline);
+}
+
+:where(.dark) .fi-sidebar-header {
+    border-bottom-color: var(--color-border-dark);
+}
+
+/* The native logo is replaced by Shell's own brand block. */
+.fi-sidebar-header-logo-ctn {
+    display: none !important;
+}
+
+.bazaar-brand__mark {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.bazaar-brand__badge {
+    width: 32px;
+    height: 32px;
+    flex: none;
+    border-radius: 9px;
+    background: var(--color-primary);
+    color: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 14px;
+}
+
+:where(.dark) .bazaar-brand__badge {
+    background: var(--color-primary-dark);
+    color: var(--color-soft-dark);
+}
+
+.bazaar-brand__name,
+.bazaar-sidebar-footer__name {
+    overflow-wrap: anywhere;
+}
+
+.bazaar-brand__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.bazaar-brand__name {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 1.3;
+    color: var(--color-charcoal);
+}
+
+.bazaar-brand__sub,
+.bazaar-brand__env-label {
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: var(--color-bluegray);
+}
+
+.bazaar-brand__sub {
+    margin-top: 1px;
+}
+
+.bazaar-brand__env {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.bazaar-brand__env-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background: var(--color-live-dot);
+}
+
+:where(.dark) .bazaar-brand__name {
+    color: var(--color-ink-dark);
+}
+
+:where(.dark) .bazaar-brand__sub,
+:where(.dark) .bazaar-brand__env-label {
+    color: var(--color-muted-dark);
+}
+
+.fi-sidebar-nav {
+    flex: 1;
+    padding: 10px 12px;
+    overflow-y: auto;
+}
+
+.fi-sidebar-nav-groups,
+.fi-sidebar-group-items {
+    display: flex;
+    flex-direction: column;
+    row-gap: 2px;
+}
+
+.fi-sidebar-item-btn {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 9px 11px;
+    border-radius: var(--radius-md);
+    color: var(--color-charcoal);
+    font-family: var(--font-heading);
+    font-weight: 500;
+    font-size: 13.5px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    position: relative;
+    width: 100%;
+}
+
+.fi-sidebar-item-btn:hover {
+    background: var(--color-nav-hover);
+}
+
+.fi-sidebar-item-icon {
+    color: var(--color-bluegray);
+}
+
+.fi-sidebar-item-label {
+    font-family: var(--font-heading);
+    font-weight: 500;
+    font-size: 13.5px;
+    color: inherit;
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn,
+.fi-sidebar-item-active > .fi-sidebar-item-btn {
+    background: var(--color-primary-50);
+    color: var(--color-primary-700);
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn::before,
+.fi-sidebar-item-active > .fi-sidebar-item-btn::before {
+    content: '';
+    position: absolute;
+    left: -12px;
+    top: 6px;
+    bottom: 6px;
+    width: 3px;
+    background: var(--color-primary);
+    border-radius: 0 3px 3px 0;
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-icon,
+.fi-sidebar-item-active > .fi-sidebar-item-btn .fi-sidebar-item-icon {
+    color: var(--color-primary);
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-label,
+.fi-sidebar-item-active > .fi-sidebar-item-btn .fi-sidebar-item-label {
+    color: var(--color-primary-700);
+}
+
+.fi-sidebar-group-label {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-bluegray);
+}
+
+:where(.dark) .fi-sidebar-item-btn {
+    color: var(--color-ink-dark);
+}
+
+:where(.dark) .fi-sidebar-item-btn:hover {
+    background: var(--color-soft-dark);
+}
+
+:where(.dark) .fi-sidebar-item-icon,
+:where(.dark) .fi-sidebar-group-label {
+    color: var(--color-muted-dark);
+}
+
+:where(.dark) .fi-sidebar-item.fi-active > .fi-sidebar-item-btn,
+:where(.dark) .fi-sidebar-item-active > .fi-sidebar-item-btn {
+    background: var(--color-primary-50-dark);
+    color: var(--color-primary-700-dark);
+}
+
+:where(.dark) .fi-sidebar-item.fi-active > .fi-sidebar-item-btn::before,
+:where(.dark) .fi-sidebar-item-active > .fi-sidebar-item-btn::before {
+    background: var(--color-primary-dark);
+}
+
+:where(.dark) .fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-label,
+:where(.dark) .fi-sidebar-item-active > .fi-sidebar-item-btn .fi-sidebar-item-label {
+    color: var(--color-primary-700-dark);
+}
+
+/* Footer: Shell's own avatar + name + role block, pinned to the bottom. */
+.bazaar-sidebar-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    border-top: 1px solid var(--color-hairline);
+    margin-top: auto;
+}
+
+:where(.dark) .bazaar-sidebar-footer {
+    border-top-color: var(--color-border-dark);
+}
+
+.bazaar-sidebar-footer__avatar {
+    width: 32px;
+    height: 32px;
+    flex: none;
+    border-radius: 9999px;
+    background: var(--color-primary-100);
+    color: var(--color-primary-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 12px;
+}
+
+:where(.dark) .bazaar-sidebar-footer__avatar {
+    background: var(--color-primary-50-dark);
+    color: var(--color-primary-700-dark);
+}
+
+.bazaar-sidebar-footer__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.bazaar-sidebar-footer__name {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 12.5px;
+    color: var(--color-charcoal);
+}
+
+.bazaar-sidebar-footer__role {
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: var(--color-bluegray);
+}
+
+:where(.dark) .bazaar-sidebar-footer__name {
+    color: var(--color-ink-dark);
+}
+
+:where(.dark) .bazaar-sidebar-footer__role {
+    color: var(--color-muted-dark);
+}
+
+/* ---- Topbar ------------------------------------------------------------- */
+.fi-topbar {
+    height: var(--bazaar-topbar-height);
+    min-height: var(--bazaar-topbar-height);
+    background: var(--color-white);
+    border-bottom: 1px solid var(--color-border);
+    box-shadow: none;
+    --tw-ring-shadow: 0 0 #0000;
+    padding-inline: 22px;
+    gap: 16px;
+}
+
+:where(.dark) .fi-topbar {
+    background: var(--color-white-dark);
+    border-bottom-color: var(--color-border-dark);
+}
+
+.fi-topbar .fi-global-search-field .fi-input-wrp,
+.fi-topbar .fi-global-search-field input {
+    background: var(--color-soft);
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--color-muted);
+}
+
+.fi-topbar .fi-global-search-field .fi-input-wrp {
+    box-shadow: none;
+    border: 1px solid var(--color-border);
+}
+
+.fi-topbar .fi-global-search-field .fi-input-wrp:focus-within {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+:where(.dark) .fi-topbar .fi-global-search-field .fi-input-wrp:focus-within {
+    outline-color: var(--color-primary-dark);
+}
+
+:where(.dark) .fi-topbar .fi-global-search-field .fi-input-wrp,
+:where(.dark) .fi-topbar .fi-global-search-field input {
+    background: var(--color-soft-dark);
+    border-color: var(--color-border-dark);
+    color: var(--color-muted-dark);
+}
+
+/* ---- Tablet rail: brand + footer collapse to badge / avatar only -------- */
+@media (min-width: 768px) and (max-width: 1279px) {
+    #fi-main-sidebar .bazaar-brand__text,
+    #fi-main-sidebar .bazaar-brand__env,
+    #fi-main-sidebar .bazaar-sidebar-footer__text {
+        display: none;
+    }
+
+    #fi-main-sidebar .fi-sidebar-header {
+        padding-inline: 0;
+        display: flex;
+        justify-content: center;
+    }
+
+    #fi-main-sidebar .bazaar-sidebar-footer {
+        justify-content: center;
+        padding-inline: 0;
+    }
+
+    #fi-main-sidebar .fi-sidebar-item-btn {
+        justify-content: center;
+    }
+}
+
+/* ---- Shell grid: sidebar full height, topbar only over the content region -- */
+@media (min-width: 768px) {
+    :root {
+        --bazaar-shell-sidebar-w: var(--bazaar-sidebar-rail-width);
+    }
+
+    #fi-main-sidebar {
+        position: fixed;
+        top: 0;
+        inset-inline-start: 0;
+        height: 100dvh;
+    }
+
+    .fi-topbar {
+        position: fixed;
+        top: 0;
+        inset-inline: var(--bazaar-shell-sidebar-w) 0;
+        width: auto;
+        z-index: 30;
+    }
+
+    .fi-layout {
+        margin-top: var(--bazaar-topbar-height);
+        padding-inline-start: var(--bazaar-shell-sidebar-w);
+    }
+
+    .fi-topbar-start {
+        display: none;
+    }
+
+    .fi-topbar-end {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .fi-topbar .fi-global-search-ctn {
+        flex: 1;
+        max-width: 420px;
+    }
+
+    .fi-topbar .fi-global-search,
+    .fi-topbar .fi-global-search-field {
+        width: 100%;
+    }
+
+    .fi-topbar .fi-user-menu {
+        margin-inline-start: auto;
+    }
+}
+
+@media (min-width: 1280px) {
+    :root {
+        --bazaar-shell-sidebar-w: var(--bazaar-sidebar-width);
+    }
+}
+
+/* Tablet rail is always visible: no drawer overlay, no toggle buttons. */
+@media (min-width: 768px) and (max-width: 1279px) {
+    .fi-sidebar-close-overlay,
+    .fi-topbar-open-sidebar-btn,
+    .fi-topbar-close-sidebar-btn {
+        display: none !important;
+    }
+
+    #fi-main-sidebar .fi-sidebar-group-btn {
+        display: none;
+    }
+
+    #fi-main-sidebar .fi-sidebar-group-items {
+        display: flex !important;
+    }
 }

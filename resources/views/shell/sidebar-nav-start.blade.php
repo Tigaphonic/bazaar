@@ -7,18 +7,27 @@
     mark; the Dashboard page itself ships in a later epic, this is Shell's
     own translated placeholder entry into that same slot.
 --}}
+@php
+    $dashboardUrl = \Filament\Facades\Filament::getUrl() ?? url('/');
+    $isDashboardActive = rtrim(url()->current(), '/') === rtrim($dashboardUrl, '/');
+    $hasNativeDashboard = collect(filament()->getNavigation())
+        ->flatMap(fn ($group) => $group->getItems())
+        ->contains(fn ($item) => rtrim((string) $item->getUrl(), '/') === rtrim($dashboardUrl, '/'));
+@endphp
+@unless ($hasNativeDashboard)
 <ul class="fi-sidebar-nav-groups bazaar-sidebar-dashboard">
     <li class="fi-sidebar-group">
         <ul class="fi-sidebar-group-items">
-            <li class="fi-sidebar-item">
+            <li @class(['fi-sidebar-item', 'fi-active fi-sidebar-item-active' => $isDashboardActive])>
                 <a
-                    href="{{ \Filament\Facades\Filament::getUrl() ?? url('/') }}"
-                    class="nav-item fi-sidebar-item-label"
+                    href="{{ $dashboardUrl }}"
+                    class="nav-item fi-sidebar-item-btn"
                     data-i18n="nav_dashboard"
                 >
-                    {{ __('bazaar::shell.nav_dashboard') }}
+                    <span class="fi-sidebar-item-label">{{ __('bazaar::shell.nav_dashboard') }}</span>
                 </a>
             </li>
         </ul>
     </li>
 </ul>
+@endunless

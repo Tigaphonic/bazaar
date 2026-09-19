@@ -41,3 +41,7 @@
 - source_spec: `_artifacts/implementation-artifacts/spec-simplify-topbar-native-filament.md`
   summary: `UserPreferences::setTheme()`/`setLocale()` (persistence layer, AD-18, `bazaar_user_preferences`) sudah ada dan teruji terisolasi sejak Story 1.2, tapi tidak pernah benar-benar terhubung ke request/Livewire action nyata manapun — tidak ada UI/controller/action yang memanggilnya di luar test.
   evidence: `grep -rn "setTheme\|setLocale" src/` mengonfirmasi nol caller di `src/` selain definisi method itu sendiri di `Shell/Support/UserPreferences.php` dan pembacaan `locale()` di `Shell/Http/Middleware/ApplyUserLocale.php` (yang membaca, bukan menulis). Locale switching Shell tetap murni client-side (`window.bazaarShell.setLocale`, localStorage-only, lihat `resources/js/shell.js`) — Language action baru di `->userMenuItems()` (spec ini) memakai ulang mekanisme JS itu apa adanya, tidak menyambungkannya ke `UserPreferences::setLocale()`. Sudah begitu sejak sebelum topbar disederhanakan; di luar boundary perubahan ini ("Never: ... Tidak memperbaiki gap wiring persistence theme/locale ke request nyata").
+
+- source_spec: `_artifacts/implementation-artifacts/spec-fix-base-layout-mockup-parity.md`
+  summary: Brand block sidebar hanya merender badge inisial; logo gambar dari `->brandLogo()` panel diabaikan.
+  evidence: `.fi-sidebar-header-logo-ctn` di-`display:none` di `shell.css` dan `sidebar-brand.blade.php` hanya memakai `getBrandName()`; host yang mengatur logo tidak melihatnya. Selesaikan bila ada kebutuhan logo per klien.

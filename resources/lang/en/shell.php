@@ -9,4 +9,6 @@ return [
     'brand_live_label' => 'Live',
     'modal_close' => 'Close',
     'nav_dashboard' => 'Dashboard',
+    'brand_admin_portal' => 'Admin Portal',
+    'brand_store' => 'Brand Store',
 ];
