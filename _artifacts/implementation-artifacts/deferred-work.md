@@ -79,3 +79,7 @@
 ## Deferred from: code review of spec-1-6-manage-global-settings.md (2026-09-19)
 - SettingsService::update() array validation weak — deferred: Sudah dicatat di Spec Triage Log untuk API Layer (1.9).
 - RoleService::ensureShippedPermissions lacks guard — deferred: Sudah dicatat di Spec Triage Log terkait deferred-work panel-auth.
+
+## Deferred from: code review (2026-09-19)
+
+- AuthorizationException pada SettingsService [src/Settings/Services/SeoResolverService.php] - Sudah tercatat di deferred-work.md

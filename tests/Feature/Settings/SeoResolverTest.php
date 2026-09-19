@@ -1,6 +1,6 @@
 <?php
 
-// Story 1.7 acceptance tests. AC: "sebuah Item/Blog/Page/Category tidak punya
+// Story 1.7 RED-PHASE scaffold. AC: "sebuah Item/Blog/Page/Category tidak punya
 // gambar sama sekali → default OG image dari Global SEO Defaults dipakai sebagai
 // fallback terakhir" (FR-24/FR-29, epics.md baris 415–417).
 //
@@ -16,6 +16,7 @@
 // Pact tidak relevan: tidak ada dua independently-deployable service saling memanggil.
 // Browser E2E tidak dijadwalkan di red-phase ini: fallback logic adalah Service concern.
 //
+// SEMUA TEST DI BAWAH MERAH sampai SeoResolverService diimplementasikan (Story 1.7).
 
 use Tigaphonic\Bazaar\Settings\Services\SeoResolverService;
 use Tigaphonic\Bazaar\Settings\Services\SettingsService;
@@ -25,6 +26,7 @@ use Tigaphonic\Bazaar\Settings\Services\SettingsService;
 // ---------------------------------------------------------------------------
 
 it('SeoResolverService can be resolved from the container via dependency injection', function () {
+
     $resolver = app(SeoResolverService::class);
 
     expect($resolver)->toBeInstanceOf(SeoResolverService::class);
@@ -35,6 +37,7 @@ it('SeoResolverService can be resolved from the container via dependency injecti
 // ---------------------------------------------------------------------------
 
 it('resolveOgImage() returns the entity\'s own image when the entity has one', function () {
+
     $resolver = app(SeoResolverService::class);
 
     // Entity array: portal atau domain lain hanya mengirim snapshot metadata mentah
@@ -44,6 +47,7 @@ it('resolveOgImage() returns the entity\'s own image when the entity has one', f
 });
 
 it('resolveOgImage() returns seo_default_og_image from Global SEO Defaults when entity has no image', function () {
+
     app(SettingsService::class)->update([
         'seo_default_og_image' => '/images/og-default.jpg',
     ]);
@@ -57,6 +61,7 @@ it('resolveOgImage() returns seo_default_og_image from Global SEO Defaults when 
 });
 
 it('resolveOgImage() returns seo_default_og_image when entity og_image key is absent entirely', function () {
+
     app(SettingsService::class)->update([
         'seo_default_og_image' => '/images/og-fallback.png',
     ]);
@@ -70,6 +75,7 @@ it('resolveOgImage() returns seo_default_og_image when entity og_image key is ab
 });
 
 it('resolveOgImage() returns null when entity has no image and seo_default_og_image is not configured', function () {
+
     // Pastikan default OG kosong (bisa null atau string kosong)
     app(SettingsService::class)->update(['seo_default_og_image' => null]);
 
@@ -87,21 +93,23 @@ it('resolveOgImage() returns null when entity has no image and seo_default_og_im
 // ---------------------------------------------------------------------------
 
 it('resolveMetaTitle() returns entity\'s own meta title when set explicitly', function () {
+
     $resolver = app(SeoResolverService::class);
 
     $entityMeta = [
         'meta_title' => 'Sepatu Kulit Premium — SEO Title Custom',
-        'name' => 'Sepatu Kulit',
+        'name'       => 'Sepatu Kulit',
     ];
 
     expect($resolver->resolveMetaTitle($entityMeta))->toBe('Sepatu Kulit Premium — SEO Title Custom');
 });
 
 it('resolveMetaTitle() applies the default meta title template substituting entity name when entity meta title is empty', function () {
+
     // Template: "{nama entity} — {nama toko}"
     app(SettingsService::class)->update([
         'seo_default_meta_title_template' => '{nama entity} — {nama toko}',
-        'store_name' => 'Toko Tigaphonic',
+        'store_name'                       => 'Toko Tigaphonic',
     ]);
 
     $resolver = app(SeoResolverService::class);
@@ -112,6 +120,7 @@ it('resolveMetaTitle() applies the default meta title template substituting enti
 });
 
 it('resolveMetaTitle() falls back to entity name alone when template is not configured', function () {
+
     app(SettingsService::class)->update(['seo_default_meta_title_template' => null]);
 
     $resolver = app(SeoResolverService::class);
@@ -122,11 +131,25 @@ it('resolveMetaTitle() falls back to entity name alone when template is not conf
     expect($resolver->resolveMetaTitle($entityMeta))->toBe('Sepatu Kulit');
 });
 
+it('resolveMetaTitle() returns null when both meta_title and name are absent, even if template is set', function () {
+    app(SettingsService::class)->update([
+        'seo_default_meta_title_template' => '{nama entity} — {nama toko}',
+        'store_name' => 'Toko Tigaphonic',
+    ]);
+
+    $resolver = app(SeoResolverService::class);
+
+    $entityMeta = ['meta_title' => null, 'name' => null];
+
+    expect($resolver->resolveMetaTitle($entityMeta))->toBeNull();
+});
+
 // ---------------------------------------------------------------------------
 // Meta Description fallback
 // ---------------------------------------------------------------------------
 
 it('resolveMetaDescription() returns entity\'s own meta description when set', function () {
+
     $resolver = app(SeoResolverService::class);
 
     $entityMeta = ['meta_description' => 'Deskripsi produk khusus untuk SEO.'];
@@ -135,6 +158,7 @@ it('resolveMetaDescription() returns entity\'s own meta description when set', f
 });
 
 it('resolveMetaDescription() returns seo_default_meta_description from settings when entity meta description is empty', function () {
+
     app(SettingsService::class)->update([
         'seo_default_meta_description' => 'Toko brand terpercaya di Indonesia.',
     ]);
@@ -148,6 +172,7 @@ it('resolveMetaDescription() returns seo_default_meta_description from settings 
 });
 
 it('resolveMetaDescription() returns null when entity has no description and no default is configured', function () {
+
     app(SettingsService::class)->update(['seo_default_meta_description' => null]);
 
     $resolver = app(SeoResolverService::class);
@@ -162,36 +187,39 @@ it('resolveMetaDescription() returns null when entity has no description and no 
 // ---------------------------------------------------------------------------
 
 it('resolveOgTitle() uses og_title when present', function () {
+
     $resolver = app(SeoResolverService::class);
 
     $entityMeta = [
-        'og_title' => 'OG Title Khusus',
+        'og_title'   => 'OG Title Khusus',
         'meta_title' => 'Meta Title',
-        'name' => 'Sepatu Kulit',
+        'name'       => 'Sepatu Kulit',
     ];
 
     expect($resolver->resolveOgTitle($entityMeta))->toBe('OG Title Khusus');
 });
 
 it('resolveOgTitle() falls back to meta title when og_title is absent', function () {
+
     $resolver = app(SeoResolverService::class);
 
     $entityMeta = [
-        'og_title' => null,
+        'og_title'   => null,
         'meta_title' => 'Meta Title Produk',
-        'name' => 'Sepatu Kulit',
+        'name'       => 'Sepatu Kulit',
     ];
 
     expect($resolver->resolveOgTitle($entityMeta))->toBe('Meta Title Produk');
 });
 
 it('resolveOgTitle() falls back to entity name when both og_title and meta_title are absent', function () {
+
     $resolver = app(SeoResolverService::class);
 
     $entityMeta = [
-        'og_title' => null,
+        'og_title'   => null,
         'meta_title' => null,
-        'name' => 'Sepatu Kulit',
+        'name'       => 'Sepatu Kulit',
     ];
 
     expect($resolver->resolveOgTitle($entityMeta))->toBe('Sepatu Kulit');
@@ -202,12 +230,14 @@ it('resolveOgTitle() falls back to entity name when both og_title and meta_title
 // ---------------------------------------------------------------------------
 
 it('SeoResolverService class lives in the Settings domain namespace, not another domain', function () {
+
     // Cek namespace — class harus di bawah Tigaphonic\Bazaar\Settings\
     expect(SeoResolverService::class)
         ->toStartWith('Tigaphonic\\Bazaar\\Settings\\');
 });
 
 it('SeoResolverService does not import any Catalog, User, or other domain Model directly', function () {
+
     // AD-5: lintas-domain hanya lewat Service. Resolver hanya menerima array metadata,
     // tidak pernah import Eloquent Model domain lain.
     $source = file_get_contents(__DIR__.'/../../../src/Settings/Services/SeoResolverService.php');
@@ -223,6 +253,7 @@ it('SeoResolverService does not import any Catalog, User, or other domain Model 
 // ---------------------------------------------------------------------------
 
 it('resolveOgImage() works with entity metadata from any domain (Item/Blog/Page/Category via array)', function () {
+
     app(SettingsService::class)->update([
         'seo_default_og_image' => '/images/og-default.jpg',
     ]);

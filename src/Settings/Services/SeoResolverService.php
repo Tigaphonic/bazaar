@@ -64,8 +64,7 @@ class SeoResolverService
     public function resolveOgTitle(array $entityMeta): ?string
     {
         return $this->filled($entityMeta['og_title'] ?? null)
-            ?? $this->filled($entityMeta['meta_title'] ?? null)
-            ?? $this->filled($entityMeta['name'] ?? null);
+            ?? $this->resolveMetaTitle($entityMeta);
     }
 
     private function filled(mixed $value): ?string

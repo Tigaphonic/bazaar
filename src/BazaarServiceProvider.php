@@ -167,7 +167,7 @@ class BazaarServiceProvider extends PackageServiceProvider
             Event::listen("eloquent.{$event}: *", [AuditTrailRecorder::class, 'handle']);
         }
 
-        Event::listen(SavingSettings::class, [AuditTrailRecorder::class, 'handleSettingsSaving']);
+        Event::listen(\Spatie\LaravelSettings\Events\SettingsSaved::class, [AuditTrailRecorder::class, 'handleSettingsSaving']);
     }
 
     /**

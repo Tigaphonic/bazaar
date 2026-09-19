@@ -126,8 +126,10 @@ it('SettingsService::update() accepts all Timeout Timer parameters and persists 
     $service = app(SettingsService::class);
 
     $service->update([
-        'timeout_otp_minutes'         => 10,
+        'timeout_otp_minutes'         => 5,
         'timeout_payment_minutes'     => 60,
+        'timeout_review_hours'        => 72,
+        'timeout_tokenized_page_days' => 5,
         'timeout_review_hours'        => 48,
         'timeout_tokenized_page_days' => 2,
         'timeout_on_process_days'     => 3,

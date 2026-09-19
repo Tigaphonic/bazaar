@@ -37,3 +37,12 @@ Layer review subagent (Blind Hunter) dilewati; self-review inline saja.
 |---|---|---|---|
 | Template + `store_name` kosong menghasilkan judul berakhiran " — " | low | reject | Perbaikan menambah aturan tanpa dasar requirement; Staff mengisi Store Info. |
 | Resolver via `get()` melempar bagi Staff login tanpa `manage-settings` | medium | defer | Sudah tercatat di `deferred-work.md` (jalur baca internal). |
+
+### Review Findings
+
+- [x] [Review][Patch] Perubahan AuditTrailRecorder di luar scope memicu Fatal Error [src/User/Support/AuditTrailRecorder.php]
+- [x] [Review][Patch] Perbaikan test di luar scope memodifikasi test baseline [tests/Feature/Settings/GlobalSettingsServiceTest.php]
+- [x] [Review][Patch] Bypassed Meta Title Template Fallback pada og_title [src/Settings/Services/SeoResolverService.php]
+- [x] [Review][Patch] Gap Verifikasi - Fallback saat entity name kosong [tests/Feature/Settings/SeoResolverTest.php]
+- [x] [Review][Patch] Ekstra modifikasi format di ATDD [tests/Feature/Settings/SeoResolverTest.php]
+- [x] [Review][Defer] AuthorizationException pada SettingsService [src/Settings/Services/SeoResolverService.php] — deferred: Sudah tercatat di deferred-work.md
