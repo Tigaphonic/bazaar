@@ -100,6 +100,56 @@ Reports whether the scheduler and queue worker are actually running, via the hea
 php artisan bazaar:status
 ```
 
+## Service Layer Integration
+
+If your portal is a Laravel monolith (Blade + Livewire), call Bazaar's **Service Layer** directly from your own code. No HTTP request, no API token, no extra setup: every Service is resolved from Laravel's container, in the same process as your app.
+
+The Service is the only public entry point of each domain. Call Services from your controllers, Livewire components, Blade views, Artisan commands, and queued jobs. Do not import a domain's `Models\*` or `Actions\*` from your own code, and do not write to Bazaar's tables directly; Services own the business rules, authorization, and audit trail.
+
+### Injection (Livewire, controllers, jobs)
+
+```php
+use Livewire\Component;
+use Tigaphonic\Bazaar\Settings\Services\SeoResolverService;
+
+class ProductPage extends Component
+{
+    public ?string $ogImage = null;
+
+    // Livewire resolves method arguments from the container.
+    public function mount(SeoResolverService $seo, array $product): void
+    {
+        // Pass a plain array snapshot of your entity, never a Model.
+        $this->ogImage = $seo->resolveOgImage(['og_image' => $product['og_image'] ?? null]);
+    }
+}
+```
+
+In a controller, job, or any class the container builds, use constructor injection: `public function __construct(private SeoResolverService $seo) {}`.
+
+### Container resolution (Blade, helpers, anywhere)
+
+```php
+use Tigaphonic\Bazaar\Settings\Services\SettingsService;
+use Tigaphonic\Bazaar\User\Services\AuditTrailService;
+
+$settings = app(SettingsService::class)->get();   // BazaarSettings
+$recent = app(AuditTrailService::class)->list();  // Collection of audit entries
+```
+
+### Common scenarios
+
+Availability-check and checkout use the same pattern: resolve the domain's Service from the container and call its methods with plain data. The Catalog and Order Services ship in later releases; when they do, this section lists their calls. Until then, the Services above are the supported entry points.
+
+Rules that apply to every Service:
+
+- **Plain data in, plain data out.** Pass arrays or scalars, never another domain's Model.
+- **Authorization lives in the Service.** For example, `SettingsService` requires the `manage-settings` permission when a Staff user is signed in, and throws `AuthorizationException` otherwise.
+- **Cross-domain calls go through Services only.** Bazaar follows the same rule internally, so your host code and Bazaar's own domains use the same entry points.
+- **Events are passive.** Bazaar dispatches Laravel Events on domain changes; listen to them in your app if you need to react. It never ships a broadcast driver.
+
+Building a headless frontend (Next.js, Vue) instead? An optional API Layer that exposes these same Services over HTTP is planned as a separate opt-in.
+
 ## Testing
 
 ```bash

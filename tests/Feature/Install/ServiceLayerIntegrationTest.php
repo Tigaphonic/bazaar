@@ -169,8 +169,8 @@ it('[1.8-INT-012][P1] resolving any Epic-1 Service does not issue an outbound HT
 it('[1.8-INT-013][P2] a README or docs file describing Service Layer integration exists', function () {
     // AC2: "tersedia contoh pemanggilan Service Layer untuk skenario umum".
     // This test is a proxy for the documentation requirement.
-    $rootReadme = base_path('README.md');
-    $docsFiles = glob(base_path('docs/*.md')) ?: [];
+    $rootReadme = dirname(__DIR__, 3) . '/README.md';
+    $docsFiles = glob(dirname(__DIR__, 3) . '/docs/*.md') ?: [];
 
     $hasReadme = file_exists($rootReadme) && str_contains(
         (string) file_get_contents($rootReadme),
@@ -188,7 +188,7 @@ it('[1.8-INT-013][P2] a README or docs file describing Service Layer integration
 });
 
 it('[1.8-INT-014][P2] the README includes a concrete usage example for at least one Service', function () {
-    $readme = base_path('README.md');
+    $readme = dirname(__DIR__, 3) . '/README.md';
 
     if (! file_exists($readme)) {
         test()->markTestSkipped('README.md not found; covered by 1.8-INT-013.');
