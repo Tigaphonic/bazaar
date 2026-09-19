@@ -18,10 +18,12 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Spatie\LaravelSettings\Events\SavingSettings;
 use Tigaphonic\Bazaar\Install\Commands\BazaarInstallCommand;
 use Tigaphonic\Bazaar\Install\Commands\BazaarStatusCommand;
 use Tigaphonic\Bazaar\Install\Jobs\RecordQueueHeartbeat;
 use Tigaphonic\Bazaar\Install\Support\PanelResolver;
+use Tigaphonic\Bazaar\Settings\Support\BazaarSettings;
 use Tigaphonic\Bazaar\Shell\Http\Middleware\ApplyUserLocale;
 use Tigaphonic\Bazaar\Shell\Support\DesignTokens;
 use Tigaphonic\Bazaar\User\Support\AuditTrailRecorder;
@@ -54,6 +56,14 @@ class BazaarServiceProvider extends PackageServiceProvider
      */
     public function packageRegistered(): void
     {
+        // spatie/laravel-settings only auto-discovers app_path('Settings'), so
+        // Bazaar's own Settings class is registered explicitly (keeps
+        // settings:cache-style tooling aware of it).
+        config(['settings.settings' => array_values(array_unique([
+            ...(array) config('settings.settings', []),
+            BazaarSettings::class,
+        ]))]);
+
         $this->app->afterResolving(PanelRegistry::class, function (PanelRegistry $registry): void {
             PanelResolver::resolve($registry)
                 ->resources((array) config('bazaar.resources'))
@@ -118,6 +128,11 @@ class BazaarServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
+        // Data-only migrations (default rows, permission seed). Kept apart from
+        // database/migrations, which holds only tables Bazaar itself authors
+        // (ULID keys, AD-18).
+        $this->loadMigrationsFrom(__DIR__.'/../database/data-migrations');
+
         $this->app->booted(function (): void {
             /** @var Schedule $schedule */
             $schedule = $this->app->make(Schedule::class);
@@ -149,6 +164,8 @@ class BazaarServiceProvider extends PackageServiceProvider
         foreach (['created', 'updated', 'deleted'] as $event) {
             Event::listen("eloquent.{$event}: *", [AuditTrailRecorder::class, 'handle']);
         }
+
+        Event::listen(SavingSettings::class, [AuditTrailRecorder::class, 'handleSettingsSaving']);
     }
 
     /**

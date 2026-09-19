@@ -34,3 +34,10 @@ it('contains no MySQL- or PostgreSQL-specific SQL in any migration Bazaar itself
 
     expect($offenders)->toBeEmpty();
 });
+
+it('seeds the manage-settings permission and the Global Settings default rows when migrate runs', function () {
+    $this->artisan('migrate')->assertSuccessful();
+
+    expect(\Spatie\Permission\Models\Permission::query()->where('name', 'manage-settings')->exists())->toBeTrue()
+        ->and(\Illuminate\Support\Facades\DB::table('settings')->where('group', 'bazaar')->count())->toBe(22);
+});

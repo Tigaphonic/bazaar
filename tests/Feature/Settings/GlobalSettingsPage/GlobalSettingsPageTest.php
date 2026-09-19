@@ -21,7 +21,6 @@ use Workbench\App\Models\User;
 // ---------------------------------------------------------------------------
 
 it('renders the GlobalSettings page without error for a Staff with manage-settings permission', function () {
-    test()->skip('RED — GlobalSettings page belum wire ke HasSettingsForms; dibuat Story 1.6');
 
     Permission::create(['name' => 'manage-settings']);
     $role = Role::create(['name' => 'Admin']);
@@ -37,7 +36,6 @@ it('renders the GlobalSettings page without error for a Staff with manage-settin
 });
 
 it('returns 403 for a Staff without the manage-settings permission', function () {
-    test()->skip('RED — GlobalSettings policy belum ada; dibuat Story 1.6');
 
     $staff = User::create(['name' => 'Noob', 'email' => 'noob@example.com', 'password' => bcrypt('password')]);
     $this->actingAs($staff);
@@ -51,7 +49,6 @@ it('returns 403 for a Staff without the manage-settings permission', function ()
 // ---------------------------------------------------------------------------
 
 it('GlobalSettings page has no Create action', function () {
-    test()->skip('RED — page belum ada form; dibuat Story 1.6');
 
     Permission::create(['name' => 'manage-settings']);
     $role = Role::create(['name' => 'Admin']);
@@ -76,7 +73,6 @@ it('GlobalSettings page has no Create action', function () {
 // ---------------------------------------------------------------------------
 
 it('submitting the GlobalSettings form with a new store_name persists via SettingsService', function () {
-    test()->skip('RED — GlobalSettings form belum ada; dibuat Story 1.6');
 
     Permission::create(['name' => 'manage-settings']);
     $role = Role::create(['name' => 'Admin']);
@@ -96,7 +92,6 @@ it('submitting the GlobalSettings form with a new store_name persists via Settin
 });
 
 it('the GlobalSettings form shows a success toast notification after a valid save', function () {
-    test()->skip('RED — GlobalSettings form belum ada; dibuat Story 1.6');
 
     Permission::create(['name' => 'manage-settings']);
     $role = Role::create(['name' => 'Admin']);
@@ -117,7 +112,6 @@ it('the GlobalSettings form shows a success toast notification after a valid sav
 // ---------------------------------------------------------------------------
 
 it('the GlobalSettings form shows a validation error when refund_min_percent >= refund_max_percent', function () {
-    test()->skip('RED — GlobalSettings form validation belum ada; dibuat Story 1.6');
 
     Permission::create(['name' => 'manage-settings']);
     $role = Role::create(['name' => 'Admin']);
@@ -138,7 +132,6 @@ it('the GlobalSettings form shows a validation error when refund_min_percent >= 
 // ---------------------------------------------------------------------------
 
 it('GlobalSettings page is registered under the Global Settings navigation group', function () {
-    test()->skip('RED — GlobalSettings navigation group belum dikonfigurasi; dibuat Story 1.6');
 
     expect(GlobalSettings::getNavigationGroup())->toBe('Global Settings');
 });
@@ -149,7 +142,6 @@ it('GlobalSettings page is registered under the Global Settings navigation group
 // ---------------------------------------------------------------------------
 
 it('GlobalSettings page contains the bazaar status widget showing queue and scheduler heartbeat', function () {
-    test()->skip('RED — GlobalSettings belum mount widget heartbeat; dibuat Story 1.6');
 
     Permission::create(['name' => 'manage-settings']);
     $role = Role::create(['name' => 'Admin']);
@@ -166,4 +158,24 @@ it('GlobalSettings page contains the bazaar status widget showing queue and sche
         ->toArray();
 
     expect($widgetClasses)->toContain(\Tigaphonic\Bazaar\Install\Filament\Widgets\BazaarStatusWidget::class);
+});
+
+it('keeps the provider identity of gateway and courier rows after a form save', function () {
+    Permission::create(['name' => 'manage-settings']);
+    $role = Role::create(['name' => 'Admin']);
+    $role->givePermissionTo('manage-settings');
+
+    $staff = User::create(['name' => 'Admin', 'email' => 'admin7@example.com', 'password' => bcrypt('password')]);
+    $staff->assignRole($role);
+    $this->actingAs($staff);
+
+    Livewire::test(GlobalSettings::class)
+        ->fillForm(['store_name' => 'Provider Check'])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $settings = app(\Tigaphonic\Bazaar\Settings\Services\SettingsService::class)->get();
+
+    expect($settings->payment_gateways[0]['provider'])->toBe('midtrans')
+        ->and($settings->shipping_couriers[0]['provider'])->toBe('rajaongkir');
 });

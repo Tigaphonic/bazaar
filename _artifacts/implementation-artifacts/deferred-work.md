@@ -60,3 +60,19 @@
 - Missing authorization gate [src/User/Filament/Resources/AuditTrailResource.php] — deferred: already in deferred-work (panel auth belum ada).
 - Soft delete restore untracked [src/User/Support/AuditTrailRecorder.php] — deferred: no SoftDeletes models exist yet.
 - Table grow infinite [database/migrations/create_bazaar_audit_trails_table.php] — deferred: pre-existing, beyond story scope.
+
+- source_spec: `_artifacts/implementation-artifacts/spec-1-6-manage-global-settings.md`
+  summary: `SettingsService::get()` digate `manage-settings` untuk user login, sehingga domain lain (Order, Payment) yang dipicu Staff tanpa permission itu tidak bisa membaca Timeout Timer/gateway lewat Service.
+  evidence: ATDD mewajibkan `get()` melempar `AuthorizationException`; belum ada konsumen lintas-domain hari ini. Butuh jalur baca internal (mis. `read()` tanpa gate) saat konsumen pertama (Epic 2/4) muncul.
+- source_spec: `_artifacts/implementation-artifacts/spec-1-6-manage-global-settings.md`
+  summary: `default_warehouse_id` belum divalidasi ke tabel Warehouse dan inputnya disabled; 2 test Warehouse tetap skip.
+  evidence: Domain Catalog/Warehouse baru ada di Epic 3. Aktifkan validasi FK, Select, dan 2 test saat Warehouse Service tersedia.
+- source_spec: `_artifacts/implementation-artifacts/spec-1-6-manage-global-settings.md`
+  summary: `GlobalSettings` mengisi `server_key`/`api_key` terdekripsi ke state Livewire (terkirim ke browser) dan submit kosong menghapus kunci.
+  evidence: `mount()` memakai `get()->toArray()`; pola aman = field kosong berarti tidak berubah. Perlu keputusan produk.
+- source_spec: `_artifacts/implementation-artifacts/spec-1-6-manage-global-settings.md`
+  summary: `SettingsService::update()` hanya cek `is_array` untuk `payment_gateways`/`shipping_couriers`; bentuk baris dan subset `enabled_methods` hanya dibatasi form.
+  evidence: Caller Service/API Layer (Story 1.9) bisa menyimpan metode tak dikenal atau menghapus `provider`.
+- source_spec: `_artifacts/implementation-artifacts/spec-1-6-manage-global-settings.md`
+  summary: Gate `SettingsService` memakai `auth()->user()`; panel dengan guard non-default membuat user null dan gate lolos, sementara `canAccess()` menolak.
+  evidence: Belum terverifikasi (panel guard kustom); sama akar dengan item guard di deferred-work Story 1.2.

@@ -51,7 +51,10 @@ class TestCase extends Orchestra
         // roles/permissions tables this setUp() creates directly below.
         // Purge any such leaked file before every test so each test starts
         // from the same clean slate regardless of run order.
-        foreach (glob(database_path('migrations/*_create_permission_tables.php')) ?: [] as $leakedMigration) {
+        foreach ([
+            ...(glob(database_path('migrations/*_create_permission_tables.php')) ?: []),
+            ...(glob(database_path('migrations/*_create_settings_table.php')) ?: []),
+        ] as $leakedMigration) {
             if (!unlink($leakedMigration)) {
                 throw new \RuntimeException("Failed to remove leaked migration file before test: {$leakedMigration}");
             }
@@ -72,6 +75,19 @@ class TestCase extends Orchestra
                 $migration = include __DIR__.'/../vendor/spatie/laravel-permission/database/migrations/create_permission_tables.php.stub';
                 $migration->up();
             }
+        })();
+
+        // spatie/laravel-settings' own `settings` table (published to the host
+        // by `bazaar:install`, so likewise never copied into this package's
+        // database/migrations/), then Bazaar's data-only default-rows migration
+        // that needs it. The permission-seed migration is deliberately not run
+        // here: tests create `manage-settings` themselves.
+        (function (): void {
+            if (!\Illuminate\Support\Facades\Schema::hasTable('settings')) {
+                (include __DIR__.'/../vendor/spatie/laravel-settings/database/migrations/create_settings_table.php.stub')->up();
+            }
+
+            (include __DIR__.'/../database/data-migrations/seed_bazaar_settings_defaults.php')->up();
         })();
 
         // Several Shell tests instantiate the framework's own base

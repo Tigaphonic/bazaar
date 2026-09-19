@@ -1,3 +1,11 @@
 <x-filament-panels::page>
-    <p>{{ __('Global Settings parameters ship in Story 1.6.') }}</p>
+    <form wire:submit="save">
+        {{ $this->form }}
+
+        <div class="fi-form-actions">
+            <x-filament::button type="submit">
+                {{ __('bazaar::settings.save') }}
+            </x-filament::button>
+        </div>
+    </form>
 </x-filament-panels::page>

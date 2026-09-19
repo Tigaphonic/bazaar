@@ -75,3 +75,13 @@ it('does not fail or duplicate the published migration file when run twice in a 
     expect($publishedAfterFirstRun)->not->toBeEmpty();
     expect($publishedAfterSecondRun->all())->toEqual($publishedAfterFirstRun->all());
 });
+
+it('publishes spatie/laravel-settings\' create_settings_table migration to database/migrations', function () {
+    foreach (glob(database_path('migrations/*_create_settings_table.php')) ?: [] as $leaked) {
+        unlink($leaked);
+    }
+
+    $this->artisan('bazaar:install')->assertSuccessful();
+
+    expect(glob(database_path('migrations/*_create_settings_table.php')))->not->toBeEmpty();
+});

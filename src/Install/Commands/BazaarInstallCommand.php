@@ -4,6 +4,7 @@ namespace Tigaphonic\Bazaar\Install\Commands;
 
 use Filament\PanelRegistry;
 use Illuminate\Console\Command;
+use Spatie\LaravelSettings\LaravelSettingsServiceProvider;
 use Spatie\Permission\PermissionServiceProvider;
 use Tigaphonic\Bazaar\Install\Support\PanelResolver;
 
@@ -60,6 +61,18 @@ class BazaarInstallCommand extends Command
 
                 return static::FAILURE;
             }
+
+            // Global Settings (Story 1.6) stores its values in
+            // spatie/laravel-settings' own `settings` table -- same
+            // dependency-owned-table rule as the permission tables above.
+            if ($this->callSilently('vendor:publish', [
+                '--provider' => LaravelSettingsServiceProvider::class,
+                '--tag' => 'migrations',
+            ]) !== static::SUCCESS) {
+                $this->components->error('Failed to publish spatie/laravel-settings migrations.');
+
+                return static::FAILURE;
+            }
         } else {
             $this->components->error('The vendor:publish command is not available.');
 
@@ -67,7 +80,7 @@ class BazaarInstallCommand extends Command
         }
 
         $this->components->info("Bazaar connected to the '{$panel->getId()}' Filament panel.");
-        $this->components->info('Run `php artisan migrate` to create the roles/permissions tables (spatie/laravel-permission) the Roles screen needs.');
+        $this->components->info('Run `php artisan migrate` to create the roles/permissions (spatie/laravel-permission) and settings (spatie/laravel-settings) tables the Roles and Global Settings screens need.');
         $this->components->warn("Manual step required: add `use Spatie\Permission\Traits\HasRoles;` to your app's User model so the Users screen's roles checklist works.");
 
         return self::SUCCESS;

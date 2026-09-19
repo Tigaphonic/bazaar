@@ -17,7 +17,6 @@ use Tigaphonic\Bazaar\Settings\Services\SettingsService;
 // ---------------------------------------------------------------------------
 
 it('SettingsService::get() returns current settings with all required keys present', function () {
-    test()->skip('RED — SettingsService belum ada; dibuat Story 1.6');
 
     $settings = app(SettingsService::class)->get();
 
@@ -49,7 +48,6 @@ it('SettingsService::get() returns current settings with all required keys prese
 });
 
 it('SettingsService::update() persists changed values so the next get() returns updated data', function () {
-    test()->skip('RED — SettingsService::update() belum ada; dibuat Story 1.6');
 
     $service = app(SettingsService::class);
 
@@ -59,7 +57,6 @@ it('SettingsService::update() persists changed values so the next get() returns 
 });
 
 it('SettingsService::update() only changes the keys provided and leaves untouched keys intact', function () {
-    test()->skip('RED — SettingsService::update() belum ada; dibuat Story 1.6');
 
     $service = app(SettingsService::class);
     $original = $service->get()->timeout_otp_minutes;
@@ -74,7 +71,6 @@ it('SettingsService::update() only changes the keys provided and leaves untouche
 // ---------------------------------------------------------------------------
 
 it('SettingsService::update() silently ignores unknown keys and does not persist them', function () {
-    test()->skip('RED — SettingsService::update() belum ada; dibuat Story 1.6');
 
     $service = app(SettingsService::class);
 
@@ -88,7 +84,6 @@ it('SettingsService::update() silently ignores unknown keys and does not persist
 // ---------------------------------------------------------------------------
 
 it('payment gateway credentials are stored encrypted — raw database value is not the plaintext credential', function () {
-    test()->skip('RED — SettingsService + encryption belum ada; dibuat Story 1.6');
 
     $service = app(SettingsService::class);
 
@@ -108,7 +103,6 @@ it('payment gateway credentials are stored encrypted — raw database value is n
 });
 
 it('SettingsService::get() decrypts payment gateway credentials transparently', function () {
-    test()->skip('RED — SettingsService + encryption belum ada; dibuat Story 1.6');
 
     $service = app(SettingsService::class);
 
@@ -128,7 +122,6 @@ it('SettingsService::get() decrypts payment gateway credentials transparently', 
 // ---------------------------------------------------------------------------
 
 it('SettingsService::update() accepts all Timeout Timer parameters and persists them', function () {
-    test()->skip('RED — SettingsService belum ada; dibuat Story 1.6');
 
     $service = app(SettingsService::class);
 
@@ -156,7 +149,7 @@ it('SettingsService::update() accepts all Timeout Timer parameters and persists 
 // ---------------------------------------------------------------------------
 
 it('SettingsService::update() rejects a default_warehouse_id that does not exist in the warehouses table', function () {
-    test()->skip('RED — SettingsService + Warehouse domain belum ada; dibuat Story 1.6');
+    $this->markTestSkipped('RED — SettingsService + Warehouse domain belum ada; dibuat Story 1.6');
 
     $service = app(SettingsService::class);
 
@@ -165,7 +158,7 @@ it('SettingsService::update() rejects a default_warehouse_id that does not exist
 });
 
 it('SettingsService::update() accepts a default_warehouse_id that references an existing Warehouse', function () {
-    test()->skip('RED — SettingsService + Warehouse domain belum ada; dibuat Story 1.6');
+    $this->markTestSkipped('RED — SettingsService + Warehouse domain belum ada; dibuat Story 1.6');
 
     $warehouse = \Tigaphonic\Bazaar\Catalog\Models\Warehouse::factory()->create();
     $service = app(SettingsService::class);
@@ -180,7 +173,6 @@ it('SettingsService::update() accepts a default_warehouse_id that references an 
 // ---------------------------------------------------------------------------
 
 it('SettingsService::update() stores robots_txt_content as free-form text without modification', function () {
-    test()->skip('RED — SettingsService belum ada; dibuat Story 1.6');
 
     $content = "User-agent: *\nDisallow: /cart\nDisallow: /checkout\n";
     $service  = app(SettingsService::class);
@@ -191,7 +183,6 @@ it('SettingsService::update() stores robots_txt_content as free-form text withou
 });
 
 it('Bazaar does not register a route for /robots.txt — portal is responsible for fetching and serving it', function () {
-    test()->skip('RED — perlu konfirmasi tidak ada route robots.txt; dibuat Story 1.6');
 
     $routes = collect(\Illuminate\Support\Facades\Route::getRoutes()->getRoutes())
         ->map(fn ($route) => $route->uri());
@@ -204,7 +195,6 @@ it('Bazaar does not register a route for /robots.txt — portal is responsible f
 // ---------------------------------------------------------------------------
 
 it('SettingsService::update() stores Google Search Console, GA4, and Facebook Pixel codes as separate fields', function () {
-    test()->skip('RED — SettingsService belum ada; dibuat Story 1.6');
 
     $service = app(SettingsService::class);
 
@@ -226,7 +216,6 @@ it('SettingsService::update() stores Google Search Console, GA4, and Facebook Pi
 // ---------------------------------------------------------------------------
 
 it('SettingsService::update() rejects refund_min_percent greater than or equal to refund_max_percent', function () {
-    test()->skip('RED — SettingsService + validation belum ada; dibuat Story 1.6');
 
     $service = app(SettingsService::class);
 
@@ -235,7 +224,6 @@ it('SettingsService::update() rejects refund_min_percent greater than or equal t
 });
 
 it('SettingsService::update() rejects equal refund_min_percent and refund_max_percent', function () {
-    test()->skip('RED — SettingsService + validation belum ada; dibuat Story 1.6');
 
     $service = app(SettingsService::class);
 
@@ -244,7 +232,6 @@ it('SettingsService::update() rejects equal refund_min_percent and refund_max_pe
 });
 
 it('SettingsService::update() accepts valid refund percent range where min is strictly less than max', function () {
-    test()->skip('RED — SettingsService belum ada; dibuat Story 1.6');
 
     $service = app(SettingsService::class);
 
@@ -255,7 +242,6 @@ it('SettingsService::update() accepts valid refund percent range where min is st
 });
 
 it('SettingsService::update() rejects decimal refund percent values — must be whole numbers', function () {
-    test()->skip('RED — SettingsService + validation belum ada; dibuat Story 1.6');
 
     $service = app(SettingsService::class);
 
@@ -268,7 +254,6 @@ it('SettingsService::update() rejects decimal refund percent values — must be 
 // ---------------------------------------------------------------------------
 
 it('SettingsService::update() persists Global SEO Defaults and get() returns them as fallback values', function () {
-    test()->skip('RED — SettingsService belum ada; dibuat Story 1.6');
 
     $service = app(SettingsService::class);
 
@@ -290,7 +275,6 @@ it('SettingsService::update() persists Global SEO Defaults and get() returns the
 // ---------------------------------------------------------------------------
 
 it('updating settings via SettingsService creates an AuditTrail entry automatically without any manual activity() call', function () {
-    test()->skip('RED — SettingsService belum ada; perlu konfirmasi Audit Trail auto-capture Settings; dibuat Story 1.6');
 
     $service = app(SettingsService::class);
 
@@ -306,7 +290,6 @@ it('updating settings via SettingsService creates an AuditTrail entry automatica
 });
 
 it('does not require any direct activity() call inside SettingsService to capture audit events', function () {
-    test()->skip('RED — SettingsService belum ada; dibuat Story 1.6');
 
     $source = file_get_contents(__DIR__.'/../../../src/Settings/Services/SettingsService.php');
 
@@ -320,7 +303,6 @@ it('does not require any direct activity() call inside SettingsService to captur
 // ---------------------------------------------------------------------------
 
 it('SettingsService::get() throws AuthorizationException when called by a Staff without the manage-settings permission', function () {
-    test()->skip('RED — SettingsService + Policy belum ada; dibuat Story 1.6');
 
     $staff = \Workbench\App\Models\User::create([
         'name'     => 'Unauthorized',
@@ -335,7 +317,6 @@ it('SettingsService::get() throws AuthorizationException when called by a Staff 
 });
 
 it('SettingsService::update() throws AuthorizationException when called by a Staff without the manage-settings permission', function () {
-    test()->skip('RED — SettingsService + Policy belum ada; dibuat Story 1.6');
 
     $staff = \Workbench\App\Models\User::create([
         'name'     => 'Unauthorized',

@@ -5,6 +5,8 @@ namespace Tigaphonic\Bazaar\User\Support;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\Support\ActivityLogger;
+use Spatie\LaravelSettings\Events\SavingSettings;
+use Spatie\LaravelSettings\Models\SettingsProperty;
 
 /**
  * Global Eloquent-event listener that records every create/update/delete of
@@ -16,6 +18,8 @@ class AuditTrailRecorder
 {
     /** @var string[] */
     private const IGNORED_ON_UPDATE = ['updated_at'];
+
+    private const MASK = '***';
 
     /**
      * @param  array<int, mixed>  $payload
@@ -47,6 +51,42 @@ class AuditTrailRecorder
             ->performedOn($model)
             ->withChanges($changes)
             ->log($event);
+    }
+
+    /**
+     * Global Settings are persisted through the query builder, so no Eloquent
+     * event fires for them; spatie/laravel-settings' own SavingSettings event
+     * (which still carries the previous values) feeds the same trail instead.
+     * Encrypted properties (gateway credentials) are masked, never logged.
+     */
+    public function handleSettingsSaving(SavingSettings $event): void
+    {
+        $original = $event->originalValues ?? collect();
+        $encrypted = $event->settings::encrypted();
+
+        $attributes = [];
+        $old = [];
+
+        foreach ($event->properties as $name => $value) {
+            if ($original->has($name) && $original->get($name) === $value) {
+                continue;
+            }
+
+            $masked = in_array($name, $encrypted, true);
+
+            $attributes[$name] = $masked ? self::MASK : $value;
+            $old[$name] = $masked ? self::MASK : $original->get($name);
+        }
+
+        if ($attributes === []) {
+            return;
+        }
+
+        app(ActivityLogger::class)
+            ->useLog('bazaar')
+            ->event('updated')
+            ->withChanges(['attributes' => $attributes, 'old' => $old])
+            ->log('updated');
     }
 
     /**
@@ -83,9 +123,12 @@ class AuditTrailRecorder
     private function isExcluded(Model $model): bool
     {
         // The Audit Trail's own rows must never be audited, or every entry
-        // would trigger another one.
+        // would trigger another one. Settings storage rows are excluded too:
+        // Global Settings changes are recorded once, masked, through
+        // handleSettingsSaving() instead of row by row.
         $excludedModels = [
             (string) config('activitylog.activity_model'),
+            SettingsProperty::class,
             ...(array) config('bazaar.audit.exclude_models', []),
         ];
 
