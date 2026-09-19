@@ -5,7 +5,6 @@ namespace Tigaphonic\Bazaar\User\Support;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\Support\ActivityLogger;
-use Spatie\LaravelSettings\Events\SavingSettings;
 use Spatie\LaravelSettings\Models\SettingsProperty;
 
 /**
@@ -59,34 +58,27 @@ class AuditTrailRecorder
      * (which still carries the previous values) feeds the same trail instead.
      * Encrypted properties (gateway credentials) are masked, never logged.
      */
-    public function handleSettingsSaving(SavingSettings $event): void
+    public function handleSettingsSaving(\Spatie\LaravelSettings\Events\SettingsSaved $event): void
     {
-        $original = $event->originalValues ?? collect();
         $encrypted = $event->settings::encrypted();
 
         $attributes = [];
-        $old = [];
 
-        foreach ($event->properties as $name => $value) {
-            if ($original->has($name) && $original->get($name) === $value) {
-                continue;
-            }
-
+        foreach ($event->settings->toArray() as $name => $value) {
             $masked = in_array($name, $encrypted, true);
-
             $attributes[$name] = $masked ? self::MASK : $value;
-            $old[$name] = $masked ? self::MASK : $original->get($name);
         }
 
         if ($attributes === []) {
             return;
         }
 
-        app(ActivityLogger::class)
-            ->useLog('bazaar')
+        $logger = activity('bazaar')
             ->event('updated')
-            ->withChanges(['attributes' => $attributes, 'old' => $old])
-            ->log('updated');
+            ->withChanges(['attributes' => $attributes]);
+
+        // Same log string used in elqouent.* event handler above
+        $logger->log('updated');
     }
 
     /**
@@ -128,7 +120,7 @@ class AuditTrailRecorder
         // handleSettingsSaving() instead of row by row.
         $excludedModels = [
             (string) config('activitylog.activity_model'),
-            SettingsProperty::class,
+            config('settings.settings_property_model', \Spatie\LaravelSettings\Models\SettingsProperty::class),
             ...(array) config('bazaar.audit.exclude_models', []),
         ];
 

@@ -61,4 +61,9 @@ return new class extends SettingsMigration
             // Re-run against an install that already holds this row.
         }
     }
+
+    public function down(): void
+    {
+        \Illuminate\Support\Facades\DB::table('settings')->where('group', 'bazaar')->delete();
+    }
 };

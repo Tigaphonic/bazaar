@@ -74,7 +74,7 @@ class RoleService
         $this->ensureShippedPermissions();
 
         $role = Role::query()->firstOrCreate(['name' => 'Admin', 'guard_name' => config('auth.defaults.guard')]);
-        $role->syncPermissions(Permission::query()->pluck('name')->all());
+        $role->syncPermissions(Permission::query()->where('guard_name', $role->guard_name)->pluck('name')->all());
 
         return $role;
     }

@@ -91,6 +91,26 @@ it('submitting the GlobalSettings form with a new store_name persists via Settin
         ->toBe('Toko Baru Sekali');
 });
 
+it('submitting the GlobalSettings form with an integer field casts and persists correctly', function () {
+
+    Permission::create(['name' => 'manage-settings']);
+    $role = Role::create(['name' => 'Admin']);
+    $role->givePermissionTo('manage-settings');
+
+    $staff = User::create(['name' => 'Admin', 'email' => 'admin3_int@example.com', 'password' => bcrypt('password')]);
+    $staff->assignRole($role);
+    $this->actingAs($staff);
+
+    // Livewire (browser) simulates submitting numeric fields as strings
+    Livewire::test(GlobalSettings::class)
+        ->fillForm(['timeout_otp_minutes' => '10'])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect(app(\Tigaphonic\Bazaar\Settings\Services\SettingsService::class)->get()->timeout_otp_minutes)
+        ->toBe(10);
+});
+
 it('the GlobalSettings form shows a success toast notification after a valid save', function () {
 
     Permission::create(['name' => 'manage-settings']);

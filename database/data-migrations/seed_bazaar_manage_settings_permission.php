@@ -17,7 +17,9 @@ return new class extends Migration
             return;
         }
 
-        Permission::findOrCreate('manage-settings');
+        foreach ((array) config('bazaar.permissions', []) as $permission) {
+            Permission::findOrCreate($permission);
+        }
     }
 
     public function down(): void
@@ -26,6 +28,8 @@ return new class extends Migration
             return;
         }
 
-        Permission::query()->where('name', 'manage-settings')->delete();
+        foreach ((array) config('bazaar.permissions', []) as $permission) {
+            Permission::query()->where('name', $permission)->delete();
+        }
     }
 };

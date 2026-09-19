@@ -36,8 +36,12 @@ class BazaarStatusWidget extends Widget
      */
     private function evaluate(string $cacheKey): array
     {
-        /** @var Carbon|null $lastTick */
+        /** @var mixed $lastTick */
         $lastTick = Cache::get($cacheKey);
+
+        if ($lastTick !== null && ! $lastTick instanceof Carbon) {
+            $lastTick = Carbon::parse($lastTick);
+        }
 
         $state = match (true) {
             $lastTick === null => 'missing',

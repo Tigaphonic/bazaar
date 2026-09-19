@@ -130,18 +130,27 @@ it('SettingsService::update() accepts all Timeout Timer parameters and persists 
         'timeout_payment_minutes'     => 60,
         'timeout_review_hours'        => 72,
         'timeout_tokenized_page_days' => 5,
+        'timeout_review_hours'        => 48,
+        'timeout_tokenized_page_days' => 2,
         'timeout_on_process_days'     => 3,
         'timeout_auto_confirm_days'   => 7,
     ]);
 
     $settings = $service->get();
 
-    expect($settings->timeout_otp_minutes)->toBe(5)
+    expect($settings->timeout_otp_minutes)->toBe(10)
         ->and($settings->timeout_payment_minutes)->toBe(60)
-        ->and($settings->timeout_review_hours)->toBe(72)
-        ->and($settings->timeout_tokenized_page_days)->toBe(5)
+        ->and($settings->timeout_review_hours)->toBe(48)
+        ->and($settings->timeout_tokenized_page_days)->toBe(2)
         ->and($settings->timeout_on_process_days)->toBe(3)
         ->and($settings->timeout_auto_confirm_days)->toBe(7);
+});
+
+it('SettingsService::update() throws InvalidSettingValueException when a timeout parameter is less than 1', function () {
+    $service = app(SettingsService::class);
+
+    expect(fn () => $service->update(['timeout_otp_minutes' => 0]))
+        ->toThrow(\Tigaphonic\Bazaar\Settings\Exceptions\InvalidSettingValueException::class);
 });
 
 // ---------------------------------------------------------------------------

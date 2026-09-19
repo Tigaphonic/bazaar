@@ -41,15 +41,6 @@ class GlobalSettings extends Page implements HasSchemas
         'refund_max_percent',
     ];
 
-    private const PAYMENT_METHODS = [
-        'bank_transfer' => 'Bank Transfer',
-        'credit_card' => 'Credit Card',
-        'gopay' => 'GoPay',
-        'qris' => 'QRIS',
-        'shopeepay' => 'ShopeePay',
-        'cstore' => 'Convenience Store',
-    ];
-
     private const COURIERS = [
         'jne' => 'JNE',
         'sicepat' => 'SiCepat',
@@ -137,7 +128,14 @@ class GlobalSettings extends Page implements HasSchemas
                             TextInput::make('client_key')->label(__('bazaar::settings.gateway_client_key')),
                             CheckboxList::make('enabled_methods')
                                 ->label(__('bazaar::settings.gateway_enabled_methods'))
-                                ->options(self::PAYMENT_METHODS)->columns(3),
+                                ->options([
+                                    'bank_transfer' => __('bazaar::settings.payment_method_bank_transfer'),
+                                    'credit_card' => __('bazaar::settings.payment_method_credit_card'),
+                                    'gopay' => __('bazaar::settings.payment_method_gopay'),
+                                    'qris' => __('bazaar::settings.payment_method_qris'),
+                                    'shopeepay' => __('bazaar::settings.payment_method_shopeepay'),
+                                    'cstore' => __('bazaar::settings.payment_method_cstore'),
+                                ])->columns(3),
                         ]),
                 ]),
                 Section::make(__('bazaar::settings.section_shipping'))->schema([

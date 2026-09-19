@@ -85,3 +85,7 @@ it('publishes spatie/laravel-settings\' create_settings_table migration to datab
 
     expect(glob(database_path('migrations/*_create_settings_table.php')))->not->toBeEmpty();
 });
+
+it('registers BazaarSettings in spatie/laravel-settings config', function () {
+    expect(config('settings.settings'))->toContain(\Tigaphonic\Bazaar\Settings\Support\BazaarSettings::class);
+});

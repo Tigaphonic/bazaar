@@ -82,6 +82,10 @@ class UserService
         $user = $this->resolveModelClass()::query()->where('email', $email)->first()
             ?? throw new RuntimeException("No user with email {$email}.");
 
+        if (!method_exists($user, 'assignRole')) {
+            throw new \RuntimeException('Missing HasRoles trait on user model');
+        }
+
         $user->assignRole(app(RoleService::class)->ensureAdminRole());
 
         return $user;

@@ -76,3 +76,6 @@
 - source_spec: `_artifacts/implementation-artifacts/spec-1-6-manage-global-settings.md`
   summary: Gate `SettingsService` memakai `auth()->user()`; panel dengan guard non-default membuat user null dan gate lolos, sementara `canAccess()` menolak.
   evidence: Belum terverifikasi (panel guard kustom); sama akar dengan item guard di deferred-work Story 1.2.
+## Deferred from: code review of spec-1-6-manage-global-settings.md (2026-09-19)
+- SettingsService::update() array validation weak — deferred: Sudah dicatat di Spec Triage Log untuk API Layer (1.9).
+- RoleService::ensureShippedPermissions lacks guard — deferred: Sudah dicatat di Spec Triage Log terkait deferred-work panel-auth.

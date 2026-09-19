@@ -78,6 +78,27 @@ context: [
 - Given gateway diaktifkan dengan daftar metode, then hanya metode yang di-enable tersimpan di `payment_gateways[].enabled_methods`.
 - Given save apa pun, then entri Audit Trail tercatat tanpa nilai kredensial.
 
+### Review Findings
+- [x] [Review][Patch] Integer field casting in Livewire form untested [GlobalSettingsPageTest.php]
+- [x] [Review][Patch] Timeout values validation missing test [GlobalSettingsServiceTest.php]
+- [x] [Review][Patch] Role resource permission adoption missing UI test [RoleResource.php:54]
+- [x] [Review][Patch] Settings config registration untested [BazaarServiceProvider.php:61]
+- [x] [Review][Patch] BazaarStatusWidget cache read unsafe [BazaarStatusWidget.php:40]
+- [x] [Review][Patch] GlobalSettings bilingual rule broken (PAYMENT_METHODS hardcoded) [GlobalSettings.php]
+- [x] [Review][Patch] RoleService::ensureAdminRole mixes guards and crashes syncPermissions [RoleService.php]
+- [x] [Review][Patch] seed_bazaar_settings_defaults lacks rollback (down method) [seed_bazaar_settings_defaults.php]
+- [x] [Review][Patch] DomainMigrationTest hardcodes settings row count [DomainMigrationTest.php]
+- [x] [Review][Patch] AuditTrailRecorder hardcodes model exclusion [AuditTrailRecorder.php]
+- [x] [Review][Patch] seed_bazaar_manage_settings_permission hardcodes string [seed_bazaar_manage_settings_permission.php]
+- [x] [Review][Patch] Wrong dependency event used for Audit Trail (SavingSettings vs SettingsSaved) [BazaarServiceProvider.php:169]
+- [x] [Review][Patch] User model lacks HasRoles trait check [UserService.php:264]
+- [x] [Review][Defer] SettingsService::update() array validation weak — deferred: Sudah dicatat di Spec Triage Log untuk API Layer (1.9).
+- [x] [Review][Defer] RoleService::ensureShippedPermissions lacks guard — deferred: Sudah dicatat di Spec Triage Log terkait deferred-work panel-auth.
+
+**Rejected Findings:**
+- `AuditTrailRecorder array comparison flawed`: Reject (low). Array Livewire order stabil; over-engineering recursive diff.
+- `SettingsService::assertValidType ignores union types`: Reject (false). BazaarSettings properties nullable (`?type`) adalah NamedType, bukan UnionType, sehingga `getName()` aman.
+
 ## Implementation Notes
 
 - Data migrations (`seed_bazaar_settings_defaults`, `seed_bazaar_manage_settings_permission`) tinggal di `database/data-migrations/`, dimuat `loadMigrationsFrom` di `packageBooted()`. `DomainMigrationTest` (Story 1.1) mewajibkan semua file `database/migrations/` memakai `->ulid(` — tabel `settings` milik dependency juga dipublish `bazaar:install` (pola sama dengan permission), bukan disalin ke package.

@@ -38,6 +38,8 @@ it('contains no MySQL- or PostgreSQL-specific SQL in any migration Bazaar itself
 it('seeds the manage-settings permission and the Global Settings default rows when migrate runs', function () {
     $this->artisan('migrate')->assertSuccessful();
 
+    $settingsCount = count(get_class_vars(\Tigaphonic\Bazaar\Settings\Support\BazaarSettings::class));
+
     expect(\Spatie\Permission\Models\Permission::query()->where('name', 'manage-settings')->exists())->toBeTrue()
-        ->and(\Illuminate\Support\Facades\DB::table('settings')->where('group', 'bazaar')->count())->toBe(22);
+        ->and(\Illuminate\Support\Facades\DB::table('settings')->where('group', 'bazaar')->count())->toBe($settingsCount);
 });
