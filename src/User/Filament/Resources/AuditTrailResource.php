@@ -83,9 +83,15 @@ class AuditTrailResource extends Resource
                 SelectFilter::make('causer_id')
                     ->label('User')
                     ->options(fn () => static::causerOptions())
-                    ->query(fn (Builder $query, array $data) => filled($data['value'] ?? null)
-                        ? $query->where('causer_id', $data['value'])
-                        : $query),
+                    ->query(function (Builder $query, array $data) {
+                        if (filled($data['value'] ?? null)) {
+                            $parts = explode(':', $data['value'], 2);
+                            if (count($parts) === 2) {
+                                $query->where('causer_type', $parts[0])->where('causer_id', $parts[1]);
+                            }
+                        }
+                        return $query;
+                    }),
                 SelectFilter::make('subject_type')
                     ->label('Entity')
                     ->options(fn () => static::subjectTypeOptions())
@@ -117,13 +123,17 @@ class AuditTrailResource extends Resource
      */
     protected static function causerOptions(): array
     {
-        return static::getModel()::query()
+        $causers = static::getModel()::query()
             ->whereNotNull('causer_id')
-            ->with('causer')
-            ->get()
-            ->unique('causer_id')
-            ->mapWithKeys(fn (Model $entry) => [$entry->getAttribute('causer_id') => $entry->causer?->getAttribute('name') ?? $entry->getAttribute('causer_id')])
-            ->all();
+            ->select(['causer_type', 'causer_id'])
+            ->distinct()
+            ->get();
+
+        $causers->load('causer');
+
+        return $causers->mapWithKeys(fn (Model $entry) => [
+            $entry->getAttribute('causer_type') . ':' . $entry->getAttribute('causer_id') => $entry->causer?->getAttribute('name') ?? $entry->getAttribute('causer_id')
+        ])->all();
     }
 
     /**

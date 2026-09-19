@@ -62,7 +62,7 @@ class AuditTrailRecorder
 
         $old = [];
         foreach (array_keys($changed) as $key) {
-            $old[$key] = $model->getRawOriginal($key);
+            $old[$key] = $model->getOriginal($key);
         }
 
         return ['attributes' => $changed, 'old' => $old];

@@ -39,7 +39,8 @@ it('displays the required columns in the AuditTrail table: causer, event, subjec
         ->assertTableColumnExists('subject_type')
         ->assertTableColumnExists('subject_id')
         ->assertTableColumnExists('created_at')
-        ->assertTableColumnExists('properties');
+        ->assertTableColumnExists('properties')
+        ->assertTableColumnFormattedStateSet('subject_type', 'Role', $entry);
 });
 
 it('renders the before → after diff in the properties column', function () {
@@ -59,7 +60,7 @@ it('filters AuditTrail entries to only show those caused by the selected User wh
     $byRara = makeEntry(['causer_type' => User::class, 'causer_id' => (string) $rara->getKey()]);
 
     Livewire::test(ListAuditTrail::class)
-        ->filterTable('causer_id', (string) $bagas->getKey())
+        ->filterTable('causer_id', User::class . ':' . $bagas->getKey())
         ->assertCanSeeTableRecords([$byBagas])
         ->assertCanNotSeeTableRecords([$byRara]);
 });
@@ -207,7 +208,7 @@ it('offers the acting Users and the entity types found in the log as filter opti
     $component = Livewire::test(ListAuditTrail::class);
     $filters = $component->instance()->getTable()->getFilters();
 
-    expect($filters['causer_id']->getOptions())->toBe([(string) $bagas->getKey() => 'Bagas'])
+    expect($filters['causer_id']->getOptions())->toBe([User::class . ':' . $bagas->getKey() => 'Bagas'])
         ->and($filters['subject_type']->getOptions())->toBe([Role::class => 'Role', User::class => 'User']); // makeStaff() itself is audited as a User create
 });
 
@@ -219,4 +220,7 @@ it('orders entries created in the same second newest-first by id', function () {
     $ids = app(AuditTrailService::class)->list()->pluck('id')->all();
 
     expect($ids)->toBe([$second->id, $first->id]);
+
+    Livewire::test(ListAuditTrail::class)
+        ->assertCanSeeTableRecords([$second, $first], inOrder: true);
 });

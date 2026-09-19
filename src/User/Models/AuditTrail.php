@@ -15,4 +15,11 @@ class AuditTrail extends Activity
     use HasUlids;
 
     protected $table = 'bazaar_audit_trails';
+
+    protected function casts(): array
+    {
+        return array_merge(parent::casts(), [
+            'attribute_changes' => 'collection',
+        ]);
+    }
 }

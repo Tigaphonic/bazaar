@@ -115,3 +115,17 @@ context: [
 - `vendor/bin/pest` -- expected: seluruh suite hijau, 0 skipped di tests/Feature/AuditTrail
 - `vendor/bin/phpstan analyse` -- expected: tanpa error baru
 - `vendor/bin/pint --test` -- expected: bersih
+
+### Review Findings
+
+- [x] [Review][Patch] JSON Cast Crash: `attribute_changes` is not cast to collection, causing crash on `->get()` [src/User/Filament/Resources/AuditTrailResource.php:143]
+- [x] [Review][Patch] Cast Mismatch on Update: `getOriginal()` returns raw values while `getChanges()` returns casted [src/User/Support/AuditTrailRecorder.php:65]
+- [x] [Review][Patch] OOM Risk in Causer Filter: `causerOptions()` hydrates all rows with `->get()` before `->unique()` [src/User/Filament/Resources/AuditTrailResource.php:123]
+- [x] [Review][Patch] Causer Index Bypass & Collision: `causer_id` filter omits `causer_type`, missing composite index [src/User/Filament/Resources/AuditTrailResource.php:87]
+- [x] [Review][Patch] Deleted entity hidden attribute stripping unverified [tests/Feature/AuditTrail/AuditTrailCaptureTest.php]
+- [x] [Review][Patch] Resource table default sort unverified [tests/Feature/AuditTrail/AuditTrailResource/ListAuditTrailTest.php]
+- [x] [Review][Patch] Entity column format unverified [tests/Feature/AuditTrail/AuditTrailResource/ListAuditTrailTest.php]
+- [x] [Review][Patch] System causer placeholder unverified [tests/Feature/AuditTrail/AuditTrailResource/ListAuditTrailTest.php]
+- [x] [Review][Defer] Missing authorization gate [src/User/Filament/Resources/AuditTrailResource.php] — deferred: already in deferred-work.
+- [x] [Review][Defer] Soft delete restore untracked [src/User/Support/AuditTrailRecorder.php] — deferred: no SoftDeletes models exist yet.
+- [x] [Review][Defer] Table grow infinite [database/migrations/create_bazaar_audit_trails_table.php] — deferred: pre-existing, beyond story scope.

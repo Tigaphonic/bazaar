@@ -55,3 +55,8 @@
 - source_spec: `_artifacts/implementation-artifacts/spec-1-5-audit-trail.md`
   summary: Perekam belum menangani `restored`, mass update/upsert, perubahan pivot (sync role/permission), dan redaksi atribut sensitif non-`$hidden` (unverified untuk guard panel non-default).
   evidence: Listener hanya `created|updated|deleted`; belum ada model SoftDeletes/secret non-hidden hari ini, tapi akan muncul di Epic 3-5.
+
+## Deferred from: code review of spec-1-5-audit-trail.md (2026-09-19)
+- Missing authorization gate [src/User/Filament/Resources/AuditTrailResource.php] — deferred: already in deferred-work (panel auth belum ada).
+- Soft delete restore untracked [src/User/Support/AuditTrailRecorder.php] — deferred: no SoftDeletes models exist yet.
+- Table grow infinite [database/migrations/create_bazaar_audit_trails_table.php] — deferred: pre-existing, beyond story scope.

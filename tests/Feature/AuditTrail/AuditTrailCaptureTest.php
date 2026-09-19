@@ -145,6 +145,19 @@ it('records an AuditTrail entry automatically when a Role is deleted, with event
         ->and($entry->attribute_changes->get('old'))->toMatchArray(['name' => 'Editor']);
 });
 
+it('never records password or other hidden attributes in the old snapshot when a User is deleted', function () {
+    $service = app(\Tigaphonic\Bazaar\User\Services\UserService::class);
+    $user = $service->create(['name' => 'John', 'email' => 'j@example.com', 'password' => 'secret', 'roles' => []]);
+
+    $user->delete();
+
+    $entry = auditEntriesFor($user::class, 'deleted')->first();
+
+    expect($entry)->not->toBeNull()
+        ->and($entry->attribute_changes->get('old'))->not->toHaveKey('password')
+        ->and($entry->attribute_changes->get('old'))->toHaveKey('name');
+});
+
 it('records which User performed the action as causer when one is bound to the request lifecycle', function () {
     $staff = User::create(['name' => 'Bagas', 'email' => 'bagas@example.com', 'password' => 'secret-password']);
 
