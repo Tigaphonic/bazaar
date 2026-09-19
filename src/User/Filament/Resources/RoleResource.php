@@ -10,7 +10,6 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tigaphonic\Bazaar\User\Filament\Resources\RoleResource\Pages\CreateRole;
 use Tigaphonic\Bazaar\User\Filament\Resources\RoleResource\Pages\EditRole;
@@ -52,7 +51,7 @@ class RoleResource extends Resource
                 ->trim()
                 ->unique(table: fn () => config('permission.table_names.roles', 'roles')),
             CheckboxList::make('permissions')
-                ->options(fn () => Permission::pluck('name', 'name'))
+                ->options(fn () => app(RoleService::class)->permissionOptions())
                 ->searchable(),
         ]);
     }

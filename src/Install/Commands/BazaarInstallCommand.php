@@ -81,6 +81,7 @@ class BazaarInstallCommand extends Command
 
         $this->components->info("Bazaar connected to the '{$panel->getId()}' Filament panel.");
         $this->components->info('Run `php artisan migrate` to create the roles/permissions (spatie/laravel-permission) and settings (spatie/laravel-settings) tables the Roles and Global Settings screens need.');
+        $this->components->info('Then run `php artisan bazaar:grant-admin you@example.com` so your first Staff user gets the Admin Role (Global Settings needs a permission).');
         $this->components->warn("Manual step required: add `use Spatie\Permission\Traits\HasRoles;` to your app's User model so the Users screen's roles checklist works.");
 
         return self::SUCCESS;

@@ -2,6 +2,7 @@
 
 namespace Tigaphonic\Bazaar\User\Services;
 
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 /**
@@ -49,6 +50,40 @@ class RoleService
         $role->syncPermissions($data['permissions'] ?? []);
 
         return $role;
+    }
+
+    /**
+     * Creates any shipped permission that is missing, then returns every
+     * permission as name => name for the Role form checklist.
+     *
+     * @return \Illuminate\Support\Collection<string, string>
+     */
+    public function permissionOptions(): \Illuminate\Support\Collection
+    {
+        $this->ensureShippedPermissions();
+
+        return Permission::query()->pluck('name', 'name');
+    }
+
+    /**
+     * Role that holds every permission; created if absent and re-synced so a
+     * newly shipped permission reaches it.
+     */
+    public function ensureAdminRole(): Role
+    {
+        $this->ensureShippedPermissions();
+
+        $role = Role::query()->firstOrCreate(['name' => 'Admin', 'guard_name' => config('auth.defaults.guard')]);
+        $role->syncPermissions(Permission::query()->pluck('name')->all());
+
+        return $role;
+    }
+
+    private function ensureShippedPermissions(): void
+    {
+        foreach ((array) config('bazaar.permissions', []) as $name) {
+            Permission::findOrCreate($name);
+        }
     }
 
     public function delete(Role $role): void

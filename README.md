@@ -29,7 +29,7 @@ Then connect it to your project's existing Filament panel:
 php artisan bazaar:install
 ```
 
-This also publishes `spatie/laravel-permission`'s own migration (`roles`, `permissions`, `model_has_roles`, `model_has_permissions`, `role_has_permissions` — needed by the Roles & Permissions screen) into your `database/migrations/`. It is published, not run automatically, so finish with:
+This also publishes `spatie/laravel-permission`'s own migration (`roles`, `permissions`, `model_has_roles`, `model_has_permissions`, `role_has_permissions` — needed by the Roles & Permissions screen) and `spatie/laravel-settings`' `settings` table migration (needed by Global Settings) into your `database/migrations/`. They are published, not run automatically, so finish with:
 
 ```bash
 php artisan migrate
@@ -64,6 +64,16 @@ class User extends Authenticatable
 
 Without this, editing a user 500s when the form tries to hydrate/save its roles.
 
+### First Staff user: grant access
+
+A fresh install has no Roles, and Global Settings is gated by the `manage-settings` permission, so your first Staff user cannot open it yet. After creating that user in your app, give them the all-permission `Admin` Role:
+
+```bash
+php artisan bazaar:grant-admin you@example.com
+```
+
+The command creates the `Admin` Role if needed, syncs every Bazaar permission onto it, and assigns it to the user. It is safe to re-run, and re-running after an upgrade picks up newly shipped permissions. Everyone else gets access through Roles in the admin panel.
+
 ## Usage
 
 ### `bazaar:install`
@@ -72,6 +82,14 @@ Connects Bazaar's Resources and Pages to your project's default Filament panel (
 
 ```bash
 php artisan bazaar:install
+```
+
+### `bazaar:grant-admin {email}`
+
+Gives an existing user the all-permission `Admin` Role (see [First Staff user](#first-staff-user-grant-access)). Fails with an error if no user has that email.
+
+```bash
+php artisan bazaar:grant-admin you@example.com
 ```
 
 ### `bazaar:status`

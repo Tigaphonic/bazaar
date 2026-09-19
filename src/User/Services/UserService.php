@@ -71,6 +71,22 @@ class UserService
         });
     }
 
+    /**
+     * Bootstrap access: gives the User with this email the all-permission
+     * Admin Role (for the first Staff member, who has no Role yet).
+     *
+     * @throws RuntimeException when no User has that email
+     */
+    public function grantAdmin(string $email): Model
+    {
+        $user = $this->resolveModelClass()::query()->where('email', $email)->first()
+            ?? throw new RuntimeException("No user with email {$email}.");
+
+        $user->assignRole(app(RoleService::class)->ensureAdminRole());
+
+        return $user;
+    }
+
     public function deactivate(Model $user): void
     {
         UserStatus::query()->updateOrCreate(

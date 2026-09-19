@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Event;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Spatie\LaravelSettings\Events\SavingSettings;
+use Tigaphonic\Bazaar\Install\Commands\BazaarGrantAdminCommand;
 use Tigaphonic\Bazaar\Install\Commands\BazaarInstallCommand;
 use Tigaphonic\Bazaar\Install\Commands\BazaarStatusCommand;
 use Tigaphonic\Bazaar\Install\Jobs\RecordQueueHeartbeat;
@@ -46,6 +47,7 @@ class BazaarServiceProvider extends PackageServiceProvider
             ->hasCommands([
                 BazaarInstallCommand::class,
                 BazaarStatusCommand::class,
+                BazaarGrantAdminCommand::class,
             ]);
     }
 

@@ -55,6 +55,15 @@ return [
     ],
 
     /*
+     * Permissions Bazaar ships. Created on demand (Role form, bazaar:grant-admin)
+     * so they exist even when the permission tables were migrated after Bazaar's
+     * own data migrations ran.
+     */
+    'permissions' => [
+        'manage-settings',
+    ],
+
+    /*
      * Audit Trail (FR-20) records every create/update/delete of every
      * Eloquent model automatically. Models listed here (or subclasses) are
      * skipped — use it for high-churn, non-business rows.
