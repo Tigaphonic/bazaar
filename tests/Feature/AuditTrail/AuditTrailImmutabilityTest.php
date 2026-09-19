@@ -1,61 +1,65 @@
 <?php
 
-// Story 1.5 RED-PHASE scaffold — AC2 (immutability / read-only mutlak):
-//
-// "Given Staff membuka Audit Trail. When Staff mencoba mengedit atau menghapus
-// sebuah entri. Then tidak ada kontrol edit/delete tersedia di UI manapun —
-// read-only mutlak."
-//
-// NFR4 (Architecture Spine): Audit Trail bersifat append-only — tidak bisa
-// diedit atau dihapus lewat UI manapun oleh User mana pun, termasuk yang
-// memiliki permission administratif.
-//
-// Two layers of enforcement tested here:
-//   1. AuditTrailResource exposes no DeleteAction and no EditAction in the
-//      Filament table — the resource is list-only, no record pages for edit.
-//   2. AuditTrailService has no delete() or update() method at all —
-//      the Service contract itself is read-only, enforcing NFR4 at the
-//      domain boundary (AD-5), not only at the UI layer.
+// Story 1.5 AC2 (read-only mutlak, NFR4): no edit/delete control anywhere in the
+// UI, and no mutation method on the domain boundary (AuditTrailService) either.
 
 use Livewire\Livewire;
 use Tigaphonic\Bazaar\User\Filament\Resources\AuditTrailResource;
 use Tigaphonic\Bazaar\User\Filament\Resources\AuditTrailResource\Pages\ListAuditTrail;
+use Tigaphonic\Bazaar\User\Models\AuditTrail;
 use Tigaphonic\Bazaar\User\Services\AuditTrailService;
 
-// ---------------------------------------------------------------------------
-// AC2 — No edit or delete action in the Filament table
-// ---------------------------------------------------------------------------
+function seedAuditEntry(): AuditTrail
+{
+    return AuditTrail::query()->create([
+        'log_name' => 'bazaar',
+        'description' => 'created',
+        'event' => 'created',
+        'subject_type' => 'Some\\Entity',
+        'subject_id' => '1',
+    ]);
+}
 
-it('does not expose a DeleteAction in the AuditTrail table')
-    ->skip('Story 1.5 not implemented yet — RED PHASE');
+it('does not expose a DeleteAction in the AuditTrail table', function () {
+    $entry = seedAuditEntry();
 
-it('does not expose a bulk DeleteAction in the AuditTrail table')
-    ->skip('Story 1.5 not implemented yet — RED PHASE');
+    Livewire::test(ListAuditTrail::class)
+        ->assertTableActionDoesNotExist('delete', record: $entry);
+});
 
-it('does not expose an EditAction in the AuditTrail table')
-    ->skip('Story 1.5 not implemented yet — RED PHASE');
+it('does not expose a bulk DeleteAction in the AuditTrail table', function () {
+    seedAuditEntry();
 
-it('does not have a record edit page registered for AuditTrailResource')
-    ->skip('Story 1.5 not implemented yet — RED PHASE');
+    Livewire::test(ListAuditTrail::class)
+        ->assertTableBulkActionDoesNotExist('delete');
+});
 
-it('does not have a record create page registered for AuditTrailResource')
-    ->skip('Story 1.5 not implemented yet — RED PHASE');
+it('does not expose an EditAction in the AuditTrail table', function () {
+    $entry = seedAuditEntry();
 
-// ---------------------------------------------------------------------------
-// AC2 — AuditTrailService has no mutation methods (NFR4 at domain boundary)
-// ---------------------------------------------------------------------------
+    Livewire::test(ListAuditTrail::class)
+        ->assertTableActionDoesNotExist('edit', record: $entry);
+});
+
+it('does not have a record edit page registered for AuditTrailResource', function () {
+    expect(AuditTrailResource::getPages())->not->toHaveKey('edit')
+        ->and(AuditTrailResource::canEdit(seedAuditEntry()))->toBeFalse();
+});
+
+it('does not have a record create page registered for AuditTrailResource', function () {
+    expect(AuditTrailResource::getPages())->not->toHaveKey('create')
+        ->and(AuditTrailResource::canCreate())->toBeFalse();
+});
+
+it('does not allow deleting an entry through the AuditTrailResource', function () {
+    expect(AuditTrailResource::canDelete(seedAuditEntry()))->toBeFalse()
+        ->and(AuditTrailResource::canDeleteAny())->toBeFalse();
+});
 
 it('AuditTrailService does not expose a delete() or update() method, enforcing NFR4 append-only at the domain boundary', function () {
-    // Reflection check on the Service class contract — this test goes red if
-    // a developer adds a mutation method to AuditTrailService.
-    // The class itself does not exist yet (story is in backlog), so this will
-    // correctly fail at class resolution until Story 1.5 is implemented.
-    $service = app(AuditTrailService::class);
-    $reflection = new ReflectionClass($service);
-
-    $publicMethods = collect($reflection->getMethods(ReflectionMethod::IS_PUBLIC))
-        ->filter(fn ($m) => ! $m->isConstructor())
-        ->map(fn ($m) => $m->getName())
+    $publicMethods = collect((new ReflectionClass(app(AuditTrailService::class)))->getMethods(ReflectionMethod::IS_PUBLIC))
+        ->filter(fn (ReflectionMethod $method) => ! $method->isConstructor())
+        ->map(fn (ReflectionMethod $method) => $method->getName())
         ->values()
         ->toArray();
 
@@ -65,4 +69,4 @@ it('AuditTrailService does not expose a delete() or update() method, enforcing N
         ->not->toContain('update')
         ->not->toContain('edit')
         ->not->toContain('truncate');
-})->skip('Story 1.5 not implemented yet — RED PHASE');
+});

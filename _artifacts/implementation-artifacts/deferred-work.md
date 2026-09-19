@@ -45,3 +45,13 @@
 - source_spec: `_artifacts/implementation-artifacts/spec-fix-base-layout-mockup-parity.md`
   summary: Brand block sidebar hanya merender badge inisial; logo gambar dari `->brandLogo()` panel diabaikan.
   evidence: `.fi-sidebar-header-logo-ctn` di-`display:none` di `shell.css` dan `sidebar-brand.blade.php` hanya memakai `getBrandName()`; host yang mengatur logo tidak melihatnya. Selesaikan bila ada kebutuhan logo per klien.
+
+- source_spec: `_artifacts/implementation-artifacts/spec-1-5-audit-trail.md`
+  summary: Kegagalan tulis Audit Trail (tabel belum termigrasi, DB error) saat ini melempar exception dan menggagalkan save bisnis.
+  evidence: `AuditTrailRecorder::handle()` tanpa try/catch; keputusan fail-open (report + lanjut) vs fail-closed perlu diambil produk.
+- source_spec: `_artifacts/implementation-artifacts/spec-1-5-audit-trail.md`
+  summary: Opsi filter User/entity di `AuditTrailResource` memuat seluruh baris log ke memori.
+  evidence: `causerOptions()` memakai `->get()->unique()`; ganti ke `distinct()` di SQL atau select searchable bila log membesar.
+- source_spec: `_artifacts/implementation-artifacts/spec-1-5-audit-trail.md`
+  summary: Perekam belum menangani `restored`, mass update/upsert, perubahan pivot (sync role/permission), dan redaksi atribut sensitif non-`$hidden` (unverified untuk guard panel non-default).
+  evidence: Listener hanya `created|updated|deleted`; belum ada model SoftDeletes/secret non-hidden hari ini, tapi akan muncul di Epic 3-5.

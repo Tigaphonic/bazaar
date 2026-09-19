@@ -15,6 +15,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Tigaphonic\Bazaar\Install\Commands\BazaarInstallCommand;
@@ -23,6 +24,7 @@ use Tigaphonic\Bazaar\Install\Jobs\RecordQueueHeartbeat;
 use Tigaphonic\Bazaar\Install\Support\PanelResolver;
 use Tigaphonic\Bazaar\Shell\Http\Middleware\ApplyUserLocale;
 use Tigaphonic\Bazaar\Shell\Support\DesignTokens;
+use Tigaphonic\Bazaar\User\Support\AuditTrailRecorder;
 
 class BazaarServiceProvider extends PackageServiceProvider
 {
@@ -36,6 +38,7 @@ class BazaarServiceProvider extends PackageServiceProvider
             ->hasMigrations([
                 'create_bazaar_user_preferences_table',
                 'create_bazaar_user_statuses_table',
+                'create_bazaar_audit_trails_table',
             ])
             ->runsMigrations()
             ->hasCommands([
@@ -130,6 +133,22 @@ class BazaarServiceProvider extends PackageServiceProvider
 
         $this->registerShellTheme();
         $this->registerShellRenderHooks();
+        $this->registerAuditTrail();
+    }
+
+    /**
+     * Audit Trail auto-capture (Story 1.5): one wildcard listener per Eloquent
+     * lifecycle event covers every model in every domain, so no Service needs
+     * a manual activity() call. Entries live in Bazaar's own ULID table via
+     * the AuditTrail subclass rather than the vendor `activity_log` (AD-18).
+     */
+    private function registerAuditTrail(): void
+    {
+        config(['activitylog.activity_model' => config('bazaar.audit.model')]);
+
+        foreach (['created', 'updated', 'deleted'] as $event) {
+            Event::listen("eloquent.{$event}: *", [AuditTrailRecorder::class, 'handle']);
+        }
     }
 
     /**

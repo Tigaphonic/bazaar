@@ -1,8 +1,10 @@
 <?php
 
 use Tigaphonic\Bazaar\Settings\Filament\Pages\GlobalSettings;
+use Tigaphonic\Bazaar\User\Filament\Resources\AuditTrailResource;
 use Tigaphonic\Bazaar\User\Filament\Resources\RoleResource;
 use Tigaphonic\Bazaar\User\Filament\Resources\UserResource;
+use Tigaphonic\Bazaar\User\Models\AuditTrail;
 
 // config for Tigaphonic/Bazaar
 return [
@@ -22,6 +24,7 @@ return [
     'resources' => [
         UserResource::class,
         RoleResource::class,
+        AuditTrailResource::class,
     ],
 
     /*
@@ -49,6 +52,17 @@ return [
     'shell' => [
         'default_theme' => 'light',
         'default_locale' => 'en',
+    ],
+
+    /*
+     * Audit Trail (FR-20) records every create/update/delete of every
+     * Eloquent model automatically. Models listed here (or subclasses) are
+     * skipped — use it for high-churn, non-business rows.
+     */
+    'audit' => [
+        'model' => AuditTrail::class,
+
+        'exclude_models' => [],
     ],
 
 ];
