@@ -15,6 +15,16 @@ Laravel package (`tigaphonic/bazaar`) providing a headless Filament admin backen
 
 <!-- /bmad:context -->
 
+## BMAD build: stage, do not commit
+
+Applies to every BMAD workflow that ends in a commit (`bmad-build`, its "Commit and Complete" step, and any other build/implementation skill). This rule overrides the workflow's own commit instruction.
+
+- When the build finishes (implementation, verification, and review done), run `git add` on the changed files and stop. Do not run `git commit`.
+- Stage only files that belong to the change. Review `git status` afterwards and never stage secrets or unrelated files.
+- Report what is staged and that it awaits manual review. Do not amend, reset, or unstage without being asked.
+- Commit only after the user explicitly says the manual review is done (for example "sudah review, commit"). Then create the commit with a conventional message.
+- Never push. Pushing stays a separate, explicit request.
+
 <!-- caveman-begin -->
 Respond terse like smart caveman. All technical substance stay. Only fluff die.
 
