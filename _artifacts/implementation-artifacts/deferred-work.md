@@ -86,3 +86,11 @@
 
 ## Deferred from: code review of spec-1-8-service-layer-integration-monolith (2026-09-20)
 - Test debt from baseline 1.7: The spec carries 4 failing tests from baseline 1.7 (`CreateRoleTest`, `GlobalSettingsAuditTest`, `GlobalSettingsServiceTest`). Deferred because it is a pre-existing issue not caused by the current change.
+
+## Deferred from: implementation of spec-1-10-media-upload-optimization-shared-pipeline (2026-09-20)
+- source_spec: `_artifacts/implementation-artifacts/spec-1-10-media-upload-optimization-shared-pipeline.md`
+  summary: Stub `media` milik spatie/laravel-medialibrary memakai `morphs('model')` (bigint) sedangkan model Bazaar ber-ULID (AD-18); attach media ke Item/HeroBanner/Blog/Page di Epic 3/6 gagal di MySQL/PostgreSQL strict.
+  evidence: Uji 1.10 lolos hanya karena SQLite tidak menegakkan tipe kolom dan fixture `MediaTestModel` berkunci integer; AD-18 melarang mengedit migrasi vendor, jadi perlu keputusan arsitektur sebelum titik upload pertama.
+- source_spec: `_artifacts/implementation-artifacts/spec-1-10-media-upload-optimization-shared-pipeline.md`
+  summary: Wiring logo/favicon/og_image Settings ke pipeline media dan komponen Dropzone Shell + hint line (AC3) belum ada; 4 test browser `tests/Browser/Media/dropzone-hint.spec.ts` tetap `test.skip`.
+  evidence: Keputusan Binyo saat planning 1.10: story ini hanya pipeline; field Settings masih string di `BazaarSettings` dan Shell belum punya Dropzone.

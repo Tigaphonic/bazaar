@@ -29,7 +29,7 @@ Then connect it to your project's existing Filament panel:
 php artisan bazaar:install
 ```
 
-This also publishes `spatie/laravel-permission`'s own migration (`roles`, `permissions`, `model_has_roles`, `model_has_permissions`, `role_has_permissions` — needed by the Roles & Permissions screen) and `spatie/laravel-settings`' `settings` table migration (needed by Global Settings) into your `database/migrations/`. They are published, not run automatically, so finish with:
+This also publishes `spatie/laravel-permission`'s own migration (`roles`, `permissions`, `model_has_roles`, `model_has_permissions`, `role_has_permissions` — needed by the Roles & Permissions screen), `spatie/laravel-settings`' `settings` table migration (needed by Global Settings), and `spatie/laravel-medialibrary`'s `media` table migration (needed by the shared image pipeline) into your `database/migrations/`. They are published, not run automatically, so finish with:
 
 ```bash
 php artisan migrate

@@ -5,6 +5,7 @@ namespace Tigaphonic\Bazaar\Install\Commands;
 use Filament\PanelRegistry;
 use Illuminate\Console\Command;
 use Spatie\LaravelSettings\LaravelSettingsServiceProvider;
+use Spatie\MediaLibrary\MediaLibraryServiceProvider;
 use Spatie\Permission\PermissionServiceProvider;
 use Tigaphonic\Bazaar\Install\Support\PanelResolver;
 
@@ -70,6 +71,18 @@ class BazaarInstallCommand extends Command
                 '--tag' => 'migrations',
             ]) !== static::SUCCESS) {
                 $this->components->error('Failed to publish spatie/laravel-settings migrations.');
+
+                return static::FAILURE;
+            }
+
+            // Media pipeline (Story 1.10) stores originals + WebP variants in
+            // spatie/laravel-medialibrary's own `media` table -- same
+            // dependency-owned-table rule as above.
+            if ($this->callSilently('vendor:publish', [
+                '--provider' => MediaLibraryServiceProvider::class,
+                '--tag' => 'medialibrary-migrations',
+            ]) !== static::SUCCESS) {
+                $this->components->error('Failed to publish spatie/laravel-medialibrary migrations.');
 
                 return static::FAILURE;
             }

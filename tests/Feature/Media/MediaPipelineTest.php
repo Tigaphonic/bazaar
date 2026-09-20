@@ -30,14 +30,10 @@ use Tigaphonic\Bazaar\Media\Services\MediaService;
 // ---------------------------------------------------------------------------
 
 it('BazaarWebpConversion class exists at the canonical location (one shared pipeline, AD-31)', function () {
-    $this->markTestSkipped('RED — BazaarWebpConversion belum dibuat; Story 1.10');
-
     expect(class_exists(BazaarWebpConversion::class))->toBeTrue();
 });
 
 it('HasBazaarMedia trait registers exactly one conversion named "webp" via BazaarWebpConversion', function () {
-    $this->markTestSkipped('RED — HasBazaarMedia trait belum dibuat; Story 1.10');
-
     // Buat model fixture yang menggunakan trait
     $model = new class {
         use HasBazaarMedia;
@@ -53,8 +49,6 @@ it('HasBazaarMedia trait registers exactly one conversion named "webp" via Bazaa
 });
 
 it('HasBazaarMedia trait does not define its own image manipulation logic — delegates to BazaarWebpConversion', function () {
-    $this->markTestSkipped('RED — HasBazaarMedia trait belum dibuat; Story 1.10');
-
     $source = file_get_contents(__DIR__.'/../../../src/Media/Concerns/HasBazaarMedia.php');
 
     // Trait tidak boleh berisi manipulasi gambar inline
@@ -70,8 +64,6 @@ it('HasBazaarMedia trait does not define its own image manipulation logic — de
 // ---------------------------------------------------------------------------
 
 it('uploading an image via addMedia() triggers the webp conversion automatically', function () {
-    $this->markTestSkipped('RED — HasBazaarMedia + konversi belum ada; Story 1.10');
-
     Storage::fake('public');
 
     // Gunakan model fixture yang menerapkan HasBazaarMedia
@@ -89,8 +81,6 @@ it('uploading an image via addMedia() triggers the webp conversion automatically
 });
 
 it('webp conversion produces a .webp file format, not the original jpg/png format', function () {
-    $this->markTestSkipped('RED — konversi WebP belum diimplementasi; Story 1.10');
-
     Storage::fake('public');
 
     $model = \Workbench\App\Models\MediaTestModel::create([]);
@@ -110,8 +100,6 @@ it('webp conversion produces a .webp file format, not the original jpg/png forma
 });
 
 it('webp conversion file size is smaller than the original file', function () {
-    $this->markTestSkipped('RED — kompresi WebP belum diimplementasi; Story 1.10');
-
     Storage::fake('public');
 
     $model = \Workbench\App\Models\MediaTestModel::create([]);
@@ -133,8 +121,6 @@ it('webp conversion file size is smaller than the original file', function () {
 // ---------------------------------------------------------------------------
 
 it('original file is preserved after webp conversion — not overwritten', function () {
-    $this->markTestSkipped('RED — HasBazaarMedia belum ada; Story 1.10');
-
     Storage::fake('public');
 
     $model = \Workbench\App\Models\MediaTestModel::create([]);
@@ -153,8 +139,6 @@ it('original file is preserved after webp conversion — not overwritten', funct
 });
 
 it('getUrl() without conversion returns original file URL; getUrl("webp") returns the webp variant URL', function () {
-    $this->markTestSkipped('RED — HasBazaarMedia belum ada; Story 1.10');
-
     Storage::fake('public');
 
     $model = \Workbench\App\Models\MediaTestModel::create([]);
@@ -175,8 +159,6 @@ it('getUrl() without conversion returns original file URL; getUrl("webp") return
 });
 
 it('Service Layer exposes webp URL via MediaService::getVariantUrl() — never exposes internal paths', function () {
-    $this->markTestSkipped('RED — MediaService belum ada; Story 1.10');
-
     Storage::fake('public');
 
     $model = \Workbench\App\Models\MediaTestModel::create([]);
@@ -201,8 +183,6 @@ it('Service Layer exposes webp URL via MediaService::getVariantUrl() — never e
 // ---------------------------------------------------------------------------
 
 it('webp variant is stored as a separate conversion path — never modifies the original file in place', function () {
-    $this->markTestSkipped('RED — HasBazaarMedia belum ada; Story 1.10');
-
     Storage::fake('public');
 
     $model = \Workbench\App\Models\MediaTestModel::create([]);
@@ -225,8 +205,6 @@ it('webp variant is stored as a separate conversion path — never modifies the 
 // ---------------------------------------------------------------------------
 
 it('no domain outside src/Media/ or src/Shell/ defines its own media conversion class', function () {
-    $this->markTestSkipped('RED — src/Media/ atau src/Shell/ belum ada; Story 1.10');
-
     // Scan semua domain directories
     $domainDirs = glob(__DIR__.'/../../../src/*', GLOB_ONLYDIR);
 
@@ -260,8 +238,6 @@ it('no domain outside src/Media/ or src/Shell/ defines its own media conversion 
 });
 
 it('HasBazaarMedia trait is the only entry point for registering media conversions — singleton pattern (AD-31)', function () {
-    $this->markTestSkipped('RED — HasBazaarMedia belum ada; Story 1.10');
-
     // Semua model yang upload gambar harus menggunakan HasBazaarMedia, bukan InteractsWithMedia langsung
     // Ini diperiksa dengan memastikan tidak ada Model yang implements InteractsWithMedia secara manual
     // tanpa juga menggunakan HasBazaarMedia
@@ -287,4 +263,25 @@ it('HasBazaarMedia trait is the only entry point for registering media conversio
     expect($violators)
         ->toBeEmpty("Model berikut menggunakan InteractsWithMedia secara langsung tanpa HasBazaarMedia (AD-31): "
             .implode(', ', $violators));
+});
+
+it('MediaService::deleteMedia() removes the original and the webp variant files from disk', function () {
+    Storage::fake('public');
+
+    $model = \Workbench\App\Models\MediaTestModel::create([]);
+    $media = $model
+        ->addMedia(UploadedFile::fake()->image('gone.jpg', 300, 300))
+        ->toMediaCollection('images');
+
+    $originalPath = $media->getPath();
+    $webpPath = $media->getPath('webp');
+
+    expect(file_exists($originalPath))->toBeTrue();
+    expect(file_exists($webpPath))->toBeTrue();
+
+    app(MediaService::class)->deleteMedia($media);
+
+    expect(file_exists($originalPath))->toBeFalse();
+    expect(file_exists($webpPath))->toBeFalse();
+    expect(Media::query()->count())->toBe(0);
 });

@@ -8,3 +8,9 @@ parameters:
         - config
         - database
     tmpDir: build/phpstan
+    ignoreErrors:
+        # Public entry point for domains that upload images (Catalog, Content);
+        # consumers land in later epics, so nothing under src/ uses it yet.
+        -
+            identifier: trait.unused
+            path: src/Media/Concerns/HasBazaarMedia.php

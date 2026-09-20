@@ -54,6 +54,7 @@ class TestCase extends Orchestra
         foreach ([
             ...(glob(database_path('migrations/*_create_permission_tables.php')) ?: []),
             ...(glob(database_path('migrations/*_create_settings_table.php')) ?: []),
+            ...(glob(database_path('migrations/*_create_media_table.php')) ?: []),
         ] as $leakedMigration) {
             if (!unlink($leakedMigration)) {
                 throw new \RuntimeException("Failed to remove leaked migration file before test: {$leakedMigration}");
@@ -88,6 +89,23 @@ class TestCase extends Orchestra
             }
 
             (include __DIR__.'/../database/data-migrations/seed_bazaar_settings_defaults.php')->up();
+        })();
+
+        // spatie/laravel-medialibrary's own `media` table (published to the
+        // host by `bazaar:install`, so likewise never copied into this
+        // package's database/migrations/), plus the workbench fixture table
+        // the Media pipeline tests attach images to.
+        (function (): void {
+            if (!\Illuminate\Support\Facades\Schema::hasTable('media')) {
+                (include __DIR__.'/../vendor/spatie/laravel-medialibrary/database/migrations/create_media_table.php.stub')->up();
+            }
+
+            if (!\Illuminate\Support\Facades\Schema::hasTable('media_test_models')) {
+                \Illuminate\Support\Facades\Schema::create('media_test_models', function (\Illuminate\Database\Schema\Blueprint $table): void {
+                    $table->id();
+                    $table->timestamps();
+                });
+            }
         })();
 
         // Several Shell tests instantiate the framework's own base

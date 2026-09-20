@@ -19,14 +19,10 @@ use Tigaphonic\Bazaar\Media\Services\MediaService;
 // ---------------------------------------------------------------------------
 
 it('MediaService::class exists in src/Media/Services/', function () {
-    $this->markTestSkipped('RED — MediaService belum ada; Story 1.10');
-
     expect(class_exists(MediaService::class))->toBeTrue();
 });
 
 it('MediaService::getVariantUrl() returns a string URL for the "webp" conversion', function () {
-    $this->markTestSkipped('RED — MediaService belum ada; Story 1.10');
-
     // Mock Media model — kita uji hanya logic service, bukan disk
     $media = $this->mock(Media::class);
     $media->shouldReceive('getUrl')
@@ -41,8 +37,6 @@ it('MediaService::getVariantUrl() returns a string URL for the "webp" conversion
 });
 
 it('MediaService::getOriginalUrl() returns the original file URL without any conversion', function () {
-    $this->markTestSkipped('RED — MediaService belum ada; Story 1.10');
-
     $media = $this->mock(Media::class);
     $media->shouldReceive('getUrl')
         ->withNoArgs()
@@ -56,8 +50,6 @@ it('MediaService::getOriginalUrl() returns the original file URL without any con
 });
 
 it('MediaService::deleteMedia() removes both original and all conversion variants', function () {
-    $this->markTestSkipped('RED — MediaService belum ada; Story 1.10');
-
     $media = $this->mock(Media::class);
     $media->shouldReceive('delete')
         ->once()
@@ -74,8 +66,6 @@ it('MediaService::deleteMedia() removes both original and all conversion variant
 // ---------------------------------------------------------------------------
 
 it('no domain outside src/Media/ accesses the Media model directly', function () {
-    $this->markTestSkipped('RED — src/Media/ belum ada; Story 1.10');
-
     $domainDirs = glob(__DIR__.'/../../../src/*', GLOB_ONLYDIR);
     $violations = [];
 

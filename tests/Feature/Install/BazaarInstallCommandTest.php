@@ -86,6 +86,16 @@ it('publishes spatie/laravel-settings\' create_settings_table migration to datab
     expect(glob(database_path('migrations/*_create_settings_table.php')))->not->toBeEmpty();
 });
 
+it('publishes spatie/laravel-medialibrary\'s create_media_table migration to database/migrations', function () {
+    foreach (glob(database_path('migrations/*_create_media_table.php')) ?: [] as $leaked) {
+        unlink($leaked);
+    }
+
+    $this->artisan('bazaar:install')->assertSuccessful();
+
+    expect(glob(database_path('migrations/*_create_media_table.php')))->not->toBeEmpty();
+});
+
 it('registers BazaarSettings in spatie/laravel-settings config', function () {
     expect(config('settings.settings'))->toContain(\Tigaphonic\Bazaar\Settings\Support\BazaarSettings::class);
 });
