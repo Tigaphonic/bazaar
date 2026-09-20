@@ -83,3 +83,6 @@
 ## Deferred from: code review (2026-09-19)
 
 - AuthorizationException pada SettingsService [src/Settings/Services/SeoResolverService.php] - Sudah tercatat di deferred-work.md
+
+## Deferred from: code review of spec-1-8-service-layer-integration-monolith (2026-09-20)
+- Test debt from baseline 1.7: The spec carries 4 failing tests from baseline 1.7 (`CreateRoleTest`, `GlobalSettingsAuditTest`, `GlobalSettingsServiceTest`). Deferred because it is a pre-existing issue not caused by the current change.

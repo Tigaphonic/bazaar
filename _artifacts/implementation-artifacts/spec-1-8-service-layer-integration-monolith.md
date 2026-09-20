@@ -39,3 +39,13 @@ Layer Blind Hunter (subagent) dilewati; self-review inline saja.
 | Contoh Livewire awal memakai `__construct` injection | medium | patch | Livewire tidak inject via konstruktor; diganti `mount()`. |
 | Contoh `CatalogService`/`OrderService` memakai signature karangan | medium | patch | Service belum ada; diganti penjelasan pola tanpa signature. |
 | Klaim API Layer sudah tersedia | low | patch | Story 1.9 belum dibangun; kalimat diubah jadi "planned". |
+
+### Review Findings
+- [x] [Review][Patch] Spec status field contradicts sprint-tracker [_artifacts/implementation-artifacts/spec-1-8-service-layer-integration-monolith.md:5]
+- [x] [Review][Defer] Test debt from baseline 1.7 [_artifacts/implementation-artifacts/spec-1-8-service-layer-integration-monolith.md] — deferred: Pre-existing issue from baseline 1.7, not caused by current change.
+
+#### Rejected Findings
+- `false` — README examples omit `try/catch` for `AuthorizationException`: Omitting try/catch in a minimal DI example is a normal convention; exceptions bubbling up is correct behavior.
+- `false` — Test path brittle (`dirname(__DIR__, 3)`): `dirname(__DIR__, 3)` is the standard and correct way to reference the package root in Laravel package tests.
+- `false` — API reference absent: Adding epic tracking links to a user-facing README violates the principle against workflow metadata in source code.
+- `false` — Controller example deviate from spec intent: Documentation correctly advises constructor injection for controllers and `app()` for Blade according to Laravel best practices.
