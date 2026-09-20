@@ -44,7 +44,7 @@ development_status:
   1-6-manage-global-settings: done
   1-7-global-seo-defaults: done
   1-8-service-layer-integration-monolith: done
-  1-9-api-layer-integration-headless: review
+  1-9-api-layer-integration-headless: done
   1-10-media-upload-optimization-shared-pipeline: backlog
   epic-1-retrospective: optional
 

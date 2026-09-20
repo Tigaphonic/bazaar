@@ -169,7 +169,13 @@ Payment and Shipping webhook ingress (Midtrans, RajaOngkir) is never controlled 
 
 ### Authenticate with a per-service Sanctum token
 
-Requests authenticate with a Laravel Sanctum token that identifies your **portal as a service**, not an individual Customer. Add `HasApiTokens` to the User model Bazaar attaches to, run your app's migrations (Sanctum's `personal_access_tokens` table), then issue one token for the portal:
+Requests authenticate with a Laravel Sanctum token that identifies your **portal as a service**, not an individual Customer. Add `HasApiTokens` to the User model Bazaar attaches to. In Laravel 11, you must first publish Sanctum and the API scaffolding by running:
+
+```bash
+php artisan install:api
+```
+
+Then run your app's migrations (Sanctum's `personal_access_tokens` table), and issue one token for the portal:
 
 ```php
 use Laravel\Sanctum\HasApiTokens;

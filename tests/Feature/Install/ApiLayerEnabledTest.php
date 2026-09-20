@@ -2,6 +2,7 @@
 
 namespace Tigaphonic\Bazaar\Tests\Feature\Install;
 
+use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
 use ReflectionClass;
 use Spatie\Permission\Models\Permission;
@@ -28,9 +29,9 @@ class ApiLayerEnabledTest extends ApiEnabledTestCase
     }
 
     /**
-     * @return \Illuminate\Support\Collection<int, string>
+     * @return Collection<int, string>
      */
-    private function apiUris(): \Illuminate\Support\Collection
+    private function apiUris(): Collection
     {
         return collect($this->app['router']->getRoutes()->getRoutes())
             ->map(fn ($route) => $route->uri())
@@ -59,6 +60,8 @@ class ApiLayerEnabledTest extends ApiEnabledTestCase
     #[Test]
     public function api_007_response_is_an_api_resource_with_only_whitelisted_fields(): void
     {
+        $settings = app(SettingsService::class)->get();
+
         $this->withToken($this->portalToken())->getJson(self::STORE_URL)
             ->assertOk()
             ->assertJsonStructure(['data' => [
@@ -70,6 +73,7 @@ class ApiLayerEnabledTest extends ApiEnabledTestCase
                 'seo_default_meta_description',
                 'seo_default_og_image',
             ]])
+            ->assertJsonPath('data.store_name', $settings->store_name)
             ->assertJsonMissingPath('data.payment_gateways')
             ->assertJsonMissingPath('data.shipping_couriers');
     }

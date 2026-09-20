@@ -8,7 +8,7 @@ use Tigaphonic\Bazaar\Http\Api\Middleware\AuthenticateApi;
 // webhooks never belong here: Payment/Shipping register their own always-on
 // routes so a Service-Layer-only install still receives vendor callbacks.
 Route::prefix('bazaar/api/v1')
-    ->middleware(['api', AuthenticateApi::class.':sanctum'])
+    ->middleware([AuthenticateApi::class.':sanctum', 'api'])
     ->group(function (): void {
         Route::get('store', [StoreController::class, 'show']);
     });

@@ -76,6 +76,21 @@ context: [
 
 ## Spec Change Log
 
+### Review Findings
+- [x] [Review][Patch] API Middleware Stack Issues & Laravel 11 Compatibility — routes/api.php
+- [x] [Review][Patch] AuthenticateApi overwrites Accept header unconditionally — src/Http/Api/Middleware/AuthenticateApi.php
+- [x] [Review][Patch] Missing data delegation verification in StoreController test — tests/Feature/Install/ApiLayerEnabledTest.php
+
+### Rejected
+- `false`: API route group lack CORS middleware — Laravel 11/12 menangani CORS secara global di level aplikasi.
+- `false`: API route group lack rate limiting — Grup middleware `api` secara default sudah menyertakan `throttle:api`.
+- `false`: composer.json hard-require laravel/sanctum — Spec (AD-3/AD-20) secara eksplisit mewajibkan dependency ini.
+- `low`: routes/api.php define route without name — Headless client tidak menggunakan route generation Laravel.
+- `false`: Pest test 1.9-API-003 change config runtime — Spec mengakui bahwa perubahan config saat runtime tidak berefek pada registrasi route boot.
+- `false`: Sanctum token ignore ability — Spec secara eksplisit memakai User `manage-settings` permission alih-alih token abilities.
+- `false`: [1.9-API-012] regex preg_match_all expects exactly 1 match — Regex tersebut tidak ada di dalam diff.
+- `false`: Test API-009 mutated without approval — Sesuai Design Notes spec, pengecekan toggle runtime tidak mungkin dilakukan.
+
 ## Review Triage Log
 
 Layer subagent dilewati (tidak diminta eksplisit); self-review inline atas diff.

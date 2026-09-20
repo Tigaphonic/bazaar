@@ -16,7 +16,9 @@ class AuthenticateApi extends Authenticate
 {
     public function handle($request, Closure $next, ...$guards)
     {
-        $request->headers->set('Accept', 'application/json');
+        if (! $request->wantsJson()) {
+            $request->headers->set('Accept', 'application/json');
+        }
 
         return parent::handle($request, $next, ...$guards);
     }
