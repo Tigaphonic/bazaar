@@ -93,3 +93,18 @@ Layer subagent dilewati (tidak diminta eksplisit); self-review inline atas diff.
 - `vendor/bin/pest tests/Feature/Media tests/Unit/Media` -- expected: hijau, 0 skipped
 - `vendor/bin/pest` -- expected: tidak ada kegagalan baru selain 4 baseline 1.7
 - `vendor/bin/phpstan analyse` -- expected: bersih
+
+### Review Findings
+- [x] [Review][Patch] Missing integration verification for original media URL [tests/Unit/Media/MediaServiceTest.php:48]
+- [x] [Review][Patch] BazaarInstallCommand info message missing media [src/Install/Commands/BazaarInstallCommand.php:82]
+- [x] [Review][Patch] MediaService::deleteMedia() silent failure [src/Media/Services/MediaService.php:29]
+- [x] [Review][Defer] ulidMorphs skip / Fixture model bypass ULID [workbench/app/Models/MediaTestModel.php] — deferred: konflik ULID vs vendor migration sudah dicatat di deferred-work.md. Model tes pakai integer agar tes jalan.
+
+**Rejected:**
+- false: Double-wrap URL `url($media->getUrl())` — fungsi `url()` Laravel mengembalikan absolut URL tanpa mengubahnya ganda.
+- false: `HasBazaarMedia` resets state — sudah ditolak human review log di spec (hanya dipakai testing).
+- false: Test checks raw filesystem — `file_exists()` valid karena Testbench default disk adalah lokal.
+- false: Lacks bulk delete — bulk delete tidak diminta spec.
+- false: Hardcodes quality 80 — spec meminta satu-satunya definisi kompresi; tuning bukan scope.
+- false: `composer.json` omits `ext-gd` — dependensi `spatie/laravel-medialibrary` sudah menarik `spatie/image` yang mengatur ekstensi ini.
+- false: Service provider skip — migrasi di-publish via `BazaarInstallCommand`, provider tidak butuh edit.

@@ -27,6 +27,8 @@ class MediaService
      */
     public function deleteMedia(Media $media): void
     {
-        $media->delete();
+        if (!$media->delete()) {
+            throw new \RuntimeException("Failed to delete media ID: {$media->getKey()}");
+        }
     }
 }

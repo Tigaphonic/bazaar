@@ -178,6 +178,23 @@ it('Service Layer exposes webp URL via MediaService::getVariantUrl() — never e
     expect($url)->toContain('webp');
 });
 
+it('Service Layer exposes original URL via MediaService::getOriginalUrl() — never exposes internal paths', function () {
+    Storage::fake('public');
+
+    $model = \Workbench\App\Models\MediaTestModel::create([]);
+    $file  = UploadedFile::fake()->image('favicon.png', 32, 32);
+
+    $media = $model
+        ->addMedia($file)
+        ->toMediaCollection('images');
+
+    $service = app(MediaService::class);
+
+    $url = $service->getOriginalUrl($media);
+
+    expect($url)->toBeUrl();
+});
+
 // ---------------------------------------------------------------------------
 // AC2 (negatif): Konversi TIDAK menimpa original secara permanen
 // ---------------------------------------------------------------------------

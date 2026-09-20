@@ -94,3 +94,6 @@
 - source_spec: `_artifacts/implementation-artifacts/spec-1-10-media-upload-optimization-shared-pipeline.md`
   summary: Wiring logo/favicon/og_image Settings ke pipeline media dan komponen Dropzone Shell + hint line (AC3) belum ada; 4 test browser `tests/Browser/Media/dropzone-hint.spec.ts` tetap `test.skip`.
   evidence: Keputusan Binyo saat planning 1.10: story ini hanya pipeline; field Settings masih string di `BazaarSettings` dan Shell belum punya Dropzone.
+
+## Deferred from: code review (2026-09-20) spec-1-10-media-upload-optimization-shared-pipeline.md
+- ulidMorphs skip / Fixture model bypass ULID: konflik ULID vs vendor migration sudah dicatat di deferred-work.md. Model tes pakai integer agar tes jalan.
