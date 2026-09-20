@@ -151,6 +151,18 @@ class BazaarServiceProvider extends PackageServiceProvider
         $this->registerShellTheme();
         $this->registerShellRenderHooks();
         $this->registerAuditTrail();
+        $this->registerApiRoutes();
+    }
+
+    /**
+     * The only route file gated by bazaar.api.enabled. Webhook ingress lives
+     * in Payment/Shipping's own always-on routes (AD-11), never here.
+     */
+    private function registerApiRoutes(): void
+    {
+        if (config('bazaar.api.enabled', false) === true) {
+            $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
+        }
     }
 
     /**

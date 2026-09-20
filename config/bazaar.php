@@ -64,6 +64,16 @@ return [
     ],
 
     /*
+     * Optional headless API Layer (FR-35). Off by default: no Bazaar API route
+     * is registered until a host app opts in. Read at boot, so run
+     * `php artisan route:cache` again after changing it. Payment/Shipping
+     * webhook ingress is never governed by this flag (AD-11).
+     */
+    'api' => [
+        'enabled' => false,
+    ],
+
+    /*
      * Audit Trail (FR-20) records every create/update/delete of every
      * Eloquent model automatically. Models listed here (or subclasses) are
      * skipped — use it for high-churn, non-business rows.

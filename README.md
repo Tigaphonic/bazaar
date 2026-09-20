@@ -148,7 +148,52 @@ Rules that apply to every Service:
 - **Cross-domain calls go through Services only.** Bazaar follows the same rule internally, so your host code and Bazaar's own domains use the same entry points.
 - **Events are passive.** Bazaar dispatches Laravel Events on domain changes; listen to them in your app if you need to react. It never ships a broadcast driver.
 
-Building a headless frontend (Next.js, Vue) instead? An optional API Layer that exposes these same Services over HTTP is planned as a separate opt-in.
+Building a headless frontend (Next.js, Vue) instead? See [API Layer (Headless)](#api-layer-headless) below.
+
+## API Layer (Headless)
+
+An optional, thin HTTP layer over the same Services, for a separate frontend (Next.js, Vue). It is **off by default**: until you opt in, Bazaar registers no API route in your app.
+
+### Enable it
+
+```php
+// config/bazaar.php
+'api' => [
+    'enabled' => true,   // bazaar.api.enabled
+],
+```
+
+The flag is read at boot. If you cache routes, run `php artisan route:cache` again after changing it.
+
+Payment and Shipping webhook ingress (Midtrans, RajaOngkir) is never controlled by this flag. Those routes are always registered, so a pure Service Layer install still receives vendor callbacks.
+
+### Authenticate with a per-service Sanctum token
+
+Requests authenticate with a Laravel Sanctum token that identifies your **portal as a service**, not an individual Customer. Add `HasApiTokens` to the User model Bazaar attaches to, run your app's migrations (Sanctum's `personal_access_tokens` table), then issue one token for the portal:
+
+```php
+use Laravel\Sanctum\HasApiTokens;
+
+class User extends Authenticatable
+{
+    use HasApiTokens;
+}
+
+$token = $user->createToken('portal-service')->plainTextToken;
+```
+
+Store the token in your portal's server-side environment. Never ship it to a browser.
+
+Bazaar's Services authorize the signed-in user, so the token's owner needs the `manage-settings` permission to read store settings. Without it the API answers `403`.
+
+### Call the API
+
+```bash
+curl -H "Authorization: Bearer $TOKEN" -H "Accept: application/json" \
+  https://your-app.test/bazaar/api/v1/store
+```
+
+Responses are Laravel API Resources (`{"data": {...}}`); errors use Laravel's default `message` / `errors` envelope. Routes live under `/bazaar/api/v1`. Later domains add their own endpoints there, each delegating to the same Service you would call in-process.
 
 ## Testing
 
